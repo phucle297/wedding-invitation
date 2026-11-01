@@ -1,0 +1,19 @@
+export const date = {
+  isoCeremony: "2026-12-06T09:30:00+07:00",
+  isoDayEnd: "2026-12-06T23:59:59+07:00",
+  display: "06.12.2026",
+  weekday: "Chủ Nhật",
+  lunar: "Nhằm ngày 28 tháng 10 năm Bính Ngọ",
+  markedDay: 6,
+  month: 12,
+  year: 2026,
+  ceremonyTime: "09:30",
+  monthName: "Tháng Mười Hai",
+  gate: "06 · 12 · 2026",
+  aria: "6 tháng 12 năm 2026",
+  parts: [
+    { value: "06", label: "Ngày" },
+    { value: "12", label: "Tháng" },
+    { value: "2026", label: "Năm" },
+  ],
+};

@@ -1,6 +1,0 @@
-pre-commit:
-  jobs:
-    - name: biome
-      glob: "*.{css,html,js,json,jsonc,ts,vue}"
-      run: bunx biome check --write --no-errors-on-unmatched {staged_files}
-      stage_fixed: true
