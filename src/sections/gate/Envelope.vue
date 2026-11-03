@@ -292,4 +292,82 @@ defineProps({
 @keyframes seal-glow {
   50% { filter: drop-shadow(0 0 12px rgba(236, 204, 140, 0.55)); }
 }
+
+@media screen and (min-width: 1024px) {
+  .frame {
+    width: min(760px, calc(100vw - 112px), calc(160svh - 153.6px));
+    height: auto;
+    aspect-ratio: 8 / 5;
+    container-type: inline-size;
+  }
+
+  .velvet {
+    box-shadow:
+      inset 0 0 0 1px rgba(164, 126, 52, 0.3),
+      0 24px 64px rgba(128, 97, 36, 0.14);
+  }
+
+  .face {
+    top: 12%;
+  }
+
+  .welcome {
+    font-size: 1.5cqw;
+  }
+
+  .script {
+    margin-top: 1.3cqw;
+    font-size: 11cqw;
+  }
+
+  .swash {
+    width: 30cqw;
+    height: 3.5cqw;
+    margin-top: -0.8cqw;
+  }
+
+  .seal {
+    width: 12cqw;
+    height: 12cqw;
+  }
+
+  .lower {
+    top: 74%;
+  }
+
+  .salute {
+    font-size: 1.6cqw;
+  }
+
+  .guest {
+    margin-top: 0.8cqw;
+    font-size: 5.5cqw;
+  }
+
+  .hint {
+    bottom: 4%;
+    font-size: 1.2cqw;
+  }
+
+  .slot {
+    left: 8%;
+    right: 8%;
+    top: 18%;
+    height: 64%;
+  }
+
+  .xi {
+    font-size: 8.8cqw;
+  }
+
+  .names {
+    margin-top: 1cqw;
+    font-size: 5.5cqw;
+  }
+
+  .when {
+    margin-top: 1.5cqw;
+    font-size: 1.8cqw;
+  }
+}
 </style>
