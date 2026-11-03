@@ -1,5 +1,6 @@
 export const date = {
   isoCeremony: "2026-12-06T09:30:00+07:00",
+  isoReception: "2026-12-06T12:00:00+07:00",
   isoDayEnd: "2026-12-06T23:59:59+07:00",
   display: "06.12.2026",
   weekday: "Chủ Nhật",
@@ -8,6 +9,7 @@ export const date = {
   month: 12,
   year: 2026,
   ceremonyTime: "09:30",
+  receptionTime: "12:00",
   monthName: "Tháng Mười Hai",
   gate: "06 · 12 · 2026",
   aria: "6 tháng 12 năm 2026",

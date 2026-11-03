@@ -9,8 +9,6 @@ export const rsvp = {
   submit: "Tạo lời xác nhận",
   absentValue: "Chưa sắp xếp được",
   choices: [
-    { value: "Cả lễ tại tư gia và tiệc tại Galaxy", label: "Cả lễ tại tư gia và tiệc" },
-    { value: "Lễ tại tư gia, 09:30", label: "Lễ tại tư gia, 09:30" },
     { value: "Tiệc tại Minh Toàn Galaxy, đón khách 11:00", label: "Tiệc tại Galaxy, đón khách 11:00" },
     { value: "Chưa sắp xếp được", label: "Chưa sắp xếp được" },
   ],

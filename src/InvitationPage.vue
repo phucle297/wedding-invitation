@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useInvitationMotion } from "./composables/useInvitationMotion.js";
+import BackToTop from "./components/BackToTop.vue";
 import StorySections from "./sections/story/StorySections.vue";
 import GuestInfo from "./sections/reception/GuestInfo.vue";
 import AlbumSection from "./sections/album/AlbumSection.vue";
@@ -42,6 +43,7 @@ useInvitationMotion(page, () => props.entered);
       <RsvpSection />
       <Colophon />
     </div>
+    <BackToTop v-if="entered" />
   </main>
 </template>
 

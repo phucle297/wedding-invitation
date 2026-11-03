@@ -46,7 +46,7 @@ import { hero } from "./content.js";
   isolation: isolate;
   overflow: clip;
   min-height: 640px;
-  height: 860px;
+  height: 800px;
 }
 .hero-photo {
   position: absolute;
@@ -73,7 +73,7 @@ import { hero } from "./content.js";
   font-family: var(--script);
   font-size: 100px;
   line-height: 0.76;
-  margin: 0 0 70px;
+  margin: 0 0 48px;
   color: var(--ink);
   width: 80%;
 }
@@ -152,9 +152,9 @@ h1 em {
 }
 @media (max-width: 600px) {
   .hero {
-    height: 167vw;
-    min-height: 560px;
-    max-height: 840px;
+    height: 150vw;
+    min-height: 530px;
+    max-height: 760px;
   }
   .hero-copy {
     padding-top: 9%;

@@ -3,7 +3,7 @@ import { timeline } from "./content.js";
 </script>
 
 <template>
-  <figure class="photo-interlude">
+  <figure class="photo-interlude together-cover">
     <img
       src="/assets/album/04.jpg"
       alt="Duy Phúc và Linh Đan trong khu vườn"
@@ -35,10 +35,11 @@ import { timeline } from "./content.js";
         />
         <circle cx="55" cy="10" r="5" fill="currentColor" />
         <circle cx="145" cy="490" r="5" fill="currentColor" />
+        <circle class="timeline-cursor" cx="55" cy="10" r="6" />
       </svg>
       <svg
         class="timeline-desktop"
-        viewBox="0 0 1100 90"
+        viewBox="0 -36 1100 126"
         preserveAspectRatio="none"
         fill="none"
         aria-hidden="true"
@@ -54,6 +55,7 @@ import { timeline } from "./content.js";
         />
         <circle cx="50" cy="65" r="4" fill="currentColor" />
         <circle cx="1050" cy="65" r="4" fill="currentColor" />
+        <circle class="timeline-cursor" cx="50" cy="65" r="6" />
       </svg>
       <ol class="day">
         <li v-for="(item, index) in timeline.items" :key="item.datetime">
@@ -120,11 +122,20 @@ import { timeline } from "./content.js";
 .timeline-base {
   stroke: var(--line);
   stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
 }
 .timeline-progress {
-  stroke: var(--bronze);
-  stroke-width: 1.2;
+  stroke: var(--espresso);
+  stroke-width: 2.5;
+  stroke-linecap: round;
   stroke-dasharray: 1;
+}
+.timeline-cursor {
+  visibility: hidden;
+  fill: var(--espresso);
+  stroke: var(--cream);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 .day {
   position: relative;

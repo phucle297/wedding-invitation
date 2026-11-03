@@ -3,7 +3,7 @@ import { useCountdown } from "../../composables/useCountdown.js";
 import { countdown } from "./content.js";
 
 const { days, hours, minutes, seconds, note } = useCountdown({
-  ceremony: countdown.isoCeremony,
+  target: countdown.isoReception,
   dayEnd: countdown.isoDayEnd,
   notes: countdown.notes,
 });
@@ -19,7 +19,7 @@ const { days, hours, minutes, seconds, note } = useCountdown({
       <h2 id="time-title">{{ countdown.title }}</h2>
       <p class="lead">{{ countdown.lead }}</p>
     </div>
-    <div class="count" role="timer" aria-label="Thời gian còn lại đến hôn lễ">
+    <div class="count" role="timer" aria-label="Thời gian còn lại đến giờ tiệc">
       <div>
         <b>{{ days }}</b
         ><span>ngày</span>

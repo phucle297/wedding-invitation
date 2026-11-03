@@ -4,19 +4,19 @@ function pad(value) {
   return String(value).padStart(2, "0");
 }
 
-export function useCountdown({ ceremony, dayEnd, notes }) {
+export function useCountdown({ target, dayEnd, notes }) {
   const days = ref("--");
   const hours = ref("--");
   const minutes = ref("--");
   const seconds = ref("--");
   const note = ref("");
-  const ceremonyAt = new Date(ceremony).getTime();
+  const targetAt = new Date(target).getTime();
   const endAt = new Date(dayEnd).getTime();
   let timer = 0;
 
   function tick() {
     const now = Date.now();
-    if (now >= endAt || now >= ceremonyAt) {
+    if (now >= endAt || now >= targetAt) {
       days.value = "00";
       hours.value = "00";
       minutes.value = "00";
@@ -24,7 +24,7 @@ export function useCountdown({ ceremony, dayEnd, notes }) {
       note.value = now >= endAt ? notes.after : notes.during;
       return;
     }
-    const total = Math.floor((ceremonyAt - now) / 1000);
+    const total = Math.floor((targetAt - now) / 1000);
     days.value = pad(Math.floor(total / 86400));
     hours.value = pad(Math.floor((total % 86400) / 3600));
     minutes.value = pad(Math.floor((total % 3600) / 60));

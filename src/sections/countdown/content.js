@@ -1,12 +1,12 @@
 import { date } from "../../content/date.js";
 
 export const countdown = {
-  title: "Đếm đến giờ làm lễ",
-  lead: `${date.ceremonyTime}, ${date.weekday} ${date.display}`,
-  isoCeremony: date.isoCeremony,
+  title: "Đếm đến giờ tiệc",
+  lead: `${date.receptionTime}, ${date.weekday} ${date.display}`,
+  isoReception: date.isoReception,
   isoDayEnd: date.isoDayEnd,
   notes: {
-    during: "Hôm nay là ngày làm lễ.",
+    during: "Đã đến giờ chung vui!",
     after: "Cảm ơn quý khách đã chung vui.",
   },
 };

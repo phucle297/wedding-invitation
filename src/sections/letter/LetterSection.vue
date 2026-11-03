@@ -79,7 +79,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
 .envelope-lining {
   position: absolute;
   inset: -30% 0 0;
-  background: #c9c9c2;
+  background: #ddc9a7;
   clip-path: polygon(0 30%, 50% 0, 100% 30%, 100% 100%, 0 100%);
 }
 .keepsake-photo {
@@ -95,14 +95,14 @@ import CallaSprig from "../../components/CallaSprig.vue";
 .envelope-pocket {
   position: absolute;
   inset: 0;
-  background: linear-gradient(145deg, #f2f2ee, #d6d6ce);
+  background: linear-gradient(145deg, var(--cream), var(--champagne-shade));
   clip-path: polygon(0 0, 50% 48%, 100% 0, 100% 100%, 0 100%);
 }
 .envelope-pocket::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(20deg, #fafaf8, #e2e2db);
+  background: linear-gradient(20deg, var(--cream), var(--champagne));
   clip-path: polygon(0 100%, 50% 48%, 100% 100%);
 }
 .wax-seal {
@@ -114,11 +114,11 @@ import CallaSprig from "../../components/CallaSprig.vue";
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: #8c8a7e;
+  background: linear-gradient(135deg, #bca077, #80643e);
   color: #ffffff;
   box-shadow:
-    inset 0 0 0 4px #b8b6a9,
-    1px 3px 5px #45453f33;
+    inset 0 0 0 4px #d8c09b,
+    1px 3px 5px #68503326;
   font: 1.3rem var(--display);
 }
 .wax-seal span {
@@ -150,10 +150,10 @@ import CallaSprig from "../../components/CallaSprig.vue";
   right: 4%;
   bottom: 1%;
   padding: 20px 4px;
-  background: #ffffff;
+  background: var(--cream);
   border-radius: 40px 40px 30px 30px;
-  border: 1px solid #b8b7ae;
-  outline: 4px solid #ffffff;
+  border: 1px solid var(--bronze);
+  outline: 4px solid var(--cream);
   text-align: center;
   box-shadow: 4px 8px 8px #45453f1a;
   transform: rotate(7deg);
@@ -171,7 +171,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
   display: block;
   width: 36px;
   height: 70px;
-  background: repeating-linear-gradient(90deg, #b0aea1 0 1px, #e8e7e0 1px 3px);
+  background: repeating-linear-gradient(90deg, #bca077 0 1px, var(--champagne-shade) 1px 3px);
   clip-path: polygon(45% 0, 55% 0, 65% 65%, 100% 100%, 0 100%, 35% 65%);
   margin: 12px auto -85px;
 }

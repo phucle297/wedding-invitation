@@ -6,7 +6,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
 </script>
 
 <template>
-  <section class="hotel satin" aria-labelledby="hotel-title">
+  <section class="hotel" aria-labelledby="hotel-title">
     <div class="venue">
       <p class="eyebrow">Trân trọng kính mời</p>
       <p class="invitation-guest">Bạn và người thương</p>
@@ -57,6 +57,8 @@ import CallaSprig from "../../components/CallaSprig.vue";
 .hotel {
   padding: 10px 0 clamp(56px, 8vw, 84px);
   color: var(--ink);
+  background-color: var(--champagne);
+  background-image: var(--paper-grain);
 }
 
 .venue {

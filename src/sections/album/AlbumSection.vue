@@ -130,7 +130,7 @@ async function toggleAlbum() {
 
 <style scoped>
 .album-cover {
-  aspect-ratio: 1.6;
+  aspect-ratio: 1.1;
 }
 .album-heading {
   text-align: center;

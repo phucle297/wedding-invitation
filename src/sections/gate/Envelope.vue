@@ -106,8 +106,8 @@ defineProps({
   left: 0;
   right: 0;
   bottom: 0;
-  height: 42px;
-  background: linear-gradient(transparent, rgba(128, 97, 36, 0.18));
+  height: 24px;
+  background: linear-gradient(transparent, rgba(128, 97, 36, 0.06));
   opacity: 0;
   pointer-events: none;
 }
@@ -128,7 +128,7 @@ defineProps({
     radial-gradient(ellipse at 50% 0%, #fff, transparent 58%),
     #fffdf7;
   color: #806124;
-  box-shadow: 0 18px 22px rgba(128, 97, 36, 0.16);
+  box-shadow: 0 8px 14px rgba(128, 97, 36, 0.07);
   transform: translateY(108%);
   transition: transform 0.95s cubic-bezier(0.16, 0.84, 0.24, 1) 0.42s;
 }
@@ -304,7 +304,7 @@ defineProps({
   .velvet {
     box-shadow:
       inset 0 0 0 1px rgba(164, 126, 52, 0.3),
-      0 24px 64px rgba(128, 97, 36, 0.14);
+      0 12px 36px rgba(128, 97, 36, 0.07);
   }
 
   .face {

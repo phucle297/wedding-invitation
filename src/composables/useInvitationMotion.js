@@ -73,8 +73,46 @@ export function useInvitationMotion(root, entered) {
             });
           }
 
+          select("h2, .invitation-guest, .photo-interlude figcaption").forEach((heading) => {
+            const previous = heading.previousElementSibling;
+            const next = heading.nextElementSibling;
+            const eyebrow = previous?.matches(".eyebrow") ? previous : null;
+            const description = next?.matches(".lead, .eyebrow, .invitation-note") ? next : null;
+            const entrance = gsap.timeline({
+              scrollTrigger: {
+                trigger: heading,
+                start: "top 88%",
+                toggleActions: "play none none reverse",
+              },
+            });
+            if (eyebrow) {
+              entrance.from(eyebrow, {
+                y: 14,
+                autoAlpha: 0,
+                duration: 0.65,
+                ease: "power2.out",
+              }, 0);
+            }
+            entrance.from(heading, {
+              y: desktop ? 42 : 28,
+              scale: 0.96,
+              autoAlpha: 0,
+              transformOrigin: "50% 100%",
+              duration: 1.05,
+              ease: "power3.out",
+            }, eyebrow ? 0.12 : 0);
+            if (description) {
+              entrance.from(description, {
+                y: 16,
+                autoAlpha: 0,
+                duration: 0.8,
+                ease: "power2.out",
+              }, 0.28);
+            }
+          });
+
           reveal(
-            ".letter-copy > *",
+            ".letter-copy > :not(h2):not(.eyebrow)",
             {
               y: 12,
               autoAlpha: 0,
@@ -92,7 +130,7 @@ export function useInvitationMotion(root, entered) {
             ".families",
           );
           reveal(
-            ".place > *",
+            ".place > :not(h2):not(.eyebrow)",
             {
               y: 14,
               autoAlpha: 0,
@@ -108,23 +146,45 @@ export function useInvitationMotion(root, entered) {
           });
           select(".day li").forEach((item, index) => {
             gsap.from(item, {
-              x: (index % 2 ? -1 : 1) * (desktop ? 30 : 14),
+              y: desktop ? 20 : 0,
+              x: desktop ? 0 : (index % 2 ? -1 : 1) * 14,
               autoAlpha: 0,
-              duration: 0.85,
-              delay: index * 0.12,
               ease: "power2.out",
               scrollTrigger: {
-                trigger: item,
-                start: "top 88%",
-                end: "top 55%",
-                scrub: 0.6,
+                trigger: desktop ? select(".day-path")[0] : item,
+                start: desktop ? `top ${80 - index * 10}%` : "top 85%",
+                end: desktop ? `bottom ${80 - index * 10}%` : "center 65%",
+                scrub: true,
+              },
+            });
+            gsap.from(item.querySelector(".day-icon"), {
+              scale: 0.75,
+              rotation: -12,
+              transformOrigin: "center",
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: desktop ? select(".day-path")[0] : item,
+                start: desktop ? `top ${80 - index * 10}%` : "top 85%",
+                end: desktop ? `bottom ${80 - index * 10}%` : "center 65%",
+                scrub: true,
               },
             });
           });
-          reveal(".vow blockquote", {
-            scale: 0.96,
+          gsap.from(select(".vow-word"), {
+            y: desktop ? 48 : 32,
+            x: (index) => index % 2 ? 10 : -10,
+            rotation: (index) => index % 2 ? 7 : -7,
+            scale: 0.92,
             autoAlpha: 0,
-            duration: 1.2,
+            transformOrigin: "50% 100%",
+            duration: 1.1,
+            stagger: 0.09,
+            ease: "back.out(1.25)",
+            scrollTrigger: {
+              trigger: select(".vow blockquote")[0],
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
           });
           reveal(
             ".count > div",
@@ -146,11 +206,6 @@ export function useInvitationMotion(root, entered) {
             ".guest-details",
           );
           reveal(".rsvp form", { y: 16, opacity: 0, duration: 0.7 });
-          reveal(".thanks h2", {
-            clipPath: "inset(0 100% 0 0)",
-            autoAlpha: 0,
-            duration: 1.4,
-          });
 
           const stationery = gsap.timeline({
             scrollTrigger: {
@@ -230,20 +285,57 @@ export function useInvitationMotion(root, entered) {
               ease: "sine.out",
             });
 
-          gsap.fromTo(
-            select(".timeline-progress"),
-            { strokeDashoffset: 1 },
-            {
-              strokeDashoffset: 0,
-              ease: "none",
-              scrollTrigger: {
-                trigger: select(".day-path")[0],
-                start: "top 70%",
-                end: "bottom 65%",
-                scrub: 0.6,
+          const timelineSvg = select(
+            desktop ? ".timeline-desktop" : ".timeline-line",
+          )[0];
+          const timelinePath = timelineSvg.querySelector(".timeline-progress");
+          const timelineCursor = timelineSvg.querySelector(".timeline-cursor");
+          const pathLength = timelinePath.getTotalLength();
+          const lineProgress = { value: 0 };
+          const setLineOffset = gsap.quickSetter(timelinePath, "strokeDashoffset");
+          const setCursor = gsap.quickSetter(timelineCursor, "attr");
+          const firstPoint = timelinePath.getPointAtLength(0);
+          function positionCursor(point) {
+            const scaleX = timelineSvg.viewBox.baseVal.width / timelineSvg.clientWidth;
+            const scaleY = timelineSvg.viewBox.baseVal.height / timelineSvg.clientHeight;
+            // The path stretches with its container; the thumb stays circular in pixels.
+            setCursor({
+              cx: point.x,
+              cy: point.y,
+              transform: `translate(${point.x} ${point.y}) scale(${scaleX} ${scaleY}) translate(${-point.x} ${-point.y})`,
+            });
+          }
+          gsap.set(timelinePath, { strokeDashoffset: 1 });
+          gsap.set(timelineCursor, {
+            autoAlpha: 1,
+            attr: { cx: firstPoint.x, cy: firstPoint.y, transform: "" },
+          });
+          positionCursor(firstPoint);
+
+          gsap.to(lineProgress, {
+            value: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: select(".day-path")[0],
+              start: desktop ? "top 75%" : "top 65%",
+              end: desktop ? "bottom 40%" : "bottom 65%",
+              scrub: true,
+              onRefresh() {
+                positionCursor({
+                  x: timelineCursor.cx.baseVal.value,
+                  y: timelineCursor.cy.baseVal.value,
+                });
               },
             },
-          );
+            onUpdate() {
+              // Give horizontal segments their own scroll distance instead of skipping them.
+              const distance = lineProgress.value * pathLength;
+              const point = timelinePath.getPointAtLength(distance);
+              // Keep fractional offsets; CSS tween auto-rounding makes a 0–1 path jump.
+              setLineOffset(1 - distance / pathLength);
+              positionCursor(point);
+            },
+          });
 
           select(".photo-interlude").forEach((photo, index) => {
             const direction = index % 2 ? -1 : 1;
@@ -265,19 +357,27 @@ export function useInvitationMotion(root, entered) {
           });
 
           const journey = select(".journey-track")[0];
-          gsap.fromTo(
+          gsap.set(select(".journey-cursor"), { autoAlpha: 1 });
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: journey,
+              start: "top 65%",
+              end: "bottom 65%",
+              scrub: true,
+            },
+          }).fromTo(
             select(".journey-progress"),
             { scaleY: 0 },
             {
               scaleY: 1,
               ease: "none",
-              scrollTrigger: {
-                trigger: journey,
-                start: "top 55%",
-                end: "bottom 55%",
-                scrub: 0.5,
-              },
             },
+            0,
+          ).fromTo(
+            select(".journey-cursor"),
+            { top: "0%" },
+            { top: "100%", ease: "none" },
+            0,
           );
           select(".journey-scene").forEach((scene, index) => {
             const frame = scene.querySelector(".journey-frame");
@@ -347,6 +447,13 @@ export function useInvitationMotion(root, entered) {
             });
           });
           ScrollTrigger.refresh();
+          return () => {
+            // quickSetter writes are not tweens, so restore them on media changes.
+            timelinePath.style.removeProperty("stroke-dashoffset");
+            timelineCursor.setAttribute("cx", firstPoint.x);
+            timelineCursor.setAttribute("cy", firstPoint.y);
+            timelineCursor.removeAttribute("transform");
+          };
         },
         root.value,
       );

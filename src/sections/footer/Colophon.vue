@@ -64,7 +64,8 @@ import { phrases } from "../../content/phrases.js";
   text-align: center;
   padding: 44px 24px;
   color: var(--ink);
-  background: #edede9;
+  background: var(--champagne);
+  border-top: 1px solid var(--line);
 }
 .colophon::before {
   position: absolute;

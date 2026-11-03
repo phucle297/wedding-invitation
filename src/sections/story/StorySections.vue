@@ -70,12 +70,13 @@ const scenes = [
   <section class="journey" id="hanh-trinh" aria-labelledby="journey-title">
     <div class="section-heading">
       <p class="eyebrow">Một dòng ký ức</p>
-      <h2 id="journey-title">Hành trình qua ảnh</h2>
+      <h2 id="journey-title">Hành trình của chúng mình</h2>
       <p class="lead">Ba chương, một hành trình — vẫn đang tiếp tục.</p>
     </div>
     <div class="journey-track">
       <div class="journey-line" aria-hidden="true">
         <span class="journey-progress"></span>
+        <span class="journey-cursor"></span>
       </div>
       <article v-for="scene in scenes" :key="scene.title" class="journey-scene">
         <figure class="journey-frame">
@@ -98,7 +99,16 @@ const scenes = [
 
   <section class="block vow" aria-labelledby="vow-title">
     <p class="eyebrow" id="vow-title">Lời hẹn</p>
-    <blockquote>“Cùng nhau, đi tiếp<br />những ngày đẹp nhất.”</blockquote>
+    <blockquote aria-label="“Cùng nhau, đi tiếp những ngày đẹp nhất.”">
+      <span class="vow-line" aria-hidden="true">
+        <span class="vow-word">“Cùng</span> <span class="vow-word">nhau,</span>{{ " " }}
+        <span class="vow-word">đi</span> <span class="vow-word">tiếp</span>
+      </span>
+      <span class="vow-line" aria-hidden="true">
+        <span class="vow-word">những</span> <span class="vow-word">ngày</span>{{ " " }}
+        <span class="vow-word">đẹp</span> <span class="vow-word">nhất.”</span>
+      </span>
+    </blockquote>
     <span class="fine-rule" aria-hidden="true"></span>
   </section>
 </template>
@@ -116,10 +126,10 @@ const scenes = [
 }
 .couple-section {
   position: relative;
-  color: #ffffff;
-  background-color: #68685f;
+  color: var(--ink);
+  background-color: var(--champagne);
   background-image:
-    var(--paper-grain), linear-gradient(125deg, #77776e, #606059);
+    var(--paper-grain), linear-gradient(125deg, var(--cream), var(--champagne));
 }
 .couple-section .eyebrow,
 .couple-section h2 {
@@ -204,15 +214,31 @@ figcaption em {
   left: 10px;
   top: 0;
   bottom: 0;
-  width: 1px;
+  width: 1.2px;
   background: var(--line);
 }
 .journey-progress {
   display: block;
-  width: 100%;
+  position: absolute;
+  left: calc(50% - 1.25px);
+  width: 2.5px;
   height: 100%;
-  background: var(--bronze);
+  border-radius: 999px;
+  background: var(--espresso);
   transform-origin: top;
+}
+.journey-cursor {
+  position: absolute;
+  z-index: 1;
+  visibility: hidden;
+  top: 0;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--cream);
+  border-radius: 50%;
+  background: var(--espresso);
+  transform: translate(-50%, -50%);
 }
 .journey-scene {
   position: relative;
@@ -265,6 +291,12 @@ figcaption em {
 .vow blockquote {
   font: 2.8rem/1.4 var(--script-vi);
   margin: 28px 0;
+}
+.vow-line {
+  display: block;
+}
+.vow-word {
+  display: inline-block;
 }
 @media (max-width: 600px) {
   .portraits {
