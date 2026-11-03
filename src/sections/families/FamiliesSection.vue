@@ -3,7 +3,7 @@ import { families } from "./content.js";
 </script>
 
 <template>
-  <section class="block" aria-labelledby="family-title">
+  <section class="block family-section" aria-labelledby="family-title">
     <h2 id="family-title">{{ families.title }}</h2>
     <div class="families">
       <article v-for="group in families.groups" :key="group.label">

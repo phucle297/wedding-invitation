@@ -1,5 +1,8 @@
 <script setup>
-import { onBeforeUnmount, watch } from "vue";
+import { ref } from "vue";
+import { useInvitationMotion } from "./composables/useInvitationMotion.js";
+import StorySections from "./sections/story/StorySections.vue";
+import GuestInfo from "./sections/reception/GuestInfo.vue";
 import AlbumSection from "./sections/album/AlbumSection.vue";
 import CeremonySection from "./sections/ceremony/CeremonySection.vue";
 import Colophon from "./sections/footer/Colophon.vue";
@@ -16,56 +19,28 @@ const props = defineProps({
   entered: { type: Boolean, default: false },
 });
 
-defineEmits(["replay"]);
-
-const selector = "#invite .hero, #invite .block, #invite .hotel, #invite .colophon";
-let observer;
-
-function clearReveal() {
-  observer?.disconnect();
-  observer = null;
-  document.querySelectorAll(`${selector}, #invite .is-in`).forEach((node) => {
-    node.classList.remove("reveal", "is-in");
-  });
-}
-
-function armReveal() {
-  clearReveal();
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const nodes = document.querySelectorAll(selector);
-  nodes.forEach((node) => node.classList.add("reveal"));
-  observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      entry.target.classList.add("is-in");
-      observer.unobserve(entry.target);
-    }
-  }, { threshold: 0.16, rootMargin: "0px 0px -8% 0px" });
-  nodes.forEach((node) => observer.observe(node));
-}
-
-watch(() => props.entered, (value) => {
-  if (value) armReveal();
-  else clearReveal();
-});
-
-onBeforeUnmount(() => observer?.disconnect());
+const page = ref(null);
+useInvitationMotion(page, () => props.entered);
 </script>
 
 <template>
-  <main id="invite" class="invite" tabindex="-1">
+  <main id="invite" ref="page" class="invite" tabindex="-1" :inert="!entered">
     <div class="sheet">
       <SiteNav />
       <HeroSection />
       <LetterSection />
-      <FamiliesSection />
-      <CeremonySection />
-      <ReceptionSection />
+      <div class="invitation-details">
+        <FamiliesSection />
+        <CeremonySection />
+        <ReceptionSection />
+      </div>
       <TimelineSection />
+      <StorySections />
       <CountdownSection />
-      <AlbumSection />
+      <AlbumSection :entered="entered" />
+      <GuestInfo />
       <RsvpSection />
-      <Colophon @replay="$emit('replay')" />
+      <Colophon />
     </div>
   </main>
 </template>
@@ -75,12 +50,12 @@ onBeforeUnmount(() => observer?.disconnect());
   min-height: 100vh;
 }
 
-.invite:focus { outline: none; }
+.invite:focus {
+  outline: none;
+}
 
 .sheet {
   width: 100%;
   min-height: 100vh;
-  background-color: var(--paper);
-  background-image: var(--silk);
 }
 </style>

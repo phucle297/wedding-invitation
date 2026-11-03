@@ -1,16 +1,32 @@
 <script setup>
 import { reception } from "./content.js";
+import { couple } from "../../content/couple.js";
+import { date } from "../../content/date.js";
+import CallaSprig from "../../components/CallaSprig.vue";
 </script>
 
 <template>
-  <section class="hotel" aria-labelledby="hotel-title">
+  <section class="hotel satin" aria-labelledby="hotel-title">
     <div class="venue">
+      <p class="eyebrow">Trân trọng kính mời</p>
+      <p class="invitation-guest">Bạn và người thương</p>
+      <p class="invitation-note">
+        Đến dự bữa tiệc chung vui cùng<br />gia đình chúng tôi
+      </p>
+      <p class="invitation-names">
+        {{ couple.groom.short }}<span>&amp;</span>{{ couple.bride.short }}
+      </p>
+      <div class="invitation-date">
+        <span>{{ date.weekday }}</span
+        ><strong>{{ date.display }}</strong>
+      </div>
+      <p class="invitation-lunar">{{ date.lunar }}</p>
       <p class="eyebrow">{{ reception.eyebrow }}</p>
       <h2 id="hotel-title">{{ reception.name }}</h2>
       <p class="hall">{{ reception.hall }}</p>
       <address>
         <template v-for="(line, index) in reception.addressLines" :key="line">
-          {{ line }}<br v-if="index < reception.addressLines.length - 1">
+          {{ line }}<br v-if="index < reception.addressLines.length - 1" />
         </template>
       </address>
       <dl class="hours">
@@ -20,11 +36,20 @@ import { reception } from "./content.js";
         </div>
       </dl>
       <div class="actions">
-        <a class="btn btn-ink" :href="reception.mapUrl" target="_blank" rel="noopener noreferrer">{{ reception.mapLabel }}</a>
-        <a class="call" :href="reception.phoneHref">{{ reception.phoneLabel }}</a>
+        <a
+          class="btn btn-ink"
+          :href="reception.mapUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ reception.mapLabel }}</a
+        >
+        <a class="call" :href="reception.phoneHref">{{
+          reception.phoneLabel
+        }}</a>
       </div>
       <p class="fine">{{ reception.phoneNote }}</p>
     </div>
+    <CallaSprig class="venue-botanical" />
   </section>
 </template>
 
@@ -77,7 +102,9 @@ address {
   border-top: 1px solid var(--line);
 }
 
-.hours div { padding-top: 12px; }
+.hours div {
+  padding-top: 12px;
+}
 
 .hours div + div {
   padding-left: 16px;

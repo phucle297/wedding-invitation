@@ -10,21 +10,41 @@ const { days, hours, minutes, seconds, note } = useCountdown({
 </script>
 
 <template>
-  <section class="block" id="thoi-gian" aria-labelledby="time-title">
-    <h2 id="time-title">{{ countdown.title }}</h2>
-    <p class="lead">{{ countdown.lead }}</p>
-    <div class="count" aria-live="polite">
-      <div><b>{{ days }}</b><span>ngày</span></div>
-      <div><b>{{ hours }}</b><span>giờ</span></div>
-      <div><b>{{ minutes }}</b><span>phút</span></div>
-      <div><b>{{ seconds }}</b><span>giây</span></div>
+  <section
+    class="block countdown-section"
+    id="thoi-gian"
+    aria-labelledby="time-title"
+  >
+    <div class="countdown-copy">
+      <h2 id="time-title">{{ countdown.title }}</h2>
+      <p class="lead">{{ countdown.lead }}</p>
+    </div>
+    <div class="count" role="timer" aria-label="Thời gian còn lại đến hôn lễ">
+      <div>
+        <b>{{ days }}</b
+        ><span>ngày</span>
+      </div>
+      <div>
+        <b>{{ hours }}</b
+        ><span>giờ</span>
+      </div>
+      <div>
+        <b>{{ minutes }}</b
+        ><span>phút</span>
+      </div>
+      <div>
+        <b>{{ seconds }}</b
+        ><span>giây</span>
+      </div>
     </div>
     <p class="count-note">{{ note }}</p>
   </section>
 </template>
 
 <style scoped>
-.block { text-align: center; }
+.block {
+  text-align: center;
+}
 
 .block h2 {
   font-family: var(--sans);
@@ -48,7 +68,10 @@ const { days, hours, minutes, seconds, note } = useCountdown({
   border-top: 1px solid var(--line);
 }
 
-.count div { text-align: center; padding: 0 4px; }
+.count div {
+  text-align: center;
+  padding: 0 4px;
+}
 
 .count b {
   display: block;

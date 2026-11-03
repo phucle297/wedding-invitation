@@ -6,7 +6,7 @@ export const rsvp = {
   countLabel: "Số người đến",
   noteLabel: "Lời nhắn",
   noteOptional: "không bắt buộc",
-  submit: "Gửi lời xác nhận",
+  submit: "Tạo lời xác nhận",
   absentValue: "Chưa sắp xếp được",
   choices: [
     { value: "Cả lễ tại tư gia và tiệc tại Galaxy", label: "Cả lễ tại tư gia và tiệc" },

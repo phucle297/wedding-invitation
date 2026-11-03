@@ -41,21 +41,26 @@ function onSubmit() {
     status.value = rsvp.messages.copied;
   };
   const fallback = () => {
-    copyText(text).then(copied).catch(() => {
-      status.value = rsvp.messages.failed;
-    });
+    copyText(text)
+      .then(copied)
+      .catch(() => {
+        status.value = rsvp.messages.failed;
+      });
   };
 
   if (navigator.share) {
-    navigator.share({ title: "Xác nhận tham dự", text }).then(() => {
-      status.value = rsvp.messages.shared;
-    }).catch((error) => {
-      if (error?.name === "AbortError") {
-        status.value = rsvp.messages.cancelled;
-        return;
-      }
-      fallback();
-    });
+    navigator
+      .share({ title: "Xác nhận tham dự", text })
+      .then(() => {
+        status.value = rsvp.messages.shared;
+      })
+      .catch((error) => {
+        if (error?.name === "AbortError") {
+          status.value = rsvp.messages.cancelled;
+          return;
+        }
+        fallback();
+      });
     return;
   }
   fallback();
@@ -64,30 +69,62 @@ function onSubmit() {
 
 <template>
   <section class="block rsvp" id="xac-nhan" aria-labelledby="rsvp-title">
-    <h2 id="rsvp-title">{{ rsvp.title }}</h2>
-    <p class="lead">{{ rsvp.lead }}</p>
+    <div class="rsvp-copy">
+      <h2 id="rsvp-title">{{ rsvp.title }}</h2>
+      <p class="lead">{{ rsvp.lead }}</p>
+    </div>
     <form @submit.prevent="onSubmit">
       <div class="field">
         <label for="guest-name">{{ rsvp.nameLabel }}</label>
-        <input id="guest-name" ref="nameInput" v-model="name" type="text" autocomplete="name" maxlength="80" required>
+        <input
+          id="guest-name"
+          ref="nameInput"
+          v-model="name"
+          type="text"
+          autocomplete="name"
+          maxlength="80"
+          required
+        />
       </div>
       <fieldset>
         <legend>{{ rsvp.attendLegend }}</legend>
-        <label v-for="choice in rsvp.choices" :key="choice.value" class="choice">
-          <input v-model="attend" type="radio" name="attend" :value="choice.value" required>
+        <label
+          v-for="choice in rsvp.choices"
+          :key="choice.value"
+          class="choice"
+        >
+          <input
+            v-model="attend"
+            type="radio"
+            name="attend"
+            :value="choice.value"
+            required
+          />
           <span>{{ choice.label }}</span>
         </label>
       </fieldset>
       <div v-show="!absent" class="field">
         <label for="guest-count">{{ rsvp.countLabel }}</label>
-        <input id="guest-count" v-model="count" type="number" inputmode="numeric" min="1" max="10">
+        <input
+          id="guest-count"
+          v-model="count"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="10"
+        />
       </div>
       <div class="field">
         <label for="guest-note">
           {{ rsvp.noteLabel }}
           <span class="optional">{{ rsvp.noteOptional }}</span>
         </label>
-        <textarea id="guest-note" v-model="note" maxlength="400" rows="3"></textarea>
+        <textarea
+          id="guest-note"
+          v-model="note"
+          maxlength="400"
+          rows="3"
+        ></textarea>
       </div>
       <button class="btn btn-ink" type="submit">{{ rsvp.submit }}</button>
       <p class="form-status" role="status">{{ status }}</p>
@@ -97,7 +134,9 @@ function onSubmit() {
 </template>
 
 <style scoped>
-.rsvp { text-align: center; }
+.rsvp {
+  text-align: center;
+}
 
 .rsvp .lead {
   max-width: 34em;
@@ -110,9 +149,13 @@ form {
   text-align: left;
 }
 
-form .btn { margin-top: 22px; }
+form .btn {
+  margin-top: 22px;
+}
 
-.field { margin-top: 22px; }
+.field {
+  margin-top: 22px;
+}
 
 .field label,
 legend {
@@ -147,7 +190,9 @@ textarea:focus {
   border-bottom-color: var(--ink);
 }
 
-textarea { resize: vertical; }
+textarea {
+  resize: vertical;
+}
 
 fieldset {
   margin: 22px 0 0;
@@ -176,14 +221,18 @@ fieldset {
   color: var(--ink);
 }
 
-.choice:has(input:checked) span { font-weight: 500; }
+.choice:has(input:checked) span {
+  font-weight: 500;
+}
 
 .form-status {
   min-height: 1.4em;
   margin: 14px 0 0;
 }
 
-.form-status:not(:empty) { color: var(--ink); }
+.form-status:not(:empty) {
+  color: var(--ink);
+}
 
 .confirm-text {
   margin: 12px 0 0;

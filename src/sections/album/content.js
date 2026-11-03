@@ -1,9 +1,5 @@
 export const album = {
   title: "Album ảnh",
-  lead: "Chạm vào bìa. Vài tấm bước ra trước, rồi cả album trải xuống.",
-  openLabel: "Mở album ảnh",
-  cover: "Album",
-  hint: "Chạm để mở",
   photos: [
     {
       src: "/assets/album/01.jpg",

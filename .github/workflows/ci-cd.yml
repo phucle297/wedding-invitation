@@ -27,7 +27,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
-      - run: bun run build-only
+      - run: bun run build
       - uses: actions/upload-artifact@v7
         with:
           name: dist

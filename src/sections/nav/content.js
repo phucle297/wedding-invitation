@@ -1,7 +1,6 @@
 export const nav = [
   { href: "#loi-ngo", label: "Lời ngỏ" },
-  { href: "#dia-diem", label: "Địa điểm" },
-  { href: "#thoi-gian", label: "Thời gian" },
-  { href: "#anh", label: "Ảnh" },
-  { href: "#xac-nhan", label: "Xác nhận" },
+  { href: "#hanh-trinh", label: "Hành trình" },
+  { href: "#dia-diem", label: "Hôn lễ" },
+  { href: "#anh", label: "Album" },
 ];

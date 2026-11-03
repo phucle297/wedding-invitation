@@ -3,80 +3,187 @@ import { timeline } from "./content.js";
 </script>
 
 <template>
-  <section class="block" aria-labelledby="timeline-title">
+  <figure class="photo-interlude">
+    <img
+      src="/assets/album/04.jpg"
+      alt="Duy Phúc và Linh Đan trong khu vườn"
+      width="1067"
+      height="1600"
+      loading="lazy"
+    />
+    <figcaption lang="en">Together, always.</figcaption>
+  </figure>
+  <section class="block day-section" aria-labelledby="timeline-title">
     <h2 id="timeline-title">{{ timeline.title }}</h2>
-    <ol class="day">
-      <li v-for="(item, index) in timeline.items" :key="item.datetime" :style="{ '--i': index }">
-        <time :datetime="item.datetime">{{ item.time }}</time>
-        <span class="dot" aria-hidden="true"></span>
-        <div>
-          <strong>{{ item.title }}</strong>
-          <span>{{ item.detail }}</span>
-        </div>
-      </li>
-    </ol>
+    <p class="eyebrow">Chương trình ngày chung đôi</p>
+    <div class="day-path">
+      <svg
+        class="timeline-line"
+        viewBox="0 0 500 510"
+        preserveAspectRatio="none"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          class="timeline-base"
+          d="M55 10H355C475 10 475 170 355 170H145C25 170 25 330 145 330H355C475 330 475 490 355 490H145"
+        />
+        <path
+          class="timeline-progress"
+          d="M55 10H355C475 10 475 170 355 170H145C25 170 25 330 145 330H355C475 330 475 490 355 490H145"
+          pathLength="1"
+        />
+        <circle cx="55" cy="10" r="5" fill="currentColor" />
+        <circle cx="145" cy="490" r="5" fill="currentColor" />
+      </svg>
+      <svg
+        class="timeline-desktop"
+        viewBox="0 0 1100 90"
+        preserveAspectRatio="none"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          class="timeline-base"
+          d="M50 65C240-65 310 155 550 45S860-35 1050 65"
+        />
+        <path
+          class="timeline-progress"
+          d="M50 65C240-65 310 155 550 45S860-35 1050 65"
+          pathLength="1"
+        />
+        <circle cx="50" cy="65" r="4" fill="currentColor" />
+        <circle cx="1050" cy="65" r="4" fill="currentColor" />
+      </svg>
+      <ol class="day">
+        <li v-for="(item, index) in timeline.items" :key="item.datetime">
+          <svg
+            class="day-icon"
+            viewBox="0 0 60 60"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.2"
+            aria-hidden="true"
+          >
+            <g v-if="index === 0">
+              <circle cx="23" cy="34" r="13" />
+              <circle cx="38" cy="34" r="13" />
+              <path d="M17 20l6-9 6 9m2 0 7-9 7 9M18 15h10m5 0h10" />
+            </g>
+            <g v-else-if="index === 1">
+              <path
+                d="M10 49h40M15 48V23a15 15 0 0 1 30 0v25M22 48V26a8 8 0 0 1 16 0v22M10 22h10m20 0h10M30 3v8"
+              />
+              <path d="M6 49V36m-4 5 4-5 4 5M54 49V36m-4 5 4-5 4 5" />
+            </g>
+            <g v-else>
+              <path
+                d="M12 9v16a6 6 0 0 0 12 0V9M18 9v43M39 10v42M39 10c-12 12-11 25 0 25"
+              />
+              <path d="M47 14v10m-5-5h10M7 39v8m-4-4h8" />
+            </g>
+          </svg>
+          <div>
+            <time :datetime="item.datetime">{{ item.time }}</time
+            ><strong>{{ item.title }}</strong
+            ><span>{{ item.detail }}</span>
+          </div>
+        </li>
+      </ol>
+    </div>
   </section>
 </template>
 
 <style scoped>
+.day-section {
+  text-align: center;
+}
+.day-section .eyebrow {
+  margin-top: 14px;
+}
+.day-path {
+  position: relative;
+  margin: 50px auto 0;
+  max-width: 500px;
+}
+.timeline-desktop {
+  display: none;
+}
+.timeline-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--bronze);
+  pointer-events: none;
+}
+.timeline-base {
+  stroke: var(--line);
+  stroke-width: 1.2;
+}
+.timeline-progress {
+  stroke: var(--bronze);
+  stroke-width: 1.2;
+  stroke-dasharray: 1;
+}
 .day {
   position: relative;
   list-style: none;
-  margin: 22px 0 0;
-  padding: 0;
-}
-
-.day::before {
-  content: "";
-  position: absolute;
-  left: calc(4.6rem + 11px);
-  top: 18px;
-  bottom: 18px;
-  width: 1px;
-  background: var(--line);
-  transform-origin: top;
-}
-
-.reveal .day::before { transform: scaleY(0); }
-.reveal.is-in .day::before { transform: scaleY(1); transition: transform 0.9s ease; }
-
-.day li {
+  padding: 10px 68px;
+  margin: 0;
   display: grid;
-  grid-template-columns: 4.6rem 22px 1fr;
-  gap: 8px;
+  grid-template-rows: repeat(3, 160px);
+}
+.day li {
+  display: flex;
   align-items: center;
-  padding: 16px 0;
+  justify-content: flex-end;
+  gap: 24px;
+  text-align: right;
+  padding: 12px 4px;
 }
-
-.reveal .day li { opacity: 0; transform: translateY(14px); }
-.reveal.is-in .day li {
-  animation: rise 0.7s cubic-bezier(0.16, 0.84, 0.24, 1) forwards;
-  animation-delay: calc(var(--i) * 140ms);
+.day li:nth-child(even) {
+  flex-direction: row-reverse;
+  text-align: left;
 }
-
+.day-icon {
+  width: 60px;
+  height: 60px;
+  flex: none;
+  color: var(--bronze);
+}
+.day li > div {
+  max-width: 210px;
+}
 .day time {
-  font-family: var(--display);
-  font-size: 1.55rem;
-  font-variant-numeric: lining-nums tabular-nums;
+  display: block;
+  font: 2rem/1.2 var(--display);
 }
-
-.dot {
-  width: 9px;
-  height: 9px;
-  justify-self: center;
-  border: 1px solid var(--bronze);
-  border-radius: 50%;
-  background: var(--paper);
-  position: relative;
-  z-index: 1;
-}
-
 .day strong {
   display: block;
-  font-family: var(--display);
-  font-size: 1.35rem;
-  font-weight: 500;
+  font: 1.3rem/1.6 var(--display);
 }
-
-.day li span:not(.dot) { color: var(--ink-soft); font-size: 0.92rem; }
+.day li span {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+}
+@media (max-width: 600px) {
+  .day {
+    padding-inline: 48px;
+  }
+  .day li {
+    gap: 10px;
+  }
+  .day-icon {
+    width: 42px;
+    height: 42px;
+  }
+  .day li > div {
+    max-width: 175px;
+  }
+  .day strong {
+    font-size: 1.15rem;
+  }
+}
 </style>
