@@ -22,7 +22,7 @@ const label = `Mở thiệp mời lễ cưới của ${couple.groom.full} và ${
 
 <style scoped>
 .gate {
-  background: #2c070c;
+  background: #f5f0e5;
 }
 
 .gate-btn {
@@ -36,7 +36,7 @@ const label = `Mở thiệp mời lễ cưới của ${couple.groom.full} và ${
   cursor: pointer;
   color: inherit;
   background:
-    radial-gradient(ellipse at 50% 42%, #6e1822 0%, #4a0e16 48%, #2c070c 100%);
+    radial-gradient(ellipse at 50% 42%, #ffffff 0%, #faf7ef 48%, #f5f0e5 100%);
 }
 
 .gate-btn:disabled {

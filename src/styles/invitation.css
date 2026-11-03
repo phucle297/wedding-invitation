@@ -1,4 +1,4 @@
-/* The interior's paper palette must not change the red opening envelope. */
+/* Keep the interior's paper palette independent of the opening envelope. */
 .invite {
   --paper: #ffffff;
   --ink: #45453f;

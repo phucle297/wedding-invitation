@@ -28,7 +28,7 @@ defineProps({
     <div class="flap">
       <div class="flap-shape">
         <svg class="creases" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <polyline points="0,0 50,100 100,0" fill="none" stroke="rgba(240,214,164,0.45)" stroke-width="0.35" />
+          <polyline points="0,0 50,100 100,0" fill="none" stroke="rgba(164,126,52,0.45)" stroke-width="0.35" />
         </svg>
       </div>
       <div class="face">
@@ -82,12 +82,12 @@ defineProps({
   width: 100%;
   height: 100%;
   perspective: 1700px;
-  color: #f0ddb0;
+  color: #806124;
   background:
-    radial-gradient(ellipse at 50% 18%, rgba(255, 206, 176, 0.16), transparent 42%),
-    radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.28), transparent 52%),
-    linear-gradient(180deg, #7c2030 0%, #64141e 46%, #531018 100%);
-  box-shadow: inset 0 0 0 1px rgba(240, 214, 164, 0.28);
+    radial-gradient(ellipse at 50% 18%, rgba(255, 255, 255, 0.8), transparent 42%),
+    radial-gradient(ellipse at 50% 100%, rgba(190, 155, 82, 0.12), transparent 52%),
+    linear-gradient(180deg, #fffefa 0%, #faf5e9 46%, #f1e5ca 100%);
+  box-shadow: inset 0 0 0 1px rgba(164, 126, 52, 0.3);
 }
 
 .slot {
@@ -107,7 +107,7 @@ defineProps({
   right: 0;
   bottom: 0;
   height: 42px;
-  background: linear-gradient(transparent, rgba(42, 8, 14, 0.42));
+  background: linear-gradient(transparent, rgba(128, 97, 36, 0.18));
   opacity: 0;
   pointer-events: none;
 }
@@ -126,9 +126,9 @@ defineProps({
   justify-content: center;
   background:
     radial-gradient(ellipse at 50% 0%, #fff, transparent 58%),
-    #f7f6f4;
-  color: #2a2724;
-  box-shadow: 0 18px 22px rgba(40, 8, 12, 0.22);
+    #fffdf7;
+  color: #806124;
+  box-shadow: 0 18px 22px rgba(128, 97, 36, 0.16);
   transform: translateY(108%);
   transition: transform 0.95s cubic-bezier(0.16, 0.84, 0.24, 1) 0.42s;
 }
@@ -140,7 +140,7 @@ defineProps({
   font-family: var(--brush);
   font-size: 4.2rem;
   line-height: 0.9;
-  color: #c8c2ba;
+  color: #a47e34;
 }
 
 .names {
@@ -151,7 +151,7 @@ defineProps({
   line-height: 1.1;
 }
 
-.names span { color: var(--bronze); padding-inline: 0.12em; }
+.names span { color: #a47e34; padding-inline: 0.12em; }
 
 .when {
   margin: 12px 0 0;
@@ -175,10 +175,10 @@ defineProps({
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 30%),
-    linear-gradient(180deg, #8a2836 0%, #721c28 58%, #611520 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6), transparent 30%),
+    linear-gradient(180deg, #ffffff 0%, #fcf8ef 58%, #eddfbd 100%);
   clip-path: polygon(0 0, 100% 0, 50% 100%);
-  filter: drop-shadow(0 16px 14px rgba(30, 0, 4, 0.28));
+  filter: drop-shadow(0 16px 14px rgba(128, 97, 36, 0.16));
 }
 
 .creases {
@@ -225,7 +225,7 @@ defineProps({
   font-size: clamp(4.6rem, 15vw, 6.2rem);
   font-weight: 400;
   line-height: 0.85;
-  color: #f3e2b4;
+  color: #957029;
 }
 
 .swash {
@@ -233,7 +233,7 @@ defineProps({
   width: min(72%, 250px);
   height: 28px;
   margin: -6px auto 0;
-  color: #e4c78a;
+  color: #a47e34;
 }
 
 .lower {
@@ -256,7 +256,7 @@ defineProps({
   font-size: clamp(2.5rem, 8vw, 3.3rem);
   font-weight: 500;
   line-height: 1;
-  color: #f3e2b4;
+  color: #957029;
 }
 
 .hint {
@@ -276,7 +276,7 @@ defineProps({
   width: 112px;
   height: 112px;
   transform: translate(-50%, 50%);
-  filter: drop-shadow(0 8px 8px rgba(40, 8, 8, 0.35));
+  filter: drop-shadow(0 8px 8px rgba(128, 97, 36, 0.24));
   animation: seal-glow 3.2s ease-in-out infinite;
 }
 
