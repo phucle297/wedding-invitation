@@ -9,6 +9,7 @@
   --cream: #fffdf9;
   --champagne: #f7f1e5;
   --champagne-shade: #eee3cf;
+  --ornament-ink: #a18454;
   --pad: 42px;
   --paper-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23757570' opacity='.1' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
   --paper-fibers: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23a8a8a0' stroke-width='.6' opacity='.22'%3E%3Cpath d='M12 28l5 9m38 4 7-3m42-18 2 13m39 19 9 2m44-31-4 10M24 94l10 3m42-14-3 11m48-13 6 6m57-5-6 5m38 31 4 8M10 158l8-5m44-13 3 9m38-5 9 5m42-20 3 12m45 11 8-6M33 213l-3-11m46 18 9-4m44-20 3 9m42 12 8-5m31 21 3-10'/%3E%3C/svg%3E");
@@ -83,8 +84,8 @@
 }
 .invite :is(.vow, .guest-info) {
   background-image:
-    repeating-linear-gradient(0deg, #70706708 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(90deg, #70706706 0 1px, transparent 1px 4px);
+    repeating-linear-gradient(0deg, #a1845406 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, #a1845405 0 1px, transparent 1px 4px);
 }
 .invite .thanks {
   background-image: var(--paper-emboss), var(--paper-grain);
@@ -922,7 +923,12 @@
   }
 }
 
-/* Botanical corner prints sit behind content, leaving the paper and layout intact. */
+/* Faint prints sit behind the copy; stronger stationery details stay in the padding. */
+.invite .block.guest-info {
+  width: 100%;
+  max-width: none;
+  padding-inline: var(--desktop-gutter, var(--pad));
+}
 .invite :is(.family-section, .day-section, .journey, .vow, .guest-info, .rsvp) {
   position: relative;
   isolation: isolate;
@@ -932,54 +938,123 @@
   content: "";
   position: absolute;
   z-index: -1;
-  width: clamp(110px, 17vw, 245px);
-  aspect-ratio: 2 / 3;
-  background: url("/assets/ornaments/botanical.svg") center / contain no-repeat;
-  opacity: 0.42;
+  width: 110px;
+  height: 36px;
+  background-color: var(--ornament-ink);
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  opacity: 0.55;
   pointer-events: none;
 }
 .invite :is(.family-section, .day-section, .journey, .vow, .guest-info, .rsvp)::before {
-  left: 0;
-  bottom: 18px;
+  left: 3%;
+  top: 10px;
+  mask-image: var(--ornament-first);
 }
 .invite :is(.family-section, .day-section, .journey, .vow, .guest-info, .rsvp)::after {
+  right: 7%;
+  bottom: 10px;
+  mask-image: var(--ornament-second);
+}
+.invite .family-section {
+  --ornament-second: url("/assets/ornaments/botanical.svg");
+}
+.invite .family-section::before,
+.invite .day-section::after,
+.invite .rsvp::after {
+  content: none;
+}
+.invite .family-section::after {
   right: 0;
-  top: 18px;
-  transform: scaleX(-1);
+  bottom: 16px;
+  width: 130px;
+  height: 200px;
+  opacity: 0.18;
+}
+.invite .day-section {
+  --ornament-first: url("/assets/ornaments/sparkles.svg");
+}
+.invite .day-section::before {
+  left: auto;
+  right: 18%;
+}
+.invite .journey {
+  --ornament-first: url("/assets/ornaments/flourish.svg");
+  --ornament-second: url("/assets/ornaments/botanical.svg");
 }
 .invite .journey::before {
-  bottom: 34%;
+  left: auto;
+  right: 5%;
+  top: 20px;
+  width: 160px;
 }
 .invite .journey::after {
-  top: 12px;
+  right: 18%;
+  bottom: 4px;
+  width: 44px;
+  height: 60px;
 }
-.invite .rsvp::after {
-  top: auto;
-  bottom: 18px;
-  opacity: 0.22;
+.invite .vow {
+  --ornament-first: url("/assets/ornaments/rings.svg");
+  --ornament-second: url("/assets/ornaments/flourish.svg");
+}
+.invite .vow::before {
+  left: 8%;
+  width: 75px;
+}
+.invite .vow::after {
+  right: 12%;
+  width: 150px;
+}
+.invite .guest-info {
+  --ornament-first: url("/assets/ornaments/botanical.svg");
+  --ornament-second: url("/assets/ornaments/ribbon.svg");
+}
+.invite .guest-info::before {
+  left: 0;
+  width: 150px;
+  height: 210px;
+  opacity: 0.18;
+}
+.invite .guest-info::after {
+  right: 3%;
+  width: 65px;
+}
+.invite .rsvp {
+  --ornament-first: url("/assets/ornaments/ribbon.svg");
 }
 .invite .rsvp::before {
-  bottom: auto;
-  top: 24px;
-}
-.invite :is(.vow, .guest-info)::before,
-.invite :is(.vow, .guest-info)::after {
-  width: clamp(90px, 12vw, 175px);
+  left: 10%;
+  width: 90px;
 }
 @media (max-width: 1023px) {
   .invite :is(.family-section, .day-section, .journey, .vow, .guest-info, .rsvp)::before,
   .invite :is(.family-section, .day-section, .journey, .vow, .guest-info, .rsvp)::after {
-    width: 90px;
-    opacity: 0.28;
-  }
-  .invite .day-section::before {
-    bottom: 28px;
+    max-width: 80px;
+    height: 28px;
+    opacity: 0.48;
   }
   .invite .journey::before {
-    bottom: 12px;
+    top: 8px;
+    max-width: 110px;
   }
-  .invite .rsvp::after {
+  .invite .journey::after {
+    height: 38px;
+  }
+  .invite .vow::after {
+    max-width: 110px;
+  }
+  .invite .family-section::after,
+  .invite .guest-info::before {
+    width: 110px;
+    max-width: 110px;
+    height: 160px;
     opacity: 0.16;
+  }
+  .invite .guest-info::before {
+    left: auto;
+    right: 0;
   }
 }
 

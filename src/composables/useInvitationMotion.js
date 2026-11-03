@@ -211,8 +211,8 @@ export function useInvitationMotion(root, entered) {
             scrollTrigger: {
               trigger: select(".stationery")[0],
               start: "top 85%",
-              end: "top 20%",
-              scrub: 0.7,
+              end: desktop ? "bottom 60%" : "top 20%",
+              scrub: desktop ? 1.1 : 0.7,
             },
           });
           stationery
