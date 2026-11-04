@@ -1,6 +1,6 @@
-<script setup>
-import { families } from "../families/content.js";
-import { date } from "../../content/date.js";
+<script setup lang="ts">
+import { families } from "../families/content";
+import { date } from "../../content/date";
 import CallaSprig from "../../components/CallaSprig.vue";
 </script>
 

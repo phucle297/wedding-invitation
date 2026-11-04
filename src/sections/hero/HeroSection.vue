@@ -1,7 +1,7 @@
-<script setup>
-import { couple } from "../../content/couple.js";
-import { date } from "../../content/date.js";
-import { hero } from "./content.js";
+<script setup lang="ts">
+import { couple } from "../../content/couple";
+import { date } from "../../content/date";
+import { hero } from "./content";
 </script>
 
 <template>

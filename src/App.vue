@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { OverlayScrollbars } from "overlayscrollbars";
 import EnvelopeGate from "./sections/gate/EnvelopeGate.vue";
@@ -9,7 +9,7 @@ const entered = ref(false);
 const desktopScrollbars = window.matchMedia(
   "(hover: hover) and (pointer: fine) and (forced-colors: none)",
 );
-let scrollbars;
+let scrollbars: ReturnType<typeof OverlayScrollbars> | undefined;
 
 function syncScrollbars() {
   if (!entered.value || !desktopScrollbars.matches) {
@@ -41,7 +41,7 @@ function reducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function paintTheme(color) {
+function paintTheme(color: string) {
   document
     .querySelector('meta[name="theme-color"]')
     ?.setAttribute("content", color);

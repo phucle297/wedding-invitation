@@ -4,4 +4,5 @@ import "overlayscrollbars/overlayscrollbars.css";
 import "./styles/base.css";
 import "./styles/invitation.css";
 
+document.documentElement.classList.add("has-gate");
 createApp(App).mount("#app");

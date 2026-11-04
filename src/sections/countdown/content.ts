@@ -1,4 +1,4 @@
-import { date } from "../../content/date.js";
+import { date } from "../../content/date";
 
 export const countdown = {
   title: "Đếm đến giờ tiệc",

@@ -1,5 +1,5 @@
-<script setup>
-import { ceremony } from "./content.js";
+<script setup lang="ts">
+import { ceremony } from "./content";
 </script>
 
 <template>

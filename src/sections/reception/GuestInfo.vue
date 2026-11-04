@@ -1,5 +1,5 @@
-<script setup>
-import { reception } from "./content.js";
+<script setup lang="ts">
+import { reception } from "./content";
 </script>
 
 <template>

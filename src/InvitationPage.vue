@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { useInvitationMotion } from "./composables/useInvitationMotion.js";
+import { useInvitationMotion } from "./composables/useInvitationMotion";
 import BackToTop from "./components/BackToTop.vue";
 import StorySections from "./sections/story/StorySections.vue";
 import GuestInfo from "./sections/reception/GuestInfo.vue";
@@ -20,7 +20,7 @@ const props = defineProps({
   entered: { type: Boolean, default: false },
 });
 
-const page = ref(null);
+const page = ref<HTMLElement | null>(null);
 useInvitationMotion(page, () => props.entered);
 </script>
 

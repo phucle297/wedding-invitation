@@ -1,7 +1,7 @@
-<script setup>
-import { reception } from "./content.js";
-import { couple } from "../../content/couple.js";
-import { date } from "../../content/date.js";
+<script setup lang="ts">
+import { reception } from "./content";
+import { couple } from "../../content/couple";
+import { date } from "../../content/date";
 import CallaSprig from "../../components/CallaSprig.vue";
 </script>
 

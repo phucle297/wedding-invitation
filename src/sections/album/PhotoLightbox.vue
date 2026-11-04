@@ -1,11 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { phrases } from "../../content/phrases.js";
+import { phrases } from "../../content/phrases";
+import type { AlbumPhoto } from "./content";
 
-const dialog = ref(null);
-const photo = ref(null);
+const dialog = ref<HTMLDialogElement | null>(null);
+const photo = ref<AlbumPhoto | null>(null);
 
-function open(next) {
+function open(next: AlbumPhoto) {
   photo.value = next;
   dialog.value?.showModal();
 }
@@ -14,7 +15,7 @@ function close() {
   dialog.value?.close();
 }
 
-function onBackdrop(event) {
+function onBackdrop(event: MouseEvent) {
   if (event.target === dialog.value) close();
 }
 

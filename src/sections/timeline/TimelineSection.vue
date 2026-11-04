@@ -1,5 +1,5 @@
-<script setup>
-import { timeline } from "./content.js";
+<script setup lang="ts">
+import { timeline } from "./content";
 </script>
 
 <template>

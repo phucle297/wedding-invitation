@@ -1,5 +1,5 @@
-<script setup>
-import { families } from "./content.js";
+<script setup lang="ts">
+import { families } from "./content";
 </script>
 
 <template>

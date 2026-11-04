@@ -1,5 +1,5 @@
-<script setup>
-import { couple } from "../../content/couple.js";
+<script setup lang="ts">
+import { couple } from "../../content/couple";
 import CallaSprig from "../../components/CallaSprig.vue";
 
 const scenes = [

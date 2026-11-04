@@ -1,11 +1,12 @@
 import { nextTick, onBeforeUnmount, watch } from "vue";
+import type { Ref, WatchSource } from "vue";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function useInvitationMotion(root, entered) {
-  let media;
+export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: WatchSource<boolean>) {
+  let media: gsap.MatchMedia | null = null;
 
   const stop = watch(
     entered,
@@ -19,6 +20,7 @@ export function useInvitationMotion(root, entered) {
       if (!active) return;
       await nextTick();
       if (cancelled || !root.value) return;
+      const rootElement = root.value;
 
       media = gsap.matchMedia();
       media.add(
@@ -28,9 +30,9 @@ export function useInvitationMotion(root, entered) {
           reduced: "(prefers-reduced-motion: reduce)",
         },
         (context) => {
-          if (context.conditions.reduced) return;
-          const desktop = context.conditions.desktop;
-          const select = gsap.utils.selector(root.value);
+          if (context.conditions?.reduced) return;
+          const desktop = context.conditions?.desktop;
+          const select = gsap.utils.selector(rootElement);
 
           gsap.from(select(".hero-copy > *"), {
             y: 28,
@@ -59,7 +61,7 @@ export function useInvitationMotion(root, entered) {
             },
           });
 
-          function reveal(selector, from, trigger = selector) {
+          function reveal(selector: string, from: gsap.TweenVars, trigger = selector) {
             gsap.from(select(selector), {
               duration: 0.9,
               ease: "power3.out",
@@ -285,17 +287,18 @@ export function useInvitationMotion(root, entered) {
               ease: "sine.out",
             });
 
-          const timelineSvg = select(
+          const timelineSvg = select<SVGSVGElement>(
             desktop ? ".timeline-desktop" : ".timeline-line",
           )[0];
-          const timelinePath = timelineSvg.querySelector(".timeline-progress");
-          const timelineCursor = timelineSvg.querySelector(".timeline-cursor");
+          const timelinePath = timelineSvg.querySelector<SVGPathElement>(".timeline-progress");
+          const timelineCursor = timelineSvg.querySelector<SVGCircleElement>(".timeline-cursor");
+          if (!timelinePath || !timelineCursor) return;
           const pathLength = timelinePath.getTotalLength();
           const lineProgress = { value: 0 };
           const setLineOffset = gsap.quickSetter(timelinePath, "strokeDashoffset");
           const setCursor = gsap.quickSetter(timelineCursor, "attr");
           const firstPoint = timelinePath.getPointAtLength(0);
-          function positionCursor(point) {
+          function positionCursor(point: { x: number; y: number }) {
             const scaleX = timelineSvg.viewBox.baseVal.width / timelineSvg.clientWidth;
             const scaleY = timelineSvg.viewBox.baseVal.height / timelineSvg.clientHeight;
             // The path stretches with its container; the thumb stays circular in pixels.
@@ -416,7 +419,7 @@ export function useInvitationMotion(root, entered) {
               { scale: 0.7 },
               {
                 scale: 1.35,
-                backgroundColor: getComputedStyle(root.value)
+                backgroundColor: getComputedStyle(rootElement)
                   .getPropertyValue("--bronze")
                   .trim(),
                 ease: "none",
@@ -450,12 +453,12 @@ export function useInvitationMotion(root, entered) {
           return () => {
             // quickSetter writes are not tweens, so restore them on media changes.
             timelinePath.style.removeProperty("stroke-dashoffset");
-            timelineCursor.setAttribute("cx", firstPoint.x);
-            timelineCursor.setAttribute("cy", firstPoint.y);
+            timelineCursor.setAttribute("cx", String(firstPoint.x));
+            timelineCursor.setAttribute("cy", String(firstPoint.y));
             timelineCursor.removeAttribute("transform");
           };
         },
-        root.value,
+        rootElement,
       );
       document.fonts.ready.then(() => {
         if (!cancelled) ScrollTrigger.refresh();

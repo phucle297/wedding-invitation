@@ -1,18 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from "vue";
-import { couple } from "../../content/couple.js";
-import { date } from "../../content/date.js";
-import { copyText } from "../../lib/clipboard.js";
-import { buildRsvpMessage } from "../../lib/rsvpMessage.js";
-import { rsvp } from "./content.js";
+import { couple } from "../../content/couple";
+import { date } from "../../content/date";
+import { copyText } from "../../lib/clipboard";
+import { buildRsvpMessage } from "../../lib/rsvpMessage";
+import { rsvp } from "./content";
 
 const name = ref("");
 const attend = ref("");
-const count = ref(1);
+const count = ref<number | string>(1);
 const note = ref("");
 const status = ref("");
 const preview = ref("");
-const nameInput = ref(null);
+const nameInput = ref<HTMLInputElement | null>(null);
 const absent = computed(() => attend.value === rsvp.absentValue);
 
 function onSubmit() {
@@ -54,8 +54,8 @@ function onSubmit() {
       .then(() => {
         status.value = rsvp.messages.shared;
       })
-      .catch((error) => {
-        if (error?.name === "AbortError") {
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === "AbortError") {
           status.value = rsvp.messages.cancelled;
           return;
         }

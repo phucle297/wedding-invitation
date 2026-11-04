@@ -1,6 +1,6 @@
-<script setup>
-import { couple } from "../../content/couple.js";
-import { date } from "../../content/date.js";
+<script setup lang="ts">
+import { couple } from "../../content/couple";
+import { date } from "../../content/date";
 import Envelope from "./Envelope.vue";
 
 defineProps({

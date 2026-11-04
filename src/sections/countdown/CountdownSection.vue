@@ -1,6 +1,6 @@
-<script setup>
-import { useCountdown } from "../../composables/useCountdown.js";
-import { countdown } from "./content.js";
+<script setup lang="ts">
+import { useCountdown } from "../../composables/useCountdown";
+import { countdown } from "./content";
 
 const { days, hours, minutes, seconds, note } = useCountdown({
   target: countdown.isoReception,

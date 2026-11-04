@@ -1,4 +1,4 @@
-export function copyText(text) {
+export function copyText(text: string): Promise<void> {
   function legacyCopy() {
     const area = document.createElement("textarea");
     area.value = text;

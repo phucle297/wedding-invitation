@@ -1,17 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { album } from "./content.js";
+import { album } from "./content";
 import PhotoLightbox from "./PhotoLightbox.vue";
 
 const props = defineProps({
   entered: { type: Boolean, default: false },
 });
 const opened = ref(false);
-const gallery = ref(null);
-const toggle = ref(null);
-const lightbox = ref(null);
+const gallery = ref<HTMLElement | null>(null);
+const toggle = ref<HTMLButtonElement | null>(null);
+const lightbox = ref<InstanceType<typeof PhotoLightbox> | null>(null);
 const photos = computed(() =>
   opened.value ? album.photos : album.photos.slice(0, 4),
 );
@@ -35,8 +35,8 @@ watch(
         normal: "(prefers-reduced-motion: no-preference)",
       },
       (context) => {
-        if (!context.conditions.reduced) {
-          gallery.value.querySelectorAll(".shot").forEach((shot, index) => {
+        if (!context.conditions?.reduced) {
+          gallery.value?.querySelectorAll(".shot").forEach((shot, index) => {
             gsap.from(shot, {
               y: index % 2 ? 28 : -18,
               rotation: index % 2 ? 2 : -2,

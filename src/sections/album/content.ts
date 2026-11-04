@@ -1,4 +1,11 @@
-export const album = {
+export interface AlbumPhoto {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+export const album: { title: string; photos: AlbumPhoto[] } = {
   title: "Album ảnh",
   photos: [
     {

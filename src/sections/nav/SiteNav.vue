@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { nav } from "./content.js";
+import { nav } from "./content";
 
 const expanded = ref(false);
 </script>

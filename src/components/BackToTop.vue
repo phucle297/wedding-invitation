@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
 const visible = ref(false);

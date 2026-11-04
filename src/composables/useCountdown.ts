@@ -1,10 +1,16 @@
 import { onMounted, onUnmounted, ref } from "vue";
 
-function pad(value) {
+function pad(value: number) {
   return String(value).padStart(2, "0");
 }
 
-export function useCountdown({ target, dayEnd, notes }) {
+interface CountdownOptions {
+  target: string;
+  dayEnd: string;
+  notes: { during: string; after: string };
+}
+
+export function useCountdown({ target, dayEnd, notes }: CountdownOptions) {
   const days = ref("--");
   const hours = ref("--");
   const minutes = ref("--");
