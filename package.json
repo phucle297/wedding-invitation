@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "bun run type-check && vite build",
-    "check": "bun run type-check",
+    "check": "bun run type-check && bun test tests/backend",
     "type-check": "vue-tsc --noEmit",
+    "pages:dev": "wrangler pages dev dist --compatibility-date 2026-11-04",
     "prepare": "lefthook install",
     "preview": "vite preview --host 127.0.0.1 --port 4174"
   },
@@ -21,6 +22,7 @@
     "lefthook": "^2.2.2",
     "typescript": "~6.0.0",
     "vite": "^7.1.10",
-    "vue-tsc": "^3.3.14"
+    "vue-tsc": "^3.3.14",
+    "wrangler": "^4.157.0"
   }
 }

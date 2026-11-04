@@ -37,3 +37,8 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Local Cloudflare state (contains synthetic or private RSVP data)
+.wrangler/
+.dev.vars
+.dev.vars.*

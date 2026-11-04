@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { couple } from "../../content/couple";
-import { date } from "../../content/date";
-import { copyText } from "../../lib/clipboard";
-import { buildRsvpMessage } from "../../lib/rsvpMessage";
+import { computed, ref, watch } from "vue";
 import { rsvp } from "./content";
 
 const name = ref("");
@@ -11,11 +7,20 @@ const attend = ref("");
 const count = ref<number | string>(1);
 const note = ref("");
 const status = ref("");
-const preview = ref("");
+const website = ref("");
+const pending = ref(false);
+const sent = ref(false);
 const nameInput = ref<HTMLInputElement | null>(null);
 const absent = computed(() => attend.value === rsvp.absentValue);
+let submission: { fingerprint: string; requestId: string } | null = null;
 
-function onSubmit() {
+watch([name, attend, count, note], () => {
+  sent.value = false;
+  status.value = "";
+});
+
+async function onSubmit() {
+  if (pending.value || sent.value) return;
   const guest = name.value.trim();
   if (!guest) {
     status.value = rsvp.messages.needName;
@@ -26,44 +31,41 @@ function onSubmit() {
     status.value = rsvp.messages.needAttend;
     return;
   }
-  const text = buildRsvpMessage({
-    title: `Xác nhận tham dự lễ cưới ${couple.groom.short} & ${couple.bride.short}`,
-    date: date.display,
+  const payload = {
     name: guest,
-    attend: attend.value,
-    count: count.value,
+    attendance: attend.value,
+    count: absent.value ? 1 : Number(count.value),
     note: note.value.trim(),
-    absentValue: rsvp.absentValue,
-  });
-  preview.value = text;
-
-  const copied = () => {
-    status.value = rsvp.messages.copied;
+    website: website.value,
   };
-  const fallback = () => {
-    copyText(text)
-      .then(copied)
-      .catch(() => {
-        status.value = rsvp.messages.failed;
-      });
-  };
-
-  if (navigator.share) {
-    navigator
-      .share({ title: "Xác nhận tham dự", text })
-      .then(() => {
-        status.value = rsvp.messages.shared;
-      })
-      .catch((error: unknown) => {
-        if (error instanceof Error && error.name === "AbortError") {
-          status.value = rsvp.messages.cancelled;
-          return;
-        }
-        fallback();
-      });
-    return;
+  const fingerprint = JSON.stringify(payload);
+  if (submission?.fingerprint !== fingerprint) {
+    submission = { fingerprint, requestId: crypto.randomUUID() };
   }
-  fallback();
+  pending.value = true;
+  status.value = "";
+  try {
+    const response = await fetch("/api/rsvp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...payload, requestId: submission.requestId }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) {
+      status.value = response.status === 503 ? rsvp.messages.unavailable : rsvp.messages.failed;
+      return;
+    }
+    const result: unknown = await response.json();
+    if (!result || typeof result !== "object" || !("ok" in result) || result.ok !== true) {
+      throw new Error("Invalid response");
+    }
+    sent.value = true;
+    status.value = rsvp.messages.saved;
+  } catch {
+    status.value = rsvp.messages.failed;
+  } finally {
+    pending.value = false;
+  }
 }
 </script>
 
@@ -73,7 +75,11 @@ function onSubmit() {
       <h2 id="rsvp-title">{{ rsvp.title }}</h2>
       <p class="lead">{{ rsvp.lead }}</p>
     </div>
-    <form @submit.prevent="onSubmit">
+    <form :aria-busy="pending" @submit.prevent="onSubmit">
+      <div class="honeypot" aria-hidden="true">
+        <label for="guest-website">Website</label>
+        <input id="guest-website" v-model="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
       <div class="field">
         <label for="guest-name">{{ rsvp.nameLabel }}</label>
         <input
@@ -83,6 +89,7 @@ function onSubmit() {
           type="text"
           autocomplete="name"
           maxlength="80"
+          :disabled="pending"
           required
         />
       </div>
@@ -98,6 +105,7 @@ function onSubmit() {
             type="radio"
             name="attend"
             :value="choice.value"
+            :disabled="pending"
             required
           />
           <span>{{ choice.label }}</span>
@@ -112,6 +120,8 @@ function onSubmit() {
           inputmode="numeric"
           min="1"
           max="10"
+          :required="!absent"
+          :disabled="pending || absent"
         />
       </div>
       <div class="field">
@@ -124,11 +134,14 @@ function onSubmit() {
           v-model="note"
           maxlength="400"
           rows="3"
+          :disabled="pending"
         ></textarea>
       </div>
-      <button class="btn btn-ink" type="submit">{{ rsvp.submit }}</button>
+      <button class="btn btn-ink" type="submit" :disabled="pending || sent">
+        {{ pending ? "Đang gửi…" : sent ? "Đã gửi xác nhận" : rsvp.submit }}
+      </button>
       <p class="form-status" role="status">{{ status }}</p>
-      <pre v-show="preview" class="confirm-text">{{ preview }}</pre>
+      <p class="privacy-note">Thông tin chỉ dùng để sắp xếp tiệc cưới.</p>
     </form>
   </section>
 </template>
@@ -136,6 +149,21 @@ function onSubmit() {
 <style scoped>
 .rsvp {
   text-align: center;
+}
+.honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+.privacy-note {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
 }
 
 .rsvp .lead {
@@ -234,16 +262,4 @@ fieldset {
   color: var(--ink);
 }
 
-.confirm-text {
-  margin: 12px 0 0;
-  padding: 14px 2px;
-  white-space: pre-wrap;
-  background: transparent;
-  border: 0;
-  border-top: 1px solid var(--line);
-  font-family: var(--sans);
-  font-size: 0.92rem;
-  line-height: 1.55;
-  text-align: left;
-}
 </style>
