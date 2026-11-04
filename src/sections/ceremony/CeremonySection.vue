@@ -25,6 +25,10 @@ import { ceremony } from "./content";
 
 .when {
   margin: 10px 0 0;
+  font-family: var(--display);
+  font-size: clamp(1.35rem, 3.8vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.6;
 }
 
 .where {

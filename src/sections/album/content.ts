@@ -5,27 +5,6 @@ export interface AlbumPhoto {
   height: number;
 }
 
-export const memories: AlbumPhoto[] = [
-  {
-    src: "/assets/album/memory-1.jpg",
-    alt: "Linh Đan chụp ảnh trước gương trong chiếc váy trắng",
-    width: 1200,
-    height: 1600,
-  },
-  {
-    src: "/assets/album/memory-2.jpg",
-    alt: "Duy Phúc trong một hoạt động tập thể, mặc áo vàng và khăn xanh",
-    width: 1600,
-    height: 1066,
-  },
-  {
-    src: "/assets/album/memory-3.jpg",
-    alt: "Duy Phúc hôn má Linh Đan trong bức ảnh selfie ngoài phố",
-    width: 1600,
-    height: 1066,
-  },
-];
-
 export const album: { title: string; photos: AlbumPhoto[] } = {
   title: "Album ảnh",
   photos: [

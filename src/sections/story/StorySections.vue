@@ -162,6 +162,9 @@ const scenes = [
   object-fit: cover;
   object-position: center 30%;
 }
+.groom-portrait img {
+  transform: scaleX(-1);
+}
 figcaption {
   text-align: center;
   margin-top: 18px;
@@ -188,7 +191,7 @@ figcaption em {
   left: 38%;
   bottom: 28%;
   filter: drop-shadow(0 2px 4px #30282033);
-  transform: rotate(-20deg);
+  transform: scaleX(-1) rotate(-20deg);
 }
 .journey {
   padding: 78px 42px 36px;

@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, watch } from "vue";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { album, memories } from "./content";
+import { album } from "./content";
 import PhotoLightbox from "./PhotoLightbox.vue";
 
 const props = defineProps({
@@ -64,39 +64,14 @@ async function toggleAlbum() {
 </script>
 
 <template>
-  <section class="block memories-block" aria-labelledby="memories-title">
-    <div class="album-heading">
-      <p class="eyebrow">Những điều bình dị</p>
-      <h2 id="memories-title">Trước ngày chung đôi</h2>
-      <p class="lead">Một vài mảnh ghép từ những ngày của chúng mình.</p>
-      <span class="fine-rule" aria-hidden="true"></span>
-    </div>
-    <div class="memories-grid">
-      <button
-        v-for="memory in memories"
-        :key="memory.src"
-        class="memory-shot"
-        type="button"
-        @click="lightbox?.open(memory)"
-      >
-        <img
-          :src="memory.src"
-          :alt="memory.alt"
-          :width="memory.width"
-          :height="memory.height"
-          loading="lazy"
-          decoding="async"
-        />
-        <span class="photo-zoom" aria-hidden="true">↗</span>
-      </button>
-    </div>
-  </section>
   <figure class="photo-interlude album-cover">
     <img
-      src="/assets/album/11.jpg"
+      src="/assets/album/album-cover.jpg"
+      srcset="/assets/album/11.jpg 1600w, /assets/album/album-cover.jpg 3200w"
+      sizes="(min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
       alt="Duy Phúc và Linh Đan trong khu vườn xanh"
-      width="1600"
-      height="1067"
+      width="3200"
+      height="2133"
       loading="lazy"
     />
     <figcaption lang="en">Our memories</figcaption>
@@ -147,36 +122,6 @@ async function toggleAlbum() {
 </template>
 
 <style scoped>
-.memories-block {
-  background: var(--cream);
-}
-.memories-block .eyebrow {
-  margin-bottom: 18px;
-}
-.memories-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.35fr;
-  align-items: start;
-  gap: 20px;
-  max-width: 1000px;
-  margin-inline: auto;
-}
-.memory-shot {
-  position: relative;
-  padding: 8px;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  cursor: zoom-in;
-}
-.memory-shot:first-child {
-  grid-row: span 2;
-  align-self: center;
-}
-.memory-shot img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
 .album-cover {
   aspect-ratio: 1.1;
 }
@@ -188,13 +133,15 @@ async function toggleAlbum() {
   font-size: 0.85rem;
 }
 .gallery {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
-  gap: 10px;
+  columns: 2;
+  column-gap: 10px;
   scroll-margin-top: 110px;
 }
 .shot {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  break-inside: avoid;
   position: relative;
   padding: 0;
   border: 0;
@@ -221,16 +168,5 @@ async function toggleAlbum() {
   display: flex;
   gap: 26px;
   margin: 32px auto 0;
-}
-@media (max-width: 759px) {
-  .memories-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  .memory-shot:first-child {
-    grid-row: auto;
-    width: 78%;
-    justify-self: center;
-  }
 }
 </style>
