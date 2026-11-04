@@ -172,14 +172,6 @@ h1, h2, h3 {
   scroll-margin-top: 72px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
 @media print {
   .gate, .topnav, .rsvp, .lightbox, .text-btn { display: none !important; }
   .invite, .sheet { display: block !important; box-shadow: none; width: auto; }

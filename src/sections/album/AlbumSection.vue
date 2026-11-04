@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, watch } from "vue";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { album } from "./content";
+import { album, memories } from "./content";
 import PhotoLightbox from "./PhotoLightbox.vue";
 
 const props = defineProps({
@@ -20,43 +20,34 @@ watch(
   [() => props.entered, opened],
   async ([active], _, onCleanup) => {
     let cancelled = false;
-    const media = gsap.matchMedia();
+    const context = gsap.context(() => {});
     onCleanup(() => {
       cancelled = true;
-      media.revert();
+      context.revert();
     });
     if (!active) return;
     await nextTick();
     if (cancelled || !gallery.value) return;
 
-    media.add(
-      {
-        reduced: "(prefers-reduced-motion: reduce)",
-        normal: "(prefers-reduced-motion: no-preference)",
-      },
-      (context) => {
-        if (!context.conditions?.reduced) {
-          gallery.value?.querySelectorAll(".shot").forEach((shot, index) => {
-            gsap.from(shot, {
-              y: index % 2 ? 28 : -18,
-              rotation: index % 2 ? 2 : -2,
-              opacity: 0,
-              delay: (index % 3) * 0.1,
-              duration: 0.9,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: shot,
-                start: "top 92%",
-                end: "top 55%",
-                scrub: 0.6,
-              },
-            });
-          });
-        }
-        ScrollTrigger.refresh();
-      },
-      gallery.value,
-    );
+    context.add(() => {
+      gallery.value?.querySelectorAll(".shot").forEach((shot, index) => {
+        gsap.from(shot, {
+          y: index % 2 ? 28 : -18,
+          rotation: index % 2 ? 2 : -2,
+          opacity: 0,
+          delay: (index % 3) * 0.1,
+          duration: 0.9,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: shot,
+            start: "top 92%",
+            end: "top 55%",
+            scrub: 0.6,
+          },
+        });
+      });
+      ScrollTrigger.refresh();
+    });
   },
   { immediate: true, flush: "post" },
 );
@@ -73,6 +64,33 @@ async function toggleAlbum() {
 </script>
 
 <template>
+  <section class="block memories-block" aria-labelledby="memories-title">
+    <div class="album-heading">
+      <p class="eyebrow">Những điều bình dị</p>
+      <h2 id="memories-title">Trước ngày chung đôi</h2>
+      <p class="lead">Một vài mảnh ghép từ những ngày của chúng mình.</p>
+      <span class="fine-rule" aria-hidden="true"></span>
+    </div>
+    <div class="memories-grid">
+      <button
+        v-for="memory in memories"
+        :key="memory.src"
+        class="memory-shot"
+        type="button"
+        @click="lightbox?.open(memory)"
+      >
+        <img
+          :src="memory.src"
+          :alt="memory.alt"
+          :width="memory.width"
+          :height="memory.height"
+          loading="lazy"
+          decoding="async"
+        />
+        <span class="photo-zoom" aria-hidden="true">↗</span>
+      </button>
+    </div>
+  </section>
   <figure class="photo-interlude album-cover">
     <img
       src="/assets/album/11.jpg"
@@ -129,6 +147,36 @@ async function toggleAlbum() {
 </template>
 
 <style scoped>
+.memories-block {
+  background: var(--cream);
+}
+.memories-block .eyebrow {
+  margin-bottom: 18px;
+}
+.memories-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  align-items: start;
+  gap: 20px;
+  max-width: 1000px;
+  margin-inline: auto;
+}
+.memory-shot {
+  position: relative;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  cursor: zoom-in;
+}
+.memory-shot:first-child {
+  grid-row: span 2;
+  align-self: center;
+}
+.memory-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 .album-cover {
   aspect-ratio: 1.1;
 }
@@ -142,27 +190,9 @@ async function toggleAlbum() {
 .gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: 10px;
   scroll-margin-top: 110px;
-}
-.gallery:not(.is-open) {
-  grid-template-rows: repeat(3, 180px);
-}
-.gallery:not(.is-open) .shot:nth-child(1) {
-  grid-area: 1/1/2/2;
-  border-radius: 75px 0 0 0;
-}
-.gallery:not(.is-open) .shot:nth-child(2) {
-  grid-area: 1/2/3/3;
-  border-radius: 0 100px 0 0;
-}
-.gallery:not(.is-open) .shot:nth-child(3) {
-  grid-area: 2/1/4/2;
-  border-radius: 0 0 100px 100px;
-}
-.gallery:not(.is-open) .shot:nth-child(4) {
-  grid-area: 3/2/4/3;
-  border-radius: 0 0 65px 0;
 }
 .shot {
   position: relative;
@@ -175,10 +205,7 @@ async function toggleAlbum() {
 .shot img {
   display: block;
   width: 100%;
-  height: 100%;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-  transition: transform 0.6s ease;
+  height: auto;
 }
 .photo-zoom {
   position: absolute;
@@ -195,14 +222,15 @@ async function toggleAlbum() {
   gap: 26px;
   margin: 32px auto 0;
 }
-@media (hover: hover) {
-  .shot:hover img {
-    transform: scale(1.04);
-  }
-}
 @media (max-width: 759px) {
-  .gallery:not(.is-open) {
-    grid-template-rows: repeat(3, 125px);
+  .memories-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .memory-shot:first-child {
+    grid-row: auto;
+    width: 78%;
+    justify-self: center;
   }
 }
 </style>

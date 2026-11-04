@@ -22,7 +22,7 @@ import { hero } from "./content";
         <span>{{ couple.groom.short }}</span
         ><em>&amp;</em><span>{{ couple.bride.short }}</span>
       </h1>
-      <div class="hero-medallion">
+      <div class="hero-keepsake">
         <img
           src="/assets/album/11.jpg"
           alt="Một khoảnh khắc bên nhau trong khu vườn"
@@ -104,17 +104,18 @@ h1 em {
   color: var(--bronze);
   margin: 8px 0;
 }
-.hero-medallion {
+.hero-keepsake {
   width: 28%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 6px solid var(--paper);
-  overflow: hidden;
+  padding: 5px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 6px 18px #45453f14;
+  transform: rotate(-4deg);
 }
-.hero-medallion img {
-  height: 100%;
+.hero-keepsake img {
+  display: block;
   width: 100%;
-  object-fit: cover;
+  height: auto;
 }
 .hero-scroll {
   display: flex;
@@ -175,8 +176,8 @@ h1 em {
     font-size: 1rem;
     margin-block: 4px;
   }
-  .hero-medallion {
-    border-width: 3px;
+  .hero-keepsake {
+    padding: 3px;
   }
   .hero-scroll {
     font-size: 0.6rem;

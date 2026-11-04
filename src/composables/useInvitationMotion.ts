@@ -27,10 +27,8 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
         {
           desktop: "(min-width: 1024px)",
           mobile: "(max-width: 1023px)",
-          reduced: "(prefers-reduced-motion: reduce)",
         },
         (context) => {
-          if (context.conditions?.reduced) return;
           const desktop = context.conditions?.desktop;
           const select = gsap.utils.selector(rootElement);
 

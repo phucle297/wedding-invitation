@@ -5,6 +5,27 @@ export interface AlbumPhoto {
   height: number;
 }
 
+export const memories: AlbumPhoto[] = [
+  {
+    src: "/assets/album/memory-1.jpg",
+    alt: "Linh Đan chụp ảnh trước gương trong chiếc váy trắng",
+    width: 1200,
+    height: 1600,
+  },
+  {
+    src: "/assets/album/memory-2.jpg",
+    alt: "Duy Phúc trong một hoạt động tập thể, mặc áo vàng và khăn xanh",
+    width: 1600,
+    height: 1066,
+  },
+  {
+    src: "/assets/album/memory-3.jpg",
+    alt: "Duy Phúc hôn má Linh Đan trong bức ảnh selfie ngoài phố",
+    width: 1600,
+    height: 1066,
+  },
+];
+
 export const album: { title: string; photos: AlbumPhoto[] } = {
   title: "Album ảnh",
   photos: [
@@ -28,7 +49,7 @@ export const album: { title: string; photos: AlbumPhoto[] } = {
     },
     {
       src: "/assets/album/04.jpg",
-      alt: "Hai người đứng trong vườn, voan bay phía trước",
+      alt: "Hai người nắm tay trong vườn, voan bay phía trước",
       width: 1067,
       height: 1600,
     },
@@ -40,7 +61,7 @@ export const album: { title: string; photos: AlbumPhoto[] } = {
     },
     {
       src: "/assets/album/06.jpg",
-      alt: "Duy Phúc bế Linh Đan giữa vườn",
+      alt: "Duy Phúc ôm Linh Đan giữa vườn",
       width: 1067,
       height: 1600,
     },
@@ -52,25 +73,25 @@ export const album: { title: string; photos: AlbumPhoto[] } = {
     },
     {
       src: "/assets/album/08.jpg",
-      alt: "Duy Phúc và Linh Đan đối diện nhau, Duy Phúc cầm một tờ giấy",
+      alt: "Duy Phúc và Linh Đan hôn nhau sau tấm thiệp trên tay",
       width: 1067,
       height: 1600,
     },
     {
       src: "/assets/album/09.jpg",
-      alt: "Hai người ngồi dưới một lớp voan",
+      alt: "Hai người tựa trán dưới một lớp voan",
       width: 1067,
       height: 1600,
     },
     {
       src: "/assets/album/10.jpg",
-      alt: "Hai người nắm tay giữa khóm hồng",
+      alt: "Hai người nhìn nhau trước bức tường cây xanh",
       width: 1067,
       height: 1600,
     },
     {
       src: "/assets/album/11.jpg",
-      alt: "Duy Phúc hôn trán Linh Đan trên ghế đá cạnh đài phun nước",
+      alt: "Duy Phúc ôm Linh Đan trên lối đi giữa khu vườn",
       width: 1600,
       height: 1067,
     },
@@ -100,19 +121,19 @@ export const album: { title: string; photos: AlbumPhoto[] } = {
     },
     {
       src: "/assets/album/16.jpg",
-      alt: "Linh Đan quay lại, cầm hoa trước tường cây",
+      alt: "Duy Phúc nâng tay Linh Đan dưới vòm cây",
       width: 1067,
       height: 1600,
     },
     {
       src: "/assets/album/17.jpg",
-      alt: "Hai bàn tay nắm nhau",
+      alt: "Duy Phúc dắt tay Linh Đan xoay giữa khu vườn",
       width: 1067,
       height: 1600,
     },
     {
       src: "/assets/album/18.jpg",
-      alt: "Hai người giơ hoa trước đài phun nước",
+      alt: "Hai người tung cánh hoa dưới tán cây",
       width: 1067,
       height: 1600,
     },

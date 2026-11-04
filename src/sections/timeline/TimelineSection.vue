@@ -5,10 +5,10 @@ import { timeline } from "./content";
 <template>
   <figure class="photo-interlude together-cover">
     <img
-      src="/assets/album/04.jpg"
-      alt="Duy Phúc và Linh Đan trong khu vườn"
-      width="1067"
-      height="1600"
+      src="/assets/album/together.jpg"
+      alt="Duy Phúc và Linh Đan giữa hai vế cầu thang trong sảnh lớn"
+      width="1600"
+      height="1067"
       loading="lazy"
     />
     <figcaption lang="en">Together, always.</figcaption>

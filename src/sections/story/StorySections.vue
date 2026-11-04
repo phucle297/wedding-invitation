@@ -34,7 +34,7 @@ const scenes = [
       <figure>
         <div class="portrait-frame groom-portrait">
           <img
-            src="/assets/album/13.jpg"
+            src="/assets/album/groom.jpg"
             alt="Chú rể Duy Phúc"
             width="1067"
             height="1600"
@@ -50,7 +50,7 @@ const scenes = [
       <figure>
         <div class="portrait-frame bride-portrait">
           <img
-            src="/assets/album/13.jpg"
+            src="/assets/album/bride.jpg"
             alt="Cô dâu Linh Đan"
             width="1067"
             height="1600"
@@ -157,18 +157,10 @@ const scenes = [
   border-radius: 0 95px 0 0;
 }
 .portrait-frame img {
-  position: absolute;
-  width: 200%;
-  max-width: none;
-  height: 148%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  top: -12%;
-}
-.groom-portrait img {
-  left: -38%;
-}
-.bride-portrait img {
-  left: -87%;
+  object-position: center 30%;
 }
 figcaption {
   text-align: center;
