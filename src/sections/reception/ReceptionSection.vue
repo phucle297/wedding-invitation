@@ -8,11 +8,19 @@ import CallaSprig from "../../components/CallaSprig.vue";
 <template>
   <section class="hotel" aria-labelledby="hotel-title">
     <div class="venue">
+      <svg class="invitation-crest" viewBox="0 0 240 48" fill="none" aria-hidden="true">
+        <path d="M0 30h92m56 0h92M120 34V5m0 17c-24-25-30 11 0 12 30-1 24-37 0-12Zm0-17c-8 9-8 13 0 18 8-5 8-9 0-18Zm0 29-5 7 5 6 5-6-5-7Z" />
+      </svg>
       <p class="eyebrow">Trân trọng kính mời</p>
       <p class="invitation-guest">Bạn và người thương</p>
       <p class="invitation-note">
         Đến dự bữa tiệc chung vui cùng<br />gia đình chúng tôi
       </p>
+      <svg class="invitation-rings" viewBox="0 0 240 28" fill="none" aria-hidden="true">
+        <path d="M0 14h96m48 0h96" />
+        <circle cx="114" cy="14" r="10" />
+        <circle cx="126" cy="14" r="10" />
+      </svg>
       <p class="invitation-names">
         {{ couple.groom.short }}<span>&amp;</span>{{ couple.bride.short }}
       </p>
@@ -48,8 +56,9 @@ import CallaSprig from "../../components/CallaSprig.vue";
         }}</a>
       </div>
       <p class="fine">{{ reception.phoneNote }}</p>
+      <CallaSprig class="venue-botanical venue-botanical-left" />
+      <CallaSprig class="venue-botanical venue-botanical-right" />
     </div>
-    <CallaSprig class="venue-botanical" />
   </section>
 </template>
 
@@ -57,8 +66,6 @@ import CallaSprig from "../../components/CallaSprig.vue";
 .hotel {
   padding: 10px 0 clamp(56px, 8vw, 84px);
   color: var(--ink);
-  background-color: var(--champagne);
-  background-image: var(--paper-grain);
 }
 
 .venue {
