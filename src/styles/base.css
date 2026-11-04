@@ -22,19 +22,6 @@
 
 html { scroll-behavior: smooth; }
 
-/* The page scrollbar overlays the content instead of reserving a viewport gutter. */
-.os-theme-invitation {
-  --os-size: 12px;
-  --os-padding-perpendicular: 3px;
-  --os-padding-axis: 4px;
-  --os-track-border-radius: 999px;
-  --os-handle-border-radius: 999px;
-  --os-handle-bg: #93836d99;
-  --os-handle-bg-hover: #93836d;
-  --os-handle-bg-active: #685033;
-  --os-handle-min-size: 40px;
-}
-
 body {
   margin: 0;
   color: var(--ink);

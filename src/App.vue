@@ -1,41 +1,10 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { OverlayScrollbars } from "overlayscrollbars";
+import { nextTick, ref } from "vue";
 import EnvelopeGate from "./sections/gate/EnvelopeGate.vue";
 import InvitationPage from "./InvitationPage.vue";
 
 const envelopeOpen = ref(false);
 const entered = ref(false);
-const desktopScrollbars = window.matchMedia(
-  "(hover: hover) and (pointer: fine) and (forced-colors: none)",
-);
-let scrollbars: ReturnType<typeof OverlayScrollbars> | undefined;
-
-function syncScrollbars() {
-  if (!entered.value || !desktopScrollbars.matches) {
-    scrollbars?.destroy();
-    scrollbars = undefined;
-    return;
-  }
-  if (scrollbars) return;
-  // Target the body to preserve window scrolling and GSAP's document triggers.
-  scrollbars = OverlayScrollbars(document.body, {
-    scrollbars: {
-      theme: "os-theme-invitation",
-      autoHide: "move",
-      autoHideDelay: 900,
-      autoHideSuspend: true,
-      clickScroll: "instant",
-    },
-  });
-}
-
-watch(entered, syncScrollbars, { flush: "post" });
-onMounted(() => desktopScrollbars.addEventListener("change", syncScrollbars));
-onBeforeUnmount(() => {
-  desktopScrollbars.removeEventListener("change", syncScrollbars);
-  scrollbars?.destroy();
-});
 
 function paintTheme(color: string) {
   document
