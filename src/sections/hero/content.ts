@@ -1,3 +1,3 @@
 export const hero = {
-  eyebrow: "Lễ thành hôn",
+  message: "Từ những ngày có nhau, đến một đời bên nhau.",
 };

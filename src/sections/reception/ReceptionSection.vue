@@ -74,8 +74,8 @@ import CallaSprig from "../../components/CallaSprig.vue";
 
 h2 {
   margin: 8px 0 0;
-  font-family: var(--display);
-  font-style: italic;
+  font-family: var(--heading);
+  font-style: normal;
   font-weight: 500;
   font-size: clamp(2rem, 5vw, 2.7rem);
   line-height: 1.15;

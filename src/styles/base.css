@@ -8,12 +8,12 @@
   --espresso: #2a2724;
   --cream: #f7f6f4;
   --xi-mark: #c8c2ba;
-  --display: "Cormorant Garamond", "Times New Roman", serif;
-  --sans: "Be Vietnam Pro", "Segoe UI", sans-serif;
-  --brush: "Ma Shan Zheng", "Noto Serif SC", cursive;
+  --sans: "Source Sans 3", "Segoe UI", sans-serif;
+  --heading: "Cormorant SC", serif;
   --script: "Great Vibes", cursive;
-  --script-vi: "Dancing Script", cursive;
-  --han: "Noto Serif SC", "Microsoft YaHei", "SimSun", "PMingLiU", serif;
+  --display: var(--sans);
+  --brush: var(--sans);
+  --script-vi: var(--script);
   --pad: max(22px, calc((100% - 1200px) / 2));
   --silk: radial-gradient(ellipse at 50% -8%, #fffcf9, transparent 52%);
 }
@@ -43,16 +43,17 @@ button, input, textarea { font: inherit; color: inherit; }
 }
 
 h1, h2, h3 {
-  font-family: var(--display);
+  font-family: var(--heading);
   font-weight: 500;
   line-height: 1.15;
+  letter-spacing: -0.025em;
 }
 
 .eyebrow {
   margin: 0;
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: var(--bronze);
 }

@@ -17,11 +17,11 @@ import { hero } from "./content";
     </div>
     <div class="hero-copy">
       <p class="hero-script" lang="en">The<br /><span>wedding of</span></p>
-      <p class="eyebrow">{{ hero.eyebrow }}</p>
       <h1>
         <span>{{ couple.groom.short }}</span
         ><em>&amp;</em><span>{{ couple.bride.short }}</span>
       </h1>
+      <p class="hero-message">{{ hero.message }}</p>
       <div class="hero-keepsake">
         <img
           src="/assets/album/11.jpg"
@@ -71,9 +71,9 @@ import { hero } from "./content";
 }
 .hero-script {
   font-family: var(--script);
-  font-size: 100px;
+  font-size: 72px;
   line-height: 0.76;
-  margin: 0 0 48px;
+  margin: 0 0 32px;
   color: var(--ink);
   width: 80%;
 }
@@ -81,19 +81,22 @@ import { hero } from "./content";
   display: block;
   margin: 6px 0 0 13%;
 }
-.hero-copy .eyebrow {
+.hero-message {
   width: 28%;
+  margin: 0 0 24px;
   text-align: center;
-  letter-spacing: 0.18em;
-  font-size: 0.65rem;
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+  line-height: 1.7;
+  text-wrap: balance;
 }
 h1 {
   width: 28%;
   text-align: center;
   margin: 22px 0 26px;
-  font-size: 1.9rem;
+  font-size: 2.3rem;
   line-height: 1.3;
-  letter-spacing: 0.05em;
+  letter-spacing: -0.025em;
 }
 h1 span,
 h1 em {
@@ -126,7 +129,7 @@ h1 em {
   margin-top: 22px;
   color: var(--ink);
   text-decoration: none;
-  font-size: 0.7rem;
+  font-size: var(--text-small);
   min-height: 44px;
 }
 .hero-scroll span {
@@ -139,38 +142,49 @@ h1 em {
   width: 100%;
   text-align: center;
   font-family: var(--display);
-  letter-spacing: 0.25em;
-  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.3;
   margin: 0;
 }
 .hero-date span {
   display: block;
   font-family: var(--sans);
-  font-size: 0.65rem;
-  letter-spacing: 0.16em;
+  font-size: var(--text-small);
+  font-weight: 400;
+  letter-spacing: 0.02em;
   margin-bottom: 8px;
   text-transform: uppercase;
 }
 @media (max-width: 600px) {
   .hero {
     height: 150vw;
-    min-height: 530px;
+    min-height: 600px;
     max-height: 760px;
   }
   .hero-copy {
     padding-top: 9%;
   }
   .hero-script {
-    font-size: clamp(58px, 13.5vw, 82px);
-    margin-bottom: 48px;
+    font-size: clamp(32px, 8vw, 46px);
+    margin-bottom: 32px;
   }
-  .hero-copy .eyebrow {
-    font-size: 0.5rem;
-    letter-spacing: 0.1em;
+  .hero-message,
+  h1,
+  .hero-keepsake,
+  .hero-scroll {
+    width: 30%;
+  }
+  .hero-message {
+    margin-bottom: 8px;
   }
   h1 {
-    font-size: clamp(1.1rem, 4.2vw, 1.55rem);
+    font-size: clamp(1.375rem, 6.2vw, 2rem);
     margin-block: 16px;
+  }
+  h1 span {
+    white-space: nowrap;
   }
   h1 em {
     font-size: 1rem;
@@ -180,15 +194,11 @@ h1 em {
     padding: 3px;
   }
   .hero-scroll {
-    font-size: 0.6rem;
     margin-top: 16px;
   }
   .hero-date {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     bottom: 20px;
-  }
-  .hero-date span {
-    font-size: 0.55rem;
   }
 }
 </style>

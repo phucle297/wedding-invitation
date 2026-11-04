@@ -63,7 +63,6 @@ onBeforeUnmount(() => controller.abort());
       </p>
     </div>
     <p class="weather-disclaimer">Điều kiện hiện tại, không phải dự báo ngày {{ date.display }}. Vui lòng kiểm tra lại gần ngày dự tiệc.</p>
-    <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Nguồn: Open-Meteo</a>
   </aside>
 </template>
 
@@ -74,12 +73,14 @@ onBeforeUnmount(() => controller.abort());
   background: var(--cream);
   background-image: var(--paper-grain);
 }
-h3 { font: 2.2rem/1.2 var(--display); margin: 18px 0 24px; }
+h3 { font: 500 2.2rem/1.2 var(--heading); margin: 18px 0 24px; }
 .weather-reading { display: flex; align-items: center; gap: 24px; margin: 24px 0; }
 .weather-reading strong { font: 4rem/1 var(--display); }
 .weather-reading strong span { font-size: 1.5rem; vertical-align: top; }
-small { display: block; margin-top: 8px; font-size: 0.8rem; }
+small { display: block; margin-top: 8px; font-size: var(--text-small); }
 .weather-status, .weather-disclaimer, small { color: var(--ink-soft); }
-.weather-disclaimer, a { font-size: 0.85rem; line-height: 1.8; }
-a { color: var(--ink); text-underline-offset: 4px; }
+.weather-disclaimer { font-size: var(--text-small); line-height: 1.8; }
+@media (max-width: 600px) {
+  .weather-reading { flex-wrap: wrap; gap: 16px; }
+}
 </style>

@@ -65,7 +65,7 @@ const expanded = ref(false);
   min-height: 44px;
   display: flex;
   align-items: center;
-  font-size: 0.7rem;
+  font-size: var(--text-small);
   color: var(--ink);
   text-underline-offset: 5px;
 }
@@ -73,11 +73,12 @@ const expanded = ref(false);
   display: flex;
   align-items: center;
   gap: 12px;
+  white-space: nowrap;
   min-height: 44px;
   padding: 0;
   border: 0;
   background: none;
-  font-size: 0.7rem;
+  font-size: var(--text-small);
   cursor: pointer;
 }
 .menu-toggle > span:last-child {
@@ -103,7 +104,7 @@ ul a {
   display: flex;
   align-items: center;
   min-height: 48px;
-  font-size: 0.85rem;
+  font-size: var(--text-body);
   color: var(--ink);
   text-decoration: none;
   border-bottom: 1px solid var(--line);
@@ -116,14 +117,27 @@ ul a {
     font-size: 1.35rem;
   }
   .nav-actions {
-    gap: 18px;
+    gap: 12px;
   }
   .nav-rsvp {
-    font-size: 0.65rem;
+    line-height: 1.4;
   }
   .menu-toggle {
-    font-size: 0.65rem;
     gap: 8px;
+  }
+}
+@media (max-width: 360px) {
+  .topnav {
+    gap: 12px;
+  }
+  .brand {
+    font-size: 1.15rem;
+  }
+  .nav-actions {
+    gap: 8px;
+  }
+  .nav-rsvp {
+    max-width: 7em;
   }
 }
 </style>

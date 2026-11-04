@@ -338,7 +338,8 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
             },
           });
 
-          select(".photo-interlude").forEach((photo, index) => {
+          select(".photo-interlude:not(.album-cover)").forEach((photo, index) => {
+            if (photo.matches(".together-cover")) return;
             const direction = index % 2 ? -1 : 1;
             gsap.fromTo(
               photo.querySelector("img"),
@@ -395,7 +396,6 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
               .from(
                 frame,
                 {
-                  clipPath: "inset(8% 0% 8% 0%)",
                   y: desktop ? 60 : 24,
                   rotate: index % 2 ? 2 : -2,
                   ease: "power2.out",

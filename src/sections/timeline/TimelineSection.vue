@@ -168,7 +168,8 @@ import { timeline } from "./content";
 }
 .day time {
   display: block;
-  font: 2rem/1.2 var(--display);
+  font: 600 2.5rem/1.2 var(--display);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .day strong {
   display: block;
@@ -176,12 +177,14 @@ import { timeline } from "./content";
 }
 .day li span {
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--text-small);
+  line-height: 1.6;
   color: var(--ink-soft);
 }
 @media (max-width: 600px) {
   .day {
-    padding-inline: 48px;
+    padding-inline: 52px;
+    grid-template-rows: repeat(3, minmax(180px, auto));
   }
   .day li {
     gap: 10px;
@@ -194,7 +197,7 @@ import { timeline } from "./content";
     max-width: 175px;
   }
   .day strong {
-    font-size: 1.15rem;
+    font-size: 1.25rem;
   }
 }
 </style>

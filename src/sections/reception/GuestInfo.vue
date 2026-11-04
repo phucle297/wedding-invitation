@@ -40,9 +40,6 @@ const mapEmbedUrl = `https://maps.google.com/maps?${new URLSearchParams({
           referrerpolicy="no-referrer-when-downgrade"
           allowfullscreen
         ></iframe>
-        <a :href="reception.mapUrl" target="_blank" rel="noopener noreferrer">
-          Xem đường đi đến Minh Toàn Galaxy Hotel ↗
-        </a>
       </div>
       <WeatherNote />
     </div>
@@ -56,24 +53,23 @@ const mapEmbedUrl = `https://maps.google.com/maps?${new URLSearchParams({
 .travel-details {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
   margin-top: 40px;
 }
+.venue-map {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
 .venue-map iframe {
   display: block;
+  flex: 1;
   width: 100%;
   min-height: 320px;
-  height: calc(100% - 56px);
-  border: 1px solid var(--line);
-}
-.venue-map a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 56px;
-  color: var(--ink);
-  font-size: 0.95rem;
-  text-underline-offset: 4px;
+  border: 0;
 }
 .guest-details {
   display: grid;
@@ -103,7 +99,7 @@ strong {
 }
 small {
   color: var(--ink-soft);
-  font-size: 0.8rem;
+  font-size: var(--text-body);
   margin-bottom: 8px;
 }
 strong {
@@ -114,12 +110,12 @@ strong {
 }
 .guest-details p > span {
   color: var(--ink-soft);
-  font-size: 0.9rem;
+  font-size: var(--text-body);
 }
 .guest-note {
   margin-top: 32px;
   color: var(--ink-soft);
-  font-size: 0.85rem;
+  font-size: var(--text-body);
 }
 @media (max-width: 600px) {
   .travel-details {

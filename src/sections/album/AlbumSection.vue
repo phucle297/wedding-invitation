@@ -31,7 +31,7 @@ watch(
 
     context.add(() => {
       gallery.value?.querySelectorAll(".shot").forEach((shot, index) => {
-        gsap.from(shot, {
+        gsap.from(shot.querySelector(".shot-content"), {
           y: index % 2 ? 28 : -18,
           rotation: index % 2 ? 2 : -2,
           opacity: 0,
@@ -61,6 +61,12 @@ async function toggleAlbum() {
     gallery.value?.scrollIntoView({ block: "start" });
   }
 }
+
+function openPhoto(index: number, event: MouseEvent) {
+  if (event.currentTarget instanceof HTMLButtonElement) {
+    lightbox.value?.open(index, event.currentTarget);
+  }
+}
 </script>
 
 <template>
@@ -70,8 +76,8 @@ async function toggleAlbum() {
       srcset="/assets/album/11.jpg 1600w, /assets/album/album-cover.jpg 3200w"
       sizes="(min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
       alt="Duy Phúc và Linh Đan trong khu vườn xanh"
-      width="3200"
-      height="2133"
+      width="1600"
+      height="900"
       loading="lazy"
     />
     <figcaption lang="en">Our memories</figcaption>
@@ -79,7 +85,6 @@ async function toggleAlbum() {
   <section class="block album-block" id="anh" aria-labelledby="photo-title">
     <div class="album-heading">
       <h2 id="photo-title">{{ album.title }}</h2>
-      <p class="lead">Những khoảnh khắc đáng nhớ.</p>
       <span class="fine-rule" aria-hidden="true"></span>
     </div>
     <div
@@ -89,21 +94,25 @@ async function toggleAlbum() {
       :class="{ 'is-open': opened }"
     >
       <button
-        v-for="photo in photos"
+        v-for="(photo, index) in photos"
         :key="photo.src"
         class="shot"
         type="button"
-        @click="lightbox?.open(photo)"
+        aria-haspopup="dialog"
+        :aria-label="`Mở ảnh ${index + 1}: ${photo.alt}`"
+        @click="openPhoto(index, $event)"
       >
-        <img
-          :src="photo.src"
-          :alt="photo.alt"
-          :width="photo.width"
-          :height="photo.height"
-          loading="lazy"
-          decoding="async"
-        />
-        <span class="photo-zoom" aria-hidden="true">↗</span>
+        <span class="shot-content">
+          <img
+            :src="photo.src"
+            :alt="photo.alt"
+            :width="photo.width"
+            :height="photo.height"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="photo-zoom" aria-hidden="true">↗</span>
+        </span>
       </button>
     </div>
     <button
@@ -114,23 +123,26 @@ async function toggleAlbum() {
       aria-controls="wedding-gallery"
       @click="toggleAlbum"
     >
-      {{ opened ? "Thu gọn album" : `Xem đủ ${album.photos.length} ảnh` }}
+      {{ opened ? "Thu gọn album" : "Xem tất cả ảnh" }}
       <span aria-hidden="true">{{ opened ? "−" : "↗" }}</span>
     </button>
-    <PhotoLightbox ref="lightbox" />
+    <PhotoLightbox ref="lightbox" :photos="album.photos" />
   </section>
 </template>
 
 <style scoped>
 .album-cover {
-  aspect-ratio: 1.1;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 900px;
+}
+.album-cover > img {
+  height: 100%;
+  object-fit: cover;
 }
 .album-heading {
   text-align: center;
   margin-bottom: 40px;
-}
-.album-heading .lead {
-  font-size: 0.85rem;
 }
 .gallery {
   columns: 2;
@@ -148,18 +160,25 @@ async function toggleAlbum() {
   background: #e7e7e2;
   overflow: hidden;
   cursor: zoom-in;
+  touch-action: manipulation;
+}
+.shot-content {
+  display: block;
+  position: relative;
+  pointer-events: none;
 }
 .shot img {
   display: block;
   width: 100%;
   height: auto;
+  object-fit: contain;
 }
 .photo-zoom {
   position: absolute;
   bottom: 12px;
   right: 12px;
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   background: #ffffffed;

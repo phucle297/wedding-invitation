@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { couple } from "../../content/couple";
-import CallaSprig from "../../components/CallaSprig.vue";
 
 const scenes = [
   {
@@ -29,6 +28,11 @@ const scenes = [
     <div class="section-heading">
       <p class="eyebrow">Hai người, một hành trình</p>
       <h2 id="couple-title">Chúng mình</h2>
+      <p class="couple-intro">
+        Chẳng cần những điều lớn lao, chỉ mong mỗi ngày đều có nhau.
+        Cùng chia sẻ những niềm vui nhỏ, cùng đi qua những ngày bình thường —
+        và cùng viết tiếp câu chuyện của chúng mình.
+      </p>
     </div>
     <div class="portraits">
       <figure>
@@ -63,7 +67,14 @@ const scenes = [
           ><em>{{ couple.bride.role }}</em>
         </figcaption>
       </figure>
-      <CallaSprig class="couple-botanical" />
+      <img
+        class="couple-botanical"
+        src="/assets/ornaments/botanical.svg"
+        alt=""
+        aria-hidden="true"
+        width="240"
+        height="360"
+      />
     </div>
   </section>
 
@@ -99,9 +110,9 @@ const scenes = [
 
   <section class="block vow" aria-labelledby="vow-title">
     <p class="eyebrow" id="vow-title">Lời hẹn</p>
-    <blockquote aria-label="“Cùng nhau, đi tiếp những ngày đẹp nhất.”">
+    <blockquote aria-label="“Cùng nhau đi tiếp những ngày đẹp nhất.”">
       <span class="vow-line" aria-hidden="true">
-        <span class="vow-word">“Cùng</span> <span class="vow-word">nhau,</span>{{ " " }}
+        <span class="vow-word">“Cùng</span> <span class="vow-word">nhau</span>{{ " " }}
         <span class="vow-word">đi</span> <span class="vow-word">tiếp</span>
       </span>
       <span class="vow-line" aria-hidden="true">
@@ -122,7 +133,7 @@ const scenes = [
   margin: 14px 0;
 }
 .section-heading .lead {
-  font-size: 0.8rem;
+  font-size: var(--text-body);
 }
 .couple-section {
   position: relative;
@@ -134,6 +145,14 @@ const scenes = [
 .couple-section .eyebrow,
 .couple-section h2 {
   color: inherit;
+}
+.couple-intro {
+  max-width: 32em;
+  margin: 20px auto 0;
+  color: var(--ink-soft);
+  font-size: var(--text-body);
+  line-height: 1.9;
+  text-wrap: pretty;
 }
 .portraits {
   display: grid;
@@ -171,35 +190,44 @@ figcaption {
 }
 figcaption span {
   display: block;
-  font: 1.8rem var(--display);
-  text-transform: uppercase;
+  font: 500 2rem/1.25 var(--heading);
 }
 figcaption small {
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--text-small);
+  line-height: 1.5;
   margin-top: 4px;
 }
 figcaption em {
   display: block;
-  font: 2rem var(--script-vi);
+  font: var(--text-small)/1.5 var(--sans);
   margin-top: 5px;
 }
 .couple-botanical {
   position: absolute;
-  width: 24%;
-  height: 44%;
-  left: 38%;
-  bottom: 28%;
-  filter: drop-shadow(0 2px 4px #30282033);
-  transform: scaleX(-1) rotate(-20deg);
+  width: clamp(96px, 24%, 180px);
+  height: auto;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -25%) rotate(-12deg);
+  pointer-events: none;
 }
 .journey {
   padding: 78px 42px 36px;
   scroll-margin-top: 90px;
 }
 .journey h2 {
-  font: 3.5rem/1.15 var(--script-vi);
+  font: var(--section-title)/1.25 var(--script-vi);
   margin: 16px 0;
+}
+.journey .section-heading::after {
+  content: "";
+  display: block;
+  width: 120px;
+  height: 36px;
+  margin: 20px auto 0;
+  background: url("/assets/ornaments/flourish.svg") center / contain no-repeat;
+  opacity: 0.7;
 }
 .journey-track {
   position: relative;
@@ -245,13 +273,10 @@ figcaption em {
 }
 .journey-frame {
   margin: 0;
-  aspect-ratio: 0.8;
+  aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 100px 100px 0 0;
+  border-radius: 50%;
   background: #e7e7e2;
-}
-.journey-scene:nth-of-type(even) .journey-frame {
-  border-radius: 0 0 100px 100px;
 }
 .journey-frame img {
   width: 100%;
@@ -271,17 +296,43 @@ figcaption em {
 }
 .journey-copy h3 {
   font: 2rem/1.15 var(--script-vi);
+  letter-spacing: 0.015em;
   margin: 0 0 16px;
 }
 .journey-copy p {
   color: var(--ink-soft);
   line-height: 1.9;
   margin: 0;
-  font-size: 0.8rem;
+  font-size: var(--text-body);
+}
+.journey-copy::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 36px;
+  margin-top: 18px;
+  background: url("/assets/ornaments/rings.svg") left center / contain no-repeat;
+  opacity: 0.65;
+}
+.journey-scene:nth-of-type(2) .journey-copy::after {
+  background-image: url("/assets/ornaments/ribbon.svg");
+}
+.journey-scene:nth-of-type(3) .journey-copy::after {
+  background-image: url("/assets/ornaments/sparkles.svg");
+}
+@media (min-width: 1024px) {
+  .journey-scene:nth-of-type(even) .journey-copy::after {
+    margin-left: auto;
+  }
 }
 .vow {
   text-align: center;
   border-block: 1px solid var(--line);
+  background-color: var(--cream);
+  background-image: var(--paper-emboss), var(--paper-grain);
+  background-size: 180px auto, 180px 180px;
+  background-repeat: no-repeat, repeat;
+  background-position: right bottom, center;
 }
 .vow blockquote {
   font: 2.8rem/1.4 var(--script-vi);
@@ -301,19 +352,10 @@ figcaption em {
     padding-top: 55px;
   }
   figcaption span {
-    font-size: 1.25rem;
-  }
-  figcaption small {
-    font-size: 0.65rem;
-  }
-  figcaption em {
     font-size: 1.5rem;
   }
   .journey {
     padding: 60px 24px 30px;
-  }
-  .journey h2 {
-    font-size: 2.9rem;
   }
   .journey-scene {
     display: flex;
@@ -322,18 +364,12 @@ figcaption em {
     align-items: stretch;
     padding: 24px 0 32px 32px;
   }
-  .journey-frame {
-    aspect-ratio: 1;
-  }
   .journey-dot {
     top: 50px;
   }
   .journey-copy h3 {
     font-size: 2.1rem;
     margin-bottom: 10px;
-  }
-  .journey-copy p {
-    font-size: 0.9rem;
   }
   .vow blockquote {
     font-size: 2.1rem;

@@ -10,6 +10,10 @@
   --champagne: #f7f1e5;
   --champagne-shade: #eee3cf;
   --ornament-ink: #a18454;
+  --text-small: 0.875rem;
+  --text-body: 1rem;
+  --text-detail: 1.125rem;
+  --section-title: clamp(2.25rem, 3.5vw, 3rem);
   --pad: 42px;
   --paper-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23757570' opacity='.1' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
   --paper-fibers: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23a8a8a0' stroke-width='.6' opacity='.22'%3E%3Cpath d='M12 28l5 9m38 4 7-3m42-18 2 13m39 19 9 2m44-31-4 10M24 94l10 3m42-14-3 11m48-13 6 6m57-5-6 5m38 31 4 8M10 158l8-5m44-13 3 9m38-5 9 5m42-20 3 12m45 11 8-6M33 213l-3-11m46 18 9-4m44-20 3 9m42 12 8-5m31 21 3-10'/%3E%3C/svg%3E");
@@ -31,7 +35,8 @@
 }
 .invite .block h2 {
   font-family: var(--script-vi);
-  font-size: 3.6rem;
+  font-size: var(--section-title);
+  line-height: 1.25;
   font-weight: 500;
   font-style: normal;
   color: var(--ink);
@@ -39,12 +44,12 @@
 }
 .invite .eyebrow {
   color: var(--ink-soft);
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
+  font-size: var(--text-small);
+  letter-spacing: 0;
 }
 .invite .btn {
   min-height: 48px;
-  font-size: 0.8rem;
+  font-size: var(--text-body);
   border-radius: 0;
 }
 .invite .btn-ink {
@@ -64,7 +69,8 @@
   outline-offset: 5px;
 }
 /* Focused controls stay readable even before their scroll reveal completes. */
-.invite :is(.venue, .rsvp form, .shot):focus-within {
+.invite :is(.venue, .rsvp form):focus-within,
+.invite .shot:focus-within .shot-content {
   opacity: 1 !important;
 }
 .satin {
@@ -82,7 +88,7 @@
   background-image: var(--paper-fibers), var(--paper-grain);
   background-size: 240px, 180px;
 }
-.invite :is(.vow, .guest-info) {
+.invite .guest-info {
   background-image:
     repeating-linear-gradient(0deg, #a1845406 0 1px, transparent 1px 4px),
     repeating-linear-gradient(90deg, #a1845405 0 1px, transparent 1px 4px);
@@ -121,7 +127,8 @@
   background: #e7e7e2;
 }
 .together-cover {
-  aspect-ratio: 0.8;
+  width: 100%;
+  aspect-ratio: 2;
 }
 .photo-interlude > img {
   width: 100%;
@@ -130,13 +137,16 @@
   object-position: center;
   display: block;
 }
+.invite .together-cover > img {
+  object-position: center bottom;
+}
 .photo-interlude > figcaption {
   position: absolute;
   bottom: 30px;
   left: 0;
   right: 0;
   text-align: center;
-  font: 3.8rem var(--script);
+  font: 3rem var(--script);
   color: #ffffff;
   text-shadow: 0 2px 15px #302b24aa;
 }
@@ -145,9 +155,6 @@
   text-align: center;
   padding-block: 34px 48px;
   border-top: 1px solid var(--line);
-}
-.invite .family-section h2 {
-  font-size: 2.7rem;
 }
 .invite .family-section .families {
   margin-top: 28px;
@@ -159,7 +166,7 @@
   font-size: 1.35rem;
 }
 .invite .family-section .where {
-  font-size: 0.75rem;
+  font-size: var(--text-small);
 }
 .invite .place {
   text-align: center;
@@ -171,14 +178,16 @@
 }
 .invite .place .when {
   font-family: var(--display);
-  font-size: 1.4rem;
+  font-size: clamp(1.75rem, 2.4vw, 2rem);
+  line-height: 1.4;
+  text-wrap: balance;
 }
 .invite .place .where {
-  font-size: 1rem;
+  font-size: var(--text-detail);
 }
 .invite .place .address-note {
   color: var(--ink-soft);
-  font-size: 0.75rem;
+  font-size: var(--text-small);
   max-width: 28em;
   margin: 18px auto 0;
 }
@@ -205,16 +214,15 @@
 }
 .invite .venue .eyebrow {
   margin: 0;
-  font-size: 0.65rem;
+  font-size: var(--text-small);
 }
 .invitation-guest {
   font: 2.1rem var(--script-vi);
   margin: 22px 0;
 }
 .invitation-note {
-  font: 0.7rem/1.9 var(--sans);
+  font: var(--text-small)/1.8 var(--sans);
   letter-spacing: 0.03em;
-  text-transform: uppercase;
   color: var(--ink-soft);
 }
 .invitation-names {
@@ -233,7 +241,7 @@
   border-block: 1px solid var(--line);
   margin: 0 0 10px;
   padding: 8px 0;
-  font: 1.55rem var(--display);
+  font: 1.75rem/1.35 var(--display);
   gap: 18px;
 }
 .invitation-date span {
@@ -241,18 +249,19 @@
   border-right: 1px solid var(--line);
 }
 .invitation-date strong {
-  font-weight: 500;
+  font-weight: 600;
+  white-space: nowrap;
 }
 .invitation-lunar {
-  font: italic 0.9rem var(--display);
+  font: italic var(--text-detail)/1.5 var(--display);
   margin: 0 0 38px;
   color: var(--ink-soft);
 }
 .invite .venue h2 {
-  font: 1.9rem/1.15 var(--display);
+  font: 500 1.9rem/1.15 var(--heading);
   margin: 12px 0;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.025em;
 }
 .invite .venue .hall {
   font-size: 1.45rem;
@@ -277,10 +286,10 @@
   margin-top: 24px;
 }
 .invite .venue .call {
-  font-size: 0.75rem;
+  font-size: var(--text-body);
 }
 .invite .venue .fine {
-  font-size: 0.65rem;
+  font-size: var(--text-small);
   max-width: 24em;
   margin: 10px auto 0;
 }
@@ -312,8 +321,9 @@
   position: absolute;
   width: 240px;
   height: 240px;
-  top: 8px;
+  top: 50%;
   right: -8px;
+  transform: translateY(-50%);
   border: 8px double var(--line);
   border-radius: 50%;
   opacity: 0.45;
@@ -330,15 +340,17 @@
   position: absolute;
   width: 70px;
   height: 85px;
-  top: 44px;
-  right: 110px;
+  top: 50%;
+  right: 120px;
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  transform: rotate(28deg);
+  transform: translateY(-100%) rotate(28deg);
+  transform-origin: bottom right;
   z-index: -1;
 }
 .invite .countdown-section .lead {
-  font-size: 0.85rem;
+  font-size: var(--text-detail);
+  font-weight: 500;
   max-width: 26em;
 }
 .invite .count {
@@ -359,10 +371,10 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 .invite .count span {
-  font-size: 0.7rem;
+  font-size: var(--text-small);
 }
 .invite .count-note {
-  font-size: 0.8rem;
+  font-size: var(--text-small);
 }
 .invite .guest-info {
   border-block: 1px solid var(--line);
@@ -373,15 +385,20 @@
 .invite .guest-info .guest-details > div + div {
   padding-left: 20px;
 }
-.invite .guest-info strong {
-  font-size: 1.5rem;
+.invite .guest-details strong {
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  line-height: 1.3;
+}
+.invite .guest-details > div:first-child strong {
+  font-size: 2.75rem;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .invite .rsvp {
   text-align: center;
 }
 .invite .rsvp .lead {
-  font-size: 0.85rem;
-  line-height: 1.9;
+  font-size: var(--text-body);
+  line-height: 1.75;
   margin: 22px auto 30px;
 }
 .invite .rsvp form {
@@ -398,15 +415,15 @@
   font-size: 16px;
 }
 .invite .rsvp :is(.field label, legend) {
-  font-size: 0.8rem;
+  font-size: var(--text-body);
   color: var(--ink);
 }
 .invite .rsvp .choice {
   min-height: 48px;
-  font-size: 0.85rem;
+  font-size: var(--text-body);
 }
 .invite .rsvp .form-status {
-  font-size: 0.8rem;
+  font-size: var(--text-body);
 }
 
 @media (max-width: 600px) {
@@ -416,9 +433,6 @@
   .invite .block {
     width: calc(100% - 48px);
     padding-block: 48px;
-  }
-  .invite .block h2 {
-    font-size: 2.8rem;
   }
   .invite .family-section article {
     padding: 18px 0;
@@ -437,20 +451,17 @@
     font-size: 1.7rem;
   }
   .invitation-date {
-    font-size: 1.35rem;
-    gap: 12px;
+    flex-direction: column;
+    font-size: 1.75rem;
+    gap: 4px;
   }
   .invitation-date span {
-    padding-right: 12px;
+    padding-right: 0;
+    border-right: 0;
+    font: var(--text-body)/1.5 var(--sans);
   }
   .invite .venue h2 {
     font-size: 1.8rem;
-  }
-  .invite .venue address {
-    font-size: 0.95rem;
-  }
-  .invite .venue .eyebrow {
-    font-size: 0.55rem;
   }
   .venue-botanical {
     width: 28%;
@@ -477,7 +488,7 @@
     width: 100%;
   }
   .photo-interlude > figcaption {
-    font-size: 2.8rem;
+    font-size: 2.4rem;
   }
   .invite .guest-info .guest-details > div + div {
     padding: 24px 0 0;
@@ -498,12 +509,6 @@
     max-width: 1280px;
     padding-block: 100px;
   }
-  .invite .block h2 {
-    font-size: clamp(3.6rem, 4.5vw, 4.8rem);
-  }
-  .invite .eyebrow {
-    font-size: 0.7rem;
-  }
   .invite .topnav {
     padding: 12px var(--desktop-gutter);
     gap: 32px;
@@ -523,7 +528,7 @@
   }
   .invite .topnav ul a {
     border: 0;
-    font-size: 0.75rem;
+    font-size: var(--text-small);
   }
   .invite .menu-toggle {
     display: none;
@@ -555,21 +560,26 @@
   }
   .invite .hero-script {
     width: 100%;
-    font-size: clamp(100px, 9.2vw, 145px);
+    font-size: clamp(68px, 6.4vw, 100px);
     margin: 0 0 54px;
     line-height: 0.85;
   }
   .invite .hero-script span {
     margin: 8px 0 0 8%;
   }
-  .invite .hero-copy .eyebrow,
+  .invite .hero-message,
   .invite .hero-copy h1,
   .invite .hero-scroll {
     width: 100%;
   }
+  .invite .hero-message {
+    max-width: 26em;
+    margin-inline: auto;
+    font-size: var(--text-body);
+  }
   .invite .hero-copy h1 {
-    font-size: clamp(2rem, 2.6vw, 2.8rem);
-    letter-spacing: 0.02em;
+    font-size: clamp(2.4rem, 3.1vw, 3.2rem);
+    letter-spacing: -0.025em;
     margin-block: 26px;
   }
   .invite .hero-copy h1 span,
@@ -599,7 +609,7 @@
     width: calc(51% - var(--desktop-gutter) - 32px);
     left: var(--desktop-gutter);
     bottom: 70px;
-    font-size: 1.6rem;
+    font-size: 2rem;
   }
   .invite .block.letter {
     display: grid;
@@ -621,11 +631,11 @@
   }
   .invite .letter h2 {
     margin-block: 24px;
-    font-size: clamp(4rem, 6vw, 6rem);
   }
   .invite .letter blockquote {
-    font-size: clamp(1.5rem, 2vw, 1.9rem);
+    font-size: clamp(1.125rem, 1.5vw, 1.25rem);
     margin-block: 28px 36px;
+    margin-inline: 0;
     max-width: 22em;
   }
   .invite .invitation-details {
@@ -642,9 +652,6 @@
   }
   .invite .invitation-details .family-section {
     align-self: end;
-  }
-  .invite .invitation-details .family-section h2 {
-    font-size: 3.2rem;
   }
   .invite .invitation-details .family-section article p:not(.where) {
     font-size: clamp(1.25rem, 1.65vw, 1.65rem);
@@ -665,25 +672,16 @@
   .invite .venue h2 {
     font-size: clamp(1.6rem, 2vw, 2rem);
   }
-  .invite .photo-interlude {
+  .invite .together-cover {
     aspect-ratio: 2.7;
-    max-height: 650px;
+    max-height: 600px;
   }
-  .invite :is(.together-cover, .album-cover) {
-    aspect-ratio: auto;
-    height: clamp(560px, 48vw, 800px);
-    max-height: none;
-  }
-  .invite .photo-interlude > img {
+  .invite .photo-interlude:not(.together-cover) > img {
     object-position: center 43%;
-  }
-  .invite .together-cover > img {
-    object-position: center 75%;
-    transform-origin: center 75%;
   }
   .invite .photo-interlude > figcaption {
     inset: auto auto 40px var(--desktop-gutter);
-    font-size: 5.5rem;
+    font-size: 3.5rem;
   }
   .invite .day-path {
     max-width: none;
@@ -717,13 +715,13 @@
     gap: 14px;
   }
   .invite .day time {
-    font-size: 2.8rem;
+    font-size: 3rem;
   }
   .invite .day strong {
     font-size: 1.6rem;
   }
   .invite .day li span {
-    font-size: 0.8rem;
+    font-size: var(--text-body);
   }
   .invite .couple-section {
     display: grid;
@@ -740,7 +738,6 @@
   }
   .invite .couple-section h2 {
     margin-top: 30px;
-    font-size: clamp(4rem, 6vw, 6rem);
   }
   .invite .portraits {
     gap: 42px;
@@ -754,12 +751,6 @@
     margin-inline: auto;
     padding: 120px 0 50px;
   }
-  .invite .journey h2 {
-    font-size: 4.8rem;
-  }
-  .invite .journey .lead {
-    font-size: 0.95rem;
-  }
   .invite .journey-line {
     left: 50%;
   }
@@ -768,13 +759,8 @@
     gap: 15%;
     padding: 45px 0 70px;
   }
-  .invite .journey-frame {
-    aspect-ratio: 1;
-    border-radius: 240px 240px 0 0;
-  }
   .invite .journey-scene:nth-of-type(even) .journey-frame {
     grid-area: 1 / 2;
-    border-radius: 0 0 240px 240px;
   }
   .invite .journey-scene:nth-of-type(even) .journey-copy {
     grid-area: 1 / 1;
@@ -785,11 +771,14 @@
     padding-right: 10%;
   }
   .invite .journey-copy h3 {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
   }
   .invite .journey-copy p {
     font-size: 1rem;
     max-width: 28em;
+  }
+  .invite .journey-scene:nth-of-type(even) .journey-copy p {
+    margin-left: auto;
   }
   .invite .journey-dot {
     left: calc(50% - 4px);
@@ -800,7 +789,7 @@
     padding: 90px var(--desktop-gutter);
   }
   .invite .vow blockquote {
-    font-size: 4rem;
+    font-size: 3rem;
   }
   .invite .countdown-section {
     display: grid;
@@ -814,7 +803,7 @@
   }
   .invite .countdown-copy .lead {
     margin: 20px 0 0;
-    font-size: 0.95rem;
+    font-size: var(--text-detail);
   }
   .invite .count {
     margin: 0;
@@ -867,18 +856,18 @@
   }
   .invite .rsvp {
     display: grid;
-    grid-template-columns: 0.85fr 1.4fr;
-    gap: 7%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
     align-items: start;
     text-align: left;
   }
-  .invite .rsvp-copy {
-    padding-top: 60px;
+  .invite .rsvp-copy h2 {
+    margin-top: 0;
   }
   .invite .rsvp .lead {
     margin: 28px 0 0;
     max-width: 25em;
-    font-size: 0.95rem;
+    font-size: var(--text-body);
   }
   .invite .rsvp form {
     margin: 0;
@@ -886,19 +875,23 @@
   }
   .invite .closing-spread {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 600px;
     background: var(--paper);
   }
   .invite .closing-photo {
-    aspect-ratio: 1.1;
+    aspect-ratio: auto;
     max-height: none;
   }
+  .invite .closing-photo > img {
+    position: absolute;
+    inset: 0;
+  }
   .invite .thanks {
-    align-content: center;
     padding: 60px 36px;
   }
   .invite .thanks h2 {
-    font-size: 7rem;
+    font-size: 4.5rem;
   }
   .invite .colophon {
     display: flex;
@@ -1044,6 +1037,38 @@
     left: auto;
     right: 0;
   }
+}
+
+.invite :is(.letter, .couple-section, .album-block) {
+  position: relative;
+  isolation: isolate;
+}
+.invite :is(.letter, .couple-section, .album-block)::before,
+.invite :is(.letter, .couple-section, .album-block)::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: clamp(64px, 8vw, 112px);
+  height: 32px;
+  background: var(--ornament-ink);
+  mask: url("/assets/ornaments/sparkles.svg") center / contain no-repeat;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.invite :is(.letter, .couple-section, .album-block)::before {
+  top: 14px;
+  right: 7%;
+}
+.invite :is(.letter, .couple-section, .album-block)::after {
+  bottom: 14px;
+  left: 7%;
+  mask-image: url("/assets/ornaments/flourish.svg");
+}
+.invite .couple-section::before {
+  mask-image: url("/assets/ornaments/rings.svg");
+}
+.invite .album-block::after {
+  mask-image: url("/assets/ornaments/ribbon.svg");
 }
 
 @media print {

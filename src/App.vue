@@ -26,9 +26,10 @@ function onOpen() {
       document.documentElement.classList.remove("has-gate", "gate-out");
       entered.value = true;
       paintTheme("#ffffff");
-      nextTick(() =>
-        document.getElementById("invite")?.focus({ preventScroll: true }),
-      );
+      nextTick(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        document.getElementById("invite")?.focus({ preventScroll: true });
+      });
     },
     2100,
   );

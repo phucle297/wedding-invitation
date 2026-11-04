@@ -165,7 +165,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
 }
 .date-tag small {
   font-size: 0.6rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.03em;
 }
 .date-tag i {
   display: block;
@@ -180,14 +180,15 @@ import CallaSprig from "../../components/CallaSprig.vue";
 }
 blockquote {
   font-family: var(--display);
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   line-height: 1.6;
   max-width: 27em;
   margin: 20px auto;
 }
 .letter-date {
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
+  font-size: var(--text-detail);
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -213,9 +214,6 @@ blockquote {
   }
   .date-tag small {
     font-size: 0.5rem;
-  }
-  blockquote {
-    font-size: 1.3rem;
   }
 }
 </style>

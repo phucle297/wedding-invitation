@@ -40,10 +40,10 @@ article + article {
 
 h3 {
   margin: 0 0 12px;
-  font-family: var(--sans);
-  font-size: 0.84rem;
+  font-family: var(--heading);
+  font-size: var(--text-detail);
   font-weight: 500;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.025em;
   text-transform: none;
   color: var(--ink-soft);
 }

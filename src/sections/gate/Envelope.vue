@@ -145,8 +145,8 @@ defineProps({
 
 .names {
   margin: 8px 0 0;
-  font-family: var(--display);
-  font-style: italic;
+  font-family: var(--heading);
+  font-style: normal;
   font-size: clamp(1.8rem, 5vw, 2.4rem);
   line-height: 1.1;
 }
@@ -155,8 +155,8 @@ defineProps({
 
 .when {
   margin: 12px 0 0;
-  letter-spacing: 0.28em;
-  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  font-size: 1rem;
 }
 
 .flap {
@@ -211,10 +211,10 @@ defineProps({
 
 .welcome {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  letter-spacing: 0.38em;
-  text-indent: 0.38em;
+  letter-spacing: 0.06em;
+  text-indent: 0.06em;
   text-transform: uppercase;
   line-height: 1.35;
 }
@@ -243,10 +243,10 @@ defineProps({
 
 .salute {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 1rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
-  text-indent: 0.16em;
+  letter-spacing: 0.04em;
+  text-indent: 0.04em;
   text-transform: uppercase;
 }
 
@@ -262,8 +262,8 @@ defineProps({
 .hint {
   bottom: max(18px, 3vh);
   margin: 0;
-  font-size: 0.68rem;
-  letter-spacing: 0.22em;
+  font-size: 0.875rem;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   opacity: 0.78;
 }
@@ -312,7 +312,7 @@ defineProps({
   }
 
   .welcome {
-    font-size: 1.5cqw;
+    font-size: max(0.875rem, 1.5cqw);
   }
 
   .script {
@@ -336,7 +336,7 @@ defineProps({
   }
 
   .salute {
-    font-size: 1.6cqw;
+    font-size: max(1rem, 1.6cqw);
   }
 
   .guest {
@@ -346,7 +346,7 @@ defineProps({
 
   .hint {
     bottom: 4%;
-    font-size: 1.2cqw;
+    font-size: max(0.875rem, 1.2cqw);
   }
 
   .slot {
@@ -367,7 +367,7 @@ defineProps({
 
   .when {
     margin-top: 1.5cqw;
-    font-size: 1.8cqw;
+    font-size: max(1rem, 1.8cqw);
   }
 }
 </style>

@@ -40,11 +40,15 @@ import { phrases } from "../../content/phrases";
   aspect-ratio: 0.85;
 }
 .thanks {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 520px;
   padding: 70px 24px;
   text-align: center;
 }
 .thanks h2 {
-  font: 5.5rem var(--script);
+  font: 4rem/1.2 var(--script);
   margin: 22px 0;
 }
 .thanks > p:not(.eyebrow) {
@@ -78,7 +82,7 @@ import { phrases } from "../../content/phrases";
 }
 .footer-names {
   color: inherit;
-  font-family: var(--display);
+  font-family: var(--heading);
   font-size: 2.2rem;
   text-decoration: none;
 }
@@ -87,8 +91,8 @@ import { phrases } from "../../content/phrases";
 }
 .colophon p {
   color: var(--ink-soft);
-  font-size: 0.8rem;
-  letter-spacing: 0.06em;
+  font-size: var(--text-small);
+  letter-spacing: 0.02em;
   margin: 12px 0 24px;
 }
 .colophon p span {
@@ -97,9 +101,6 @@ import { phrases } from "../../content/phrases";
 @media (max-width: 759px) {
   .thanks {
     padding-block: 60px;
-  }
-  .thanks .eyebrow {
-    font-size: 0.62rem;
   }
 }
 </style>
