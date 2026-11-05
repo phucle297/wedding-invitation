@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <path id="outline" d="M58 8C66 5 70 10 78 11S88 13 92 20 100 23 102 32 109 42 107 50 112 62 108 69 108 80 101 85 97 96 88 98 78 107 69 105 58 111 50 106 37 107 32 101 20 98 19 89 10 81 12 73 6 61 10 53 7 42 13 35 13 24 22 21 29 11 39 12 49 6 58 8Z"/>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8e8b9"/>
+      <stop offset=".3" stop-color="#d3b26b"/>
+      <stop offset=".48" stop-color="#f2d99a"/>
+      <stop offset=".75" stop-color="#c4a15b"/>
+      <stop offset="1" stop-color="#af8b46"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2=".85" y2="1">
+      <stop offset="0" stop-color="#faedcb"/>
+      <stop offset=".36" stop-color="#e4cb8c"/>
+      <stop offset=".52" stop-color="#f4e0ad"/>
+      <stop offset="1" stop-color="#ccad6a"/>
+    </linearGradient>
+    <linearGradient id="engraving" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#94733b"/>
+      <stop offset="1" stop-color="#b4985c"/>
+    </linearGradient>
+    <pattern id="brush" width="4" height="3" patternUnits="userSpaceOnUse">
+      <path d="M0 .5h4" stroke="#fff8dc" stroke-opacity=".14" stroke-width=".4"/>
+      <path d="M0 2h4" stroke="#66502e" stroke-opacity=".08" stroke-width=".3"/>
+    </pattern>
+    <g id="botanical">
+      <path d="M43 82c13-12 24-26 31-47" fill="none" stroke-width="1.5"/>
+      <path d="M54 70c-11-1-14-8-12-14 8 0 13 6 12 14ZM61 61c-9-3-12-10-8-16 7 3 10 9 8 16ZM68 49c-5-5-5-12 0-16 5 5 5 11 0 16ZM58 68c4-9 12-12 18-8-2 7-10 10-18 8ZM66 56c3-9 10-12 16-9-2 7-8 10-16 9ZM73 43c0-7 4-12 10-12 1 6-3 11-10 12Z" stroke-width=".6"/>
+    </g>
+  </defs>
+  <use href="#outline" transform="translate(0 2)" fill="#ac8a4d"/>
+  <use href="#outline" fill="url(#rim)" stroke="#f7efdf" stroke-width=".6"/>
+  <path d="M24 39C30 20 50 16 66 20S93 31 96 49" fill="none" stroke="#fff9ed" stroke-width="1.2" opacity=".65"/>
+  <path d="M20 64C16 42 35 23 57 24S93 38 95 58 81 94 60 95 23 87 20 64Z" fill="url(#face)" stroke="#b69859" stroke-width="1.1"/>
+  <path d="M20 64C16 42 35 23 57 24S93 38 95 58 81 94 60 95 23 87 20 64Z" fill="url(#brush)"/>
+  <path d="M26 68C20 45 37 28 57 29S89 43 90 59 77 88 59 89 31 83 26 68Z" fill="none" stroke="#faf3e5" stroke-width=".65"/>
+  <use href="#botanical" transform="translate(.7 1)" fill="#fff9ed" stroke="#fff9ed"/>
+  <use href="#botanical" fill="url(#engraving)" stroke="#a88b4d"/>
+</svg>
