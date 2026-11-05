@@ -34,7 +34,21 @@ defineProps({
 
       <div class="flap">
         <div class="flap-back">
-          <div class="flap-lining"></div>
+          <div class="flap-lining">
+            <svg
+              class="creases"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+            >
+              <polygon
+                points="0,0 100,0 50,100"
+                fill="none"
+                stroke="#aa9670"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
+          </div>
           <div class="seal">
             <img src="/assets/ornaments/gold-seal.svg" alt="" />
           </div>
@@ -116,9 +130,8 @@ defineProps({
     inset 0 0 0 1px #a39a8729,
     inset 0 0 48px #b9a37414,
     1px 2px 0 #d8d4c8,
-    0 4px 7px #4c483c1f,
-    5px 20px 32px #4c483c26,
-    12px 38px 60px #4c483c12;
+    0 3px 6px #4c483c14,
+    3px 10px 20px #4c483c14;
 }
 .velvet::after {
   content: "";
@@ -260,16 +273,20 @@ defineProps({
 }
 .flap-lining {
   position: absolute;
+  z-index: 1;
   inset: 0;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   background:
     var(--paper-grain), linear-gradient(180deg, #fffefa, #faf5e9 65%, #f1e5ca);
 }
+.flap-back .seal {
+  z-index: 0;
+}
 /* The shadow belongs outside the clipped paper, so it follows the folded edge. */
 .flap-paper {
   position: absolute;
   inset: 0;
-  filter: drop-shadow(2px 12px 8px #4c483c38) drop-shadow(0 2px 1px #a49b8866);
+  filter: drop-shadow(1px 5px 5px #4c483c21) drop-shadow(0 1px 1px #a49b8833);
 }
 .flap-shape {
   position: absolute;
@@ -401,7 +418,7 @@ defineProps({
   bottom: 0;
   width: 100px;
   height: 100px;
-  transform: translate(-50%, -8%) rotate(-8deg);
+  transform: translate(-50%, 50%) rotate(-8deg);
 }
 .seal::before {
   content: "";
@@ -445,9 +462,8 @@ defineProps({
       inset 0 0 0 1px #a39a8729,
       inset 0 0 56px #b9a37414,
       1px 3px 0 #d8d4c8,
-      0 5px 9px #4c483c21,
-      7px 24px 36px #4c483c29,
-      18px 52px 80px #4c483c17;
+      0 4px 8px #4c483c14,
+      4px 12px 24px #4c483c17;
   }
   .velvet::after {
     inset: 18px;
