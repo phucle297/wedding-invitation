@@ -229,7 +229,7 @@ defineProps({
 .names {
   margin: 8px 0 0;
   font-family: var(--heading);
-  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  font-size: clamp(1rem, 4.8vw, 2.2rem);
   line-height: 1.1;
 }
 .names span {

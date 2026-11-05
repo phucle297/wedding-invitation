@@ -8,7 +8,6 @@ import { ceremony } from "./content";
     <h2 id="place-title">{{ ceremony.place }}</h2>
     <p class="when">{{ ceremony.when }}</p>
     <p class="where">{{ ceremony.lunar }}</p>
-    <p class="address-note">Địa chỉ tư gia sẽ được gia đình thông báo cùng lời mời.</p>
   </section>
 </template>
 

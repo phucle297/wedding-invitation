@@ -185,151 +185,6 @@
 .invite .place .where {
   font-size: var(--text-detail);
 }
-.invite .place .address-note {
-  color: var(--ink-soft);
-  font-size: var(--text-small);
-  max-width: 28em;
-  margin: 18px auto 0;
-}
-.invite .hotel {
-  position: relative;
-  padding: 64px 42px;
-  isolation: isolate;
-  overflow: clip;
-}
-.invite .venue {
-  position: relative;
-  width: 100%;
-  margin: 0;
-  padding: 56px 36px 32px;
-  border-radius: 50% 50% 0 0 / 190px 190px 0 0;
-  background: var(--cream);
-  background-image: var(--paper-grain);
-  border: 1px solid var(--ornament-ink);
-  box-shadow: 8px 18px 28px #6850330d;
-  text-align: center;
-}
-.venue > :not(.venue-botanical) {
-  position: relative;
-  z-index: 1;
-}
-.invitation-crest,
-.invitation-rings {
-  display: block;
-  width: 65%;
-  max-width: 240px;
-  margin: 0 auto 28px;
-  color: var(--ornament-ink);
-  stroke: currentColor;
-  stroke-width: 1;
-}
-.invitation-rings {
-  margin: 24px auto 0;
-}
-.invite .venue .eyebrow {
-  margin: 0;
-  font-size: var(--text-small);
-}
-.invitation-guest {
-  font: clamp(2rem, 4vw, 2.8rem)/1.4 var(--script-vi);
-  margin: 20px -12px;
-}
-.invitation-note {
-  font: var(--text-small)/1.8 var(--sans);
-  letter-spacing: 0.03em;
-  color: var(--ink-soft);
-}
-.invitation-names {
-  font: 4.1rem/1.15 var(--script-vi);
-  margin: 24px 0 28px;
-}
-.invitation-names span {
-  display: block;
-  font: 1.3rem var(--display);
-  margin-block: 6px;
-}
-.invitation-date {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 0 10px;
-  padding: 8px 0;
-  font: 1.35rem/1.35 var(--heading);
-  gap: 10px;
-}
-.invitation-date span::after {
-  content: "·";
-  margin-left: 10px;
-}
-.invitation-date strong {
-  font-weight: 600;
-  white-space: nowrap;
-}
-.invitation-lunar {
-  font: var(--text-small)/1.6 var(--sans);
-  margin: 0 0 28px;
-  color: var(--ink-soft);
-}
-.invitation-lunar::after {
-  content: "◇";
-  display: block;
-  width: 70%;
-  margin: 24px auto 0;
-  color: var(--ornament-ink);
-  background: linear-gradient(var(--line), var(--line)) left center / 44% 1px no-repeat,
-    linear-gradient(var(--line), var(--line)) right center / 44% 1px no-repeat;
-}
-.invite .venue h2 {
-  font: 500 1.9rem/1.15 var(--heading);
-  margin: 12px 0;
-  letter-spacing: -0.025em;
-}
-.invite .venue .hall {
-  font-size: 1.45rem;
-}
-.invite .venue address {
-  font-size: 1rem;
-  line-height: 1.75;
-  margin-top: 12px;
-}
-.invite .venue .hours {
-  width: 76%;
-  margin: 24px auto 0;
-  border-top: 0;
-}
-.invite .venue .hours dt {
-  font-size: 0.95rem;
-}
-.invite .venue .hours dd {
-  font-size: 2.6rem;
-}
-.invite .venue .actions {
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 24px;
-}
-.invite .venue .call {
-  font-size: var(--text-body);
-}
-.invite .venue .fine {
-  font-size: var(--text-small);
-  max-width: 75%;
-  margin: 10px auto 0;
-}
-.venue-botanical {
-  position: absolute;
-  width: 22%;
-  height: auto;
-  bottom: 0;
-  opacity: 0.7;
-}
-.venue-botanical-left {
-  left: 0;
-}
-.venue-botanical-right {
-  right: 0;
-  transform: scaleX(-1);
-}
 .invite .couple-section {
   width: 100%;
   padding: 56px 42px 64px;
@@ -464,28 +319,6 @@
   }
   .invite .family-section article {
     padding: 18px 0;
-  }
-  .invite .hotel {
-    padding: 48px 22px;
-  }
-  .invite .venue {
-    padding: 40px 18px 28px;
-    border-radius: 50% 50% 0 0 / 120px 120px 0 0;
-  }
-  .invitation-names {
-    font-size: 3.2rem;
-    margin-block: 26px;
-  }
-  .invitation-guest {
-    font-size: clamp(1.85rem, 7.5vw, 2.4rem);
-  }
-  .invitation-date {
-    flex-wrap: wrap;
-    font-size: 1.2rem;
-    gap: 6px;
-  }
-  .invite .venue h2 {
-    font-size: 1.8rem;
   }
   .invite .couple-section {
     width: 100%;
@@ -682,14 +515,8 @@
   }
   .invite .invitation-details .hotel {
     grid-area: 1 / 2 / 3 / 3;
-    padding: 42px 26px;
+    padding: 24px;
     width: 100%;
-  }
-  .invite .venue {
-    padding: 56px 32px 32px;
-  }
-  .invite .venue h2 {
-    font-size: clamp(1.6rem, 2vw, 2rem);
   }
   .invite .together-cover {
     aspect-ratio: 2.7;

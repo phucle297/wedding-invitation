@@ -73,11 +73,11 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
             });
           }
 
-          select("h2, .invitation-guest, .photo-interlude figcaption").forEach((heading) => {
+          select("h2, .photo-interlude figcaption").forEach((heading) => {
             const previous = heading.previousElementSibling;
             const next = heading.nextElementSibling;
             const eyebrow = previous?.matches(".eyebrow") ? previous : null;
-            const description = next?.matches(".lead, .eyebrow, .invitation-note") ? next : null;
+            const description = next?.matches(".lead, .eyebrow") ? next : null;
             const entrance = gsap.timeline({
               scrollTrigger: {
                 trigger: heading,
