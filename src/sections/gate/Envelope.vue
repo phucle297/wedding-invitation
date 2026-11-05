@@ -13,7 +13,18 @@ defineProps({
     <div class="velvet" :class="{ 'is-open': open }">
       <div class="fold fold-left"></div>
       <div class="fold fold-right"></div>
-      <div class="fold fold-bottom"></div>
+      <div class="fold fold-bottom">
+        <svg class="creases" viewBox="0 0 800 500" preserveAspectRatio="none">
+          <path
+            d="M0 500 400 295 800 500"
+            fill="none"
+            stroke="#fffef9"
+            stroke-opacity="0.8"
+            stroke-width="0.8"
+            vector-effect="non-scaling-stroke"
+          />
+        </svg>
+      </div>
       <div class="slot">
         <article class="card">
           <p class="monogram">
@@ -43,14 +54,14 @@ defineProps({
               <polygon
                 points="0,0 100,0 50,100"
                 fill="none"
-                stroke="#aa9670"
-                stroke-width="1.5"
+                stroke="#c1b7a2"
+                stroke-width="0.6"
                 vector-effect="non-scaling-stroke"
               />
             </svg>
           </div>
           <div class="seal">
-            <img src="/assets/ornaments/gold-seal.svg" alt="" />
+            <img src="/assets/ornaments/gold-seal.webp" width="384" height="384" alt="" />
           </div>
         </div>
         <div class="flap-front">
@@ -64,15 +75,10 @@ defineProps({
                 <polyline
                   points="0,0 50,100 100,0"
                   fill="none"
-                  stroke="#fffffc"
-                  stroke-width="0.45"
-                />
-                <polyline
-                  points="3,0 50,94 97,0"
-                  fill="none"
-                  stroke="#bbad92"
-                  stroke-opacity="0.65"
-                  stroke-width="0.14"
+                  stroke="#fffefb"
+                  stroke-opacity="0.9"
+                  stroke-width="1"
+                  vector-effect="non-scaling-stroke"
                 />
               </svg>
             </div>
@@ -91,7 +97,7 @@ defineProps({
             </svg>
           </div>
           <div class="seal">
-            <img src="/assets/ornaments/gold-seal.svg" alt="" />
+            <img src="/assets/ornaments/gold-seal.webp" width="384" height="384" alt="" />
           </div>
         </div>
       </div>
@@ -111,9 +117,9 @@ defineProps({
   --paper-grain: url("/assets/ornaments/cotton-paper.svg");
   --paper-vignette: radial-gradient(
     ellipse at 50% 42%,
-    #fffdf955 0%,
-    #efe2c522 48%,
-    #ac94642b 100%
+    #fffdf933 0%,
+    #eee8db11 48%,
+    #ada18a14 100%
   );
   position: relative;
   width: 100%;
@@ -123,26 +129,22 @@ defineProps({
   color: #806124;
   background:
     var(--paper-grain), var(--paper-vignette),
-    radial-gradient(ellipse at 50% 18%, #ffffffcc, transparent 42%),
-    radial-gradient(ellipse at 50% 100%, #be9b521f, transparent 52%),
-    linear-gradient(180deg, #fffefa 0%, #faf5e9 46%, #f1e5ca 100%);
+    linear-gradient(180deg, #fbf9f2, #f0eadd);
   box-shadow:
-    inset 0 0 0 1px #a39a8729,
-    inset 0 0 48px #b9a37414,
-    1px 2px 0 #d8d4c8,
-    0 3px 6px #4c483c14,
-    3px 10px 20px #4c483c14;
+    0 1px 0 #ddd6c8,
+    0 2px 2px #534a3824,
+    0 8px 14px -6px #534a3833,
+    0 22px 38px -18px #534a3826;
 }
 .velvet::after {
   content: "";
   position: absolute;
   z-index: 1;
-  inset: 14px;
-  border: 1px solid #b7aa9059;
+  inset: 0;
   box-shadow:
-    0 1px 0 #fffffa99,
-    inset 0 1px 0 #fffffa99,
-    inset 0 0 28px #c9b5870f;
+    inset 1px 0 0 #fffefa99,
+    inset -1px 0 0 #ada18a26,
+    inset 0 -1px 0 #ada18a33;
   pointer-events: none;
 }
 .velvet::before {
@@ -152,15 +154,16 @@ defineProps({
   inset: 0;
   background: radial-gradient(
     ellipse at 50% 59%,
-    #8f79522e 0%,
-    #bea57114 28%,
-    transparent 58%
+    #8574591a 0%,
+    #b1a0800a 20%,
+    transparent 42%
   );
   pointer-events: none;
-  transition: opacity 0.6s ease;
 }
 .velvet.is-open::before {
-  opacity: 0;
+  background:
+    linear-gradient(180deg, #72634b1a, #a18e700d 3%, transparent 14%),
+    radial-gradient(ellipse at 50% 38%, #8f7b5b26, transparent 66%);
 }
 
 .fold {
@@ -169,22 +172,28 @@ defineProps({
   pointer-events: none;
 }
 .fold-left {
-  clip-path: polygon(0 0, 54% 62%, 0 100%);
+  clip-path: polygon(0 0, 52% 59%, 0 100%);
   background:
     var(--paper-grain), var(--paper-vignette),
-    linear-gradient(110deg, #fffefa, #f5ecd9);
+    linear-gradient(110deg, #fcfaf4, #f2ece0);
 }
 .fold-right {
-  clip-path: polygon(100% 0, 46% 62%, 100% 100%);
+  clip-path: polygon(100% 0, 48% 59%, 100% 100%);
   background:
     var(--paper-grain), var(--paper-vignette),
-    linear-gradient(240deg, #fcf8ef, #f1e5ca);
+    linear-gradient(250deg, #f8f5ed, #eee7da);
 }
 .fold-bottom {
-  clip-path: polygon(0 100%, 0 99%, 50% 54%, 100% 99%, 100% 100%);
+  filter: drop-shadow(0 -1px 1px #70624c29);
+}
+.fold-bottom::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 100%, 50% 59%, 100% 100%);
   background:
     var(--paper-grain), var(--paper-vignette),
-    linear-gradient(165deg, #fffdfa, #f5ecd8);
+    linear-gradient(175deg, #fdfbf5 50%, #f5f0e5);
 }
 
 .slot {
@@ -198,19 +207,31 @@ defineProps({
 }
 .card {
   position: absolute;
-  inset: 0;
+  /* Leave room inside the reveal mask for the paper's edge and cast shadow. */
+  inset: 10px 12px 26px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--paper-grain), linear-gradient(135deg, #fffdf7, #faf5e9);
-  border: 1px solid #b8ae993d;
+  padding: 14px 18px;
+  background:
+    linear-gradient(135deg, #ffffff66, transparent 60%),
+    var(--paper-grain), linear-gradient(160deg, #fffefa, #fbf7ed);
+  border: 1px solid #fffefb;
   box-shadow:
-    inset 0 0 0 7px #fffefa,
-    inset 0 0 0 8px #b8ae992b,
-    0 8px 14px #4c483c12;
-  transform: translateY(108%);
+    0 1px 0 #c9bda7,
+    0 3px 3px #66543d29,
+    2px 12px 18px -6px #66543d40;
+  transform: translateY(calc(100% + 32px));
   transition: transform 0.42s cubic-bezier(0.16, 0.84, 0.24, 1) 0.4s;
+}
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 1px solid #b8a68159;
+  box-shadow: 0 1px 0 #ffffffb3;
+  pointer-events: none;
 }
 .velvet.is-open .card {
   transform: translateY(0);
@@ -277,7 +298,8 @@ defineProps({
   inset: 0;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   background:
-    var(--paper-grain), linear-gradient(180deg, #fffefa, #faf5e9 65%, #f1e5ca);
+    linear-gradient(180deg, #7f6a4924, #a18c6914 9%, transparent 32%),
+    var(--paper-grain), linear-gradient(180deg, #eee6d6, #f4eee1 40%, #faf7ef);
 }
 .flap-back .seal {
   z-index: 0;
@@ -286,16 +308,18 @@ defineProps({
 .flap-paper {
   position: absolute;
   inset: 0;
-  filter: drop-shadow(1px 5px 5px #4c483c21) drop-shadow(0 1px 1px #a49b8833);
+  filter:
+    drop-shadow(0 1px 0.5px #70624c40)
+    drop-shadow(1px 4px 3px #70624c24)
+    drop-shadow(2px 10px 8px #70624c12);
 }
 .flap-shape {
   position: absolute;
   inset: 0;
   background:
     var(--paper-grain),
-    radial-gradient(ellipse at 50% 18%, #ffffffd9, transparent 58%),
-    radial-gradient(ellipse at 50% 100%, #ae925b2e, transparent 68%),
-    linear-gradient(180deg, #ffffff 0%, #fcf8ef 58%, #eddfbd 100%);
+    radial-gradient(ellipse at 40% 0%, #ffffff80, transparent 65%),
+    linear-gradient(170deg, #fffdf8 0%, #faf7ef 60%, #eee7d7 100%);
   clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
 .creases {
@@ -424,13 +448,13 @@ defineProps({
   content: "";
   position: absolute;
   z-index: -1;
-  inset: -35%;
+  inset: -12%;
   border-radius: 50%;
   background: radial-gradient(
     closest-side,
-    #80694259 0%,
-    #a58b5533 40%,
-    #b69a6612 68%,
+    #66543c40 0%,
+    #8f795126 40%,
+    #b69a660a 68%,
     transparent 100%
   );
   pointer-events: none;
@@ -441,7 +465,7 @@ defineProps({
   display: block;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(3px 8px 5px #514c403d) drop-shadow(0 2px 1px #514c4033);
+  filter: drop-shadow(1px 2px 1px #51432d4d) drop-shadow(2px 5px 4px #51432d33);
 }
 .velvet.is-open .lower,
 .velvet.is-open .hint {
@@ -459,14 +483,10 @@ defineProps({
   }
   .velvet {
     box-shadow:
-      inset 0 0 0 1px #a39a8729,
-      inset 0 0 56px #b9a37414,
-      1px 3px 0 #d8d4c8,
-      0 4px 8px #4c483c14,
-      4px 12px 24px #4c483c17;
-  }
-  .velvet::after {
-    inset: 18px;
+      0 1px 0 #ddd6c8,
+      0 3px 3px #534a3826,
+      0 12px 18px -8px #534a3833,
+      0 30px 48px -22px #534a382b;
   }
   .velvet.is-open .flap {
     transform: rotateX(-135deg);
@@ -535,7 +555,7 @@ defineProps({
 
 @media screen and (min-width: 1024px) and (max-height: 700px) {
   .velvet.is-open .flap {
-    transform: rotateX(-106deg);
+    transform: rotateX(-101deg);
   }
 }
 
@@ -559,6 +579,13 @@ defineProps({
     margin-top: 6px;
     font-size: 2.2rem;
     line-height: 1.05;
+  }
+  .monogram {
+    font-size: 2.6rem;
+  }
+  .when {
+    margin-top: 8px;
+    font-size: 0.875rem;
   }
   .hint {
     bottom: 18px;
