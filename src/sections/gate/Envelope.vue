@@ -203,6 +203,11 @@ defineProps({
   top: 22%;
   height: 64%;
   overflow: hidden;
+  visibility: hidden;
+}
+.velvet.is-open .slot {
+  visibility: visible;
+  transition: visibility 0s linear 0.4s;
 }
 .card {
   position: absolute;
@@ -607,6 +612,9 @@ defineProps({
     transition-delay: 0s;
   }
   .velvet.is-open .flap-front {
+    transition-delay: 0s;
+  }
+  .velvet.is-open .slot {
     transition-delay: 0s;
   }
   .card {

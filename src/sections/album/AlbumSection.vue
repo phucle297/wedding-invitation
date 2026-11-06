@@ -120,7 +120,11 @@ function openPhoto(index: number, event: MouseEvent) {
             loading="lazy"
             decoding="async"
           />
-          <span class="photo-zoom" aria-hidden="true">↗</span>
+          <span class="photo-zoom" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              <path d="M7 17 17 7M7 7h10v10" />
+            </svg>
+          </span>
         </span>
       </button>
     </div>
@@ -159,6 +163,7 @@ function openPhoto(index: number, event: MouseEvent) {
   scroll-margin-top: 110px;
 }
 .shot {
+  appearance: none;
   display: block;
   width: 100%;
   margin-bottom: 10px;
@@ -196,6 +201,7 @@ function openPhoto(index: number, event: MouseEvent) {
   display: grid;
   place-items: center;
   background: #ffffffed;
+  color: var(--ink);
 }
 .album-toggle {
   display: flex;
