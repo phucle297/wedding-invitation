@@ -163,6 +163,9 @@ h1 em {
     min-height: 600px;
     max-height: 760px;
   }
+  .hero-photo {
+    height: calc(67% - 24px);
+  }
   .hero-copy {
     padding-top: 9%;
   }

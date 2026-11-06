@@ -107,10 +107,9 @@ defineProps({
 
 <style scoped>
 .frame {
-  width: min(calc(100% - 32px), 520px);
-  height: calc(100% - 180px);
-  align-self: end;
-  margin-bottom: 24px;
+  width: min(calc(100% - 64px), 520px);
+  height: calc(100% - 96px);
+  align-self: center;
 }
 
 .velvet {
@@ -199,10 +198,10 @@ defineProps({
 .slot {
   position: absolute;
   z-index: 2;
-  left: 11%;
-  right: 11%;
-  top: 34%;
-  height: 48%;
+  left: 6%;
+  right: 6%;
+  top: 22%;
+  height: 64%;
   overflow: hidden;
 }
 .card {
@@ -239,7 +238,7 @@ defineProps({
 .monogram {
   margin: 0;
   font-family: var(--heading);
-  font-size: 3.2rem;
+  font-size: 3.8rem;
   line-height: 1.1;
   color: #a47e34;
 }
@@ -250,8 +249,9 @@ defineProps({
 .names {
   margin: 8px 0 0;
   font-family: var(--heading);
-  font-size: clamp(1rem, 4.8vw, 2.2rem);
+  font-size: clamp(1.1rem, 5.2vw, 2.4rem);
   line-height: 1.1;
+  text-wrap: balance;
 }
 .names span {
   color: #a47e34;
@@ -260,7 +260,7 @@ defineProps({
 .when {
   margin: 12px 0 0;
   letter-spacing: 0.04em;
-  font-size: 1rem;
+  font-size: 1.15rem;
 }
 
 .flap {
@@ -329,7 +329,7 @@ defineProps({
   height: 100%;
 }
 .velvet.is-open .flap {
-  transform: rotateX(-110deg);
+  transform: rotateX(-180deg);
 }
 .face,
 .lower,
@@ -581,11 +581,15 @@ defineProps({
     line-height: 1.05;
   }
   .monogram {
-    font-size: 2.6rem;
+    font-size: 3.2rem;
+  }
+  .names {
+    font-size: clamp(1.1rem, 5.2vw, 2rem);
   }
   .when {
     margin-top: 8px;
-    font-size: 0.875rem;
+    font-size: 1rem;
+    line-height: 1.4;
   }
   .hint {
     bottom: 18px;

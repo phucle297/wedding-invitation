@@ -88,8 +88,8 @@ defineExpose({ open });
     >
       <div class="light-toolbar">
         <span>Album ảnh cưới</span>
-        <button ref="closeButton" class="light-close" type="button" @click="close">
-          {{ phrases.closePhoto }}<span aria-hidden="true">×</span>
+        <button ref="closeButton" class="light-close" type="button" :aria-label="phrases.closePhoto" @click="close">
+          <span aria-hidden="true">×</span>
         </button>
       </div>
       <div ref="viewport" class="light-viewport" aria-roledescription="carousel" aria-label="Ảnh cưới">
@@ -193,7 +193,11 @@ defineExpose({ open });
 }
 .lightbox button:hover { background: #ffffff24; }
 .lightbox button:focus-visible { outline: 2px solid #f6f0e6; outline-offset: 3px; }
-.light-close { gap: 12px; }
+.lightbox .light-close {
+  padding: 8px;
+  border: 0;
+  background: transparent;
+}
 .light-close span { font-size: 1.6rem; line-height: 1; }
 .light-viewport {
   min-width: 0;

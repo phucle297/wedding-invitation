@@ -22,6 +22,7 @@ const label = `Mở thiệp mời lễ cưới của ${couple.groom.full} và ${
 
 <style scoped>
 .gate {
+  overflow: hidden;
   background: #f5f0e5;
 }
 
