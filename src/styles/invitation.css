@@ -163,7 +163,7 @@
   padding-inline: 12px;
 }
 .invite .family-section article p:not(.where) {
-  font-size: 1.35rem;
+  font-size: 1.125rem;
 }
 .invite .family-section .where {
   font-size: var(--text-small);
@@ -506,7 +506,7 @@
     align-self: end;
   }
   .invite .invitation-details .family-section article p:not(.where) {
-    font-size: clamp(1.25rem, 1.65vw, 1.65rem);
+    font-size: clamp(1.125rem, 1.35vw, 1.25rem);
   }
   .invite .invitation-details .place {
     align-self: start;

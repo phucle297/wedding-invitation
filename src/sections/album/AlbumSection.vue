@@ -9,6 +9,7 @@ const props = defineProps({
   entered: { type: Boolean, default: false },
 });
 const opened = ref(false);
+const albumSection = ref<HTMLElement | null>(null);
 const gallery = ref<HTMLElement | null>(null);
 const toggle = ref<HTMLButtonElement | null>(null);
 const lightbox = ref<InstanceType<typeof PhotoLightbox> | null>(null);
@@ -56,7 +57,14 @@ async function toggleAlbum() {
   opened.value = !opened.value;
   await nextTick();
   ScrollTrigger.refresh();
-  if (!opened.value) {
+  if (opened.value) {
+    // Let the gallery's post-render animation setup finish before scrolling.
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    albumSection.value?.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  } else {
     toggle.value?.focus({ preventScroll: true });
     gallery.value?.scrollIntoView({ block: "start" });
   }
@@ -82,7 +90,7 @@ function openPhoto(index: number, event: MouseEvent) {
     />
     <figcaption lang="en">Our memories</figcaption>
   </figure>
-  <section class="block album-block" id="anh" aria-labelledby="photo-title">
+  <section ref="albumSection" class="block album-block" id="anh" aria-labelledby="photo-title">
     <div class="album-heading">
       <h2 id="photo-title">{{ album.title }}</h2>
       <span class="fine-rule" aria-hidden="true"></span>
@@ -97,6 +105,7 @@ function openPhoto(index: number, event: MouseEvent) {
         v-for="(photo, index) in photos"
         :key="photo.src"
         class="shot"
+        :class="{ 'shot-cover': photo.width > photo.height }"
         type="button"
         aria-haspopup="dialog"
         :aria-label="`Mở ảnh ${index + 1}: ${photo.alt}`"
@@ -172,6 +181,11 @@ function openPhoto(index: number, event: MouseEvent) {
   width: 100%;
   height: auto;
   object-fit: contain;
+}
+.shot-cover img {
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  object-position: 60% center;
 }
 .photo-zoom {
   position: absolute;

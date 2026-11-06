@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { nextTick, onBeforeUnmount, ref, watch } from "vue";
 import emblaCarouselVue from "embla-carousel-vue";
 import { phrases } from "../../content/phrases";
 import type { AlbumPhoto } from "./content";
@@ -13,38 +13,14 @@ const [viewport, carousel] = emblaCarouselVue({ loop: true, watchFocus: false })
 let opener: HTMLButtonElement | null = null;
 let previousOverflow: string | null = null;
 let scrollPosition = { top: 0, left: 0 };
-let autoplayTimer: ReturnType<typeof setTimeout> | undefined;
-let dragging = false;
-
-function stopAutoplay() {
-  clearTimeout(autoplayTimer);
-  autoplayTimer = undefined;
-}
-
-function scheduleAutoplay() {
-  stopAutoplay();
-  if (!active.value || dragging || document.hidden || props.photos.length < 2 ||
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  autoplayTimer = setTimeout(next, 2500);
-}
 
 function goTo(index: number) {
   carousel.value?.scrollTo(index, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  scheduleAutoplay();
 }
 
 watch(carousel, (api) => {
   api?.on("select", () => {
     selected.value = api.selectedScrollSnap();
-    scheduleAutoplay();
-  });
-  api?.on("pointerDown", () => {
-    dragging = true;
-    stopAutoplay();
-  });
-  api?.on("pointerUp", () => {
-    dragging = false;
-    scheduleAutoplay();
   });
 });
 
@@ -53,7 +29,6 @@ async function open(index: number, trigger: HTMLButtonElement) {
   opener = trigger;
   selected.value = index;
   active.value = true;
-  dragging = false;
   scrollPosition = { top: window.scrollY, left: window.scrollX };
   await nextTick();
   if (!active.value || !dialog.value) return;
@@ -64,11 +39,9 @@ async function open(index: number, trigger: HTMLButtonElement) {
   carousel.value?.reInit({ startIndex: index });
   carousel.value?.scrollTo(index, true);
   closeButton.value?.focus({ preventScroll: true });
-  scheduleAutoplay();
 }
 
 function close() {
-  stopAutoplay();
   dialog.value?.close();
 }
 
@@ -82,7 +55,6 @@ function restorePage() {
 
 function onClose() {
   active.value = false;
-  stopAutoplay();
   restorePage();
 }
 
@@ -93,20 +65,13 @@ function onBackdrop(event: MouseEvent) {
 
 function previous() {
   carousel.value?.scrollPrev(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  scheduleAutoplay();
 }
 
 function next() {
   carousel.value?.scrollNext(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  scheduleAutoplay();
 }
 
-onMounted(() => document.addEventListener("visibilitychange", scheduleAutoplay));
-onBeforeUnmount(() => {
-  stopAutoplay();
-  document.removeEventListener("visibilitychange", scheduleAutoplay);
-  restorePage();
-});
+onBeforeUnmount(restorePage);
 defineExpose({ open });
 </script>
 

@@ -104,7 +104,8 @@ onBeforeUnmount(() => frameObserver?.disconnect());
           Sự hiện diện của quý khách<br />là niềm vinh hạnh cho gia đình chúng tôi.
         </p>
         <p class="invitation-couple">
-          {{ couple.groom.short }} <span>&amp;</span> {{ couple.bride.short }}
+          {{ couple.groom.short.toLocaleLowerCase("vi") }} <span>&amp;</span>
+          {{ couple.bride.short.toLocaleLowerCase("vi") }}
         </p>
       </div>
 
@@ -242,7 +243,8 @@ address {
 }
 .invitation-couple {
   margin: 14px 0 0;
-  font: clamp(1.4rem, 6cqw, 2rem)/1.4 var(--script-vi);
+  font: 400 clamp(1.4rem, 9cqw, 2.6rem)/1.4 var(--script);
+  text-transform: capitalize;
 }
 .invitation-couple span {
   font-size: 0.75em;
@@ -332,9 +334,6 @@ address {
   }
   .invitation-gratitude > p:first-child {
     font-size: 0.875rem;
-  }
-  .invitation-couple {
-    font-size: 1.35rem;
   }
   .invitation-footer {
     gap: 12px;
