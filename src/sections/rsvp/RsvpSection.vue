@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { rsvp } from "./content";
+import { submitRsvp } from "./submitRsvp";
+import type { RsvpSubmission } from "./submitRsvp";
 
 const name = ref("");
 const attend = ref("");
@@ -27,11 +29,11 @@ async function onSubmit() {
     nameInput.value?.focus();
     return;
   }
-  if (!attend.value) {
+  if (attend.value !== "attending" && attend.value !== "absent") {
     status.value = rsvp.messages.needAttend;
     return;
   }
-  const payload = {
+  const payload: Omit<RsvpSubmission, "requestId"> = {
     name: guest,
     attendance: attend.value,
     count: absent.value ? 1 : Number(count.value),
@@ -45,24 +47,12 @@ async function onSubmit() {
   pending.value = true;
   status.value = "";
   try {
-    const response = await fetch("/api/rsvp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...payload, requestId: submission.requestId }),
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!response.ok) {
-      status.value = response.status === 503 ? rsvp.messages.unavailable : rsvp.messages.failed;
-      return;
-    }
-    const result: unknown = await response.json();
-    if (!result || typeof result !== "object" || !("ok" in result) || result.ok !== true) {
-      throw new Error("Invalid response");
-    }
+    await submitRsvp({ ...payload, requestId: submission.requestId });
     sent.value = true;
     status.value = rsvp.messages.saved;
-  } catch {
-    status.value = rsvp.messages.failed;
+  } catch (error) {
+    status.value = error instanceof Error && error.message === "service_unavailable"
+      ? rsvp.messages.unavailable : rsvp.messages.failed;
   } finally {
     pending.value = false;
   }

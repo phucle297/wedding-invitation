@@ -1,23 +1,29 @@
 // Deploy as a web app: execute as yourself, access Anyone. Keep the Sheet restricted.
-// Set RSVP_API_TOKEN in Script Properties, never in this file or client code.
+// The public form posts directly here; no Cloudflare Function or shared token is needed.
 const SPREADSHEET_ID = "1c7TpzxU7pS5JtdgGbt_1cFwR336KVPWPQqdzLD1ARc0";
 const RSVP_TAB = "RSVP";
 const HEADERS = ["Request ID", "Thời gian", "Họ tên", "Tham dự", "Số người", "Lời nhắn", "Payload"];
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function output_(value) {
-  return ContentService.createTextOutput(JSON.stringify(value))
-    .setMimeType(ContentService.MimeType.JSON);
+function output_(value, receipt) {
+  // Return only a receipt, never guest data. Escape script delimiters in untrusted input.
+  const message = JSON.stringify({ type: "wedding-rsvp", nonce: receipt.nonce, ...value })
+    .replace(/</g, "\\u003c");
+  const origin = JSON.stringify(receipt.origin).replace(/</g, "\\u003c");
+  return HtmlService.createHtmlOutput(
+    `<script>window.top.postMessage(${message}, ${origin});</script>`
+  ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function validate_(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const { requestId, name, attendance, count, note = "" } = value;
-  if (typeof requestId !== "string" ||
-      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId) ||
+  const { requestId, name, attendance, count, note = "", website } = value;
+  if (typeof requestId !== "string" || !UUID.test(requestId) ||
       typeof name !== "string" || !name.trim() || name.length > 80 ||
       (attendance !== "attending" && attendance !== "absent") ||
       !Number.isInteger(count) || count < 1 || count > 10 ||
-      typeof note !== "string" || note.length > 400) return null;
+      typeof note !== "string" || note.length > 400 ||
+      (website !== undefined && (typeof website !== "string" || website.trim() !== ""))) return null;
   return { requestId: requestId.toLowerCase(), name: name.trim(), attendance, count, note: note.trim() };
 }
 
@@ -28,29 +34,30 @@ function cellText_(text) {
 
 function doPost(e) {
   let lock;
+  const receipt = e && e.parameter;
+  if (!receipt || typeof receipt.nonce !== "string" || !UUID.test(receipt.nonce) ||
+      typeof receipt.origin !== "string" ||
+      !/^https?:\/\/[a-z0-9.-]+(?::[0-9]+)?$/i.test(receipt.origin)) {
+    return HtmlService.createHtmlOutput("Invalid request");
+  }
+  const respond = (value) => output_(value, receipt);
   try {
-    const token = PropertiesService.getScriptProperties().getProperty("RSVP_API_TOKEN");
-    if (!token || token.length < 32) return output_({ ok: false, error: "service_unavailable" });
-    const text = e && e.postData && e.postData.contents;
+    const text = receipt.payload;
     if (typeof text !== "string" || text.length > 16384) {
-      return output_({ ok: false, error: "invalid_request" });
+      return respond({ ok: false, error: "invalid_request" });
     }
-    const body = JSON.parse(text);
-    if (!body || typeof body.token !== "string" || body.token !== token) {
-      return output_({ ok: false, error: "unauthorized" });
-    }
-    const rsvp = validate_(body.submission);
-    if (!rsvp) return output_({ ok: false, error: "invalid_request" });
+    const rsvp = validate_(JSON.parse(text));
+    if (!rsvp) return respond({ ok: false, error: "invalid_request" });
 
     // Serialize lookup + append so concurrent retries cannot create two rows.
     lock = LockService.getScriptLock();
-    if (!lock.tryLock(5000)) return output_({ ok: false, error: "service_unavailable" });
+    if (!lock.tryLock(5000)) return respond({ ok: false, error: "service_unavailable" });
     const book = SpreadsheetApp.openById(SPREADSHEET_ID);
     const sheet = book.getSheetByName(RSVP_TAB) || book.insertSheet(RSVP_TAB);
     if (sheet.getLastRow() === 0) sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
     const headers = sheet.getRange(1, 1, 1, HEADERS.length).getValues()[0];
     if (JSON.stringify(headers) !== JSON.stringify(HEADERS)) {
-      return output_({ ok: false, error: "service_unavailable" });
+      return respond({ ok: false, error: "service_unavailable" });
     }
     const payload = JSON.stringify(rsvp);
     const lastRow = sheet.getLastRow();
@@ -59,7 +66,7 @@ function doPost(e) {
         .matchEntireCell(true).matchCase(true).useRegularExpression(false).findNext();
       if (match) {
         const saved = sheet.getRange(match.getRow(), 7).getValue();
-        return output_(saved === payload
+        return respond(saved === payload
           ? { ok: true, requestId: rsvp.requestId }
           : { ok: false, error: "idempotency_conflict" });
       }
@@ -71,12 +78,12 @@ function doPost(e) {
     ]);
     SpreadsheetApp.flush();
     if (sheet.getRange(row, 7).getValue() !== payload) {
-      return output_({ ok: false, error: "service_unavailable" });
+      return respond({ ok: false, error: "service_unavailable" });
     }
-    return output_({ ok: true, requestId: rsvp.requestId });
+    return respond({ ok: true, requestId: rsvp.requestId });
   } catch {
-    // Do not log submitted guest data, tokens, or Google account errors.
-    return output_({ ok: false, error: "service_unavailable" });
+    // Do not log submitted guest data or Google account errors.
+    return respond({ ok: false, error: "service_unavailable" });
   } finally {
     if (lock && lock.hasLock()) lock.releaseLock();
   }

