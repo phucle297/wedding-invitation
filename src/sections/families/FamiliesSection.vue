@@ -22,7 +22,7 @@ import { families } from "./content";
 }
 
 .block h2 {
-  font-size: clamp(1.6rem, 3.4vw, 2rem);
+  font-size: var(--section-title);
 }
 
 .families {
@@ -44,7 +44,7 @@ h3 {
   font-size: var(--text-detail);
   font-weight: 500;
   letter-spacing: -0.025em;
-  text-transform: none;
+  text-transform: uppercase;
   color: var(--ink-soft);
 }
 
@@ -52,7 +52,7 @@ p { margin: 0; }
 
 article p:not(.where) {
   font-family: var(--display);
-  font-size: clamp(1.35rem, 3vw, 1.65rem);
+  font-size: var(--text-detail);
   line-height: 1.35;
   text-wrap: balance;
 }

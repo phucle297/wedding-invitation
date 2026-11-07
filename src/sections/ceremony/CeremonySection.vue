@@ -19,13 +19,13 @@ import { ceremony } from "./content";
 
 .place h2 {
   margin-top: 8px;
-  font-size: clamp(2.2rem, 6vw, 3rem);
+  font-size: var(--section-title);
 }
 
 .when {
   margin: 10px 0 0;
   font-family: var(--display);
-  font-size: clamp(1.35rem, 3.8vw, 1.6rem);
+  font-size: var(--text-feature);
   font-weight: 600;
   line-height: 1.6;
 }
@@ -34,6 +34,6 @@ import { ceremony } from "./content";
   margin-top: 4px;
   font-family: var(--display);
   font-style: italic;
-  font-size: 1.15rem;
+  font-size: var(--text-detail);
 }
 </style>

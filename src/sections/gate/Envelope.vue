@@ -243,6 +243,7 @@ defineProps({
 .monogram {
   margin: 0;
   font-family: var(--heading);
+  text-transform: uppercase;
   font-size: 3.8rem;
   line-height: 1.1;
   color: #a47e34;
@@ -254,6 +255,7 @@ defineProps({
 .names {
   margin: 8px 0 0;
   font-family: var(--heading);
+  text-transform: uppercase;
   font-size: clamp(1.1rem, 5.2vw, 2.4rem);
   line-height: 1.1;
   text-wrap: balance;

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from "vue";
 import emblaCarouselVue from "embla-carousel-vue";
+import { albumSrcset } from "../../content/images";
 import { phrases } from "../../content/phrases";
 import type { AlbumPhoto } from "./content";
 
@@ -9,6 +10,7 @@ const dialog = ref<HTMLDialogElement | null>(null);
 const closeButton = ref<HTMLButtonElement | null>(null);
 const active = ref(false);
 const selected = ref(0);
+const fullResolutionPhotos = ref(new Set<number>());
 const [viewport, carousel] = emblaCarouselVue({ loop: true, watchFocus: false });
 let opener: HTMLButtonElement | null = null;
 let previousOverflow: string | null = null;
@@ -21,6 +23,7 @@ function goTo(index: number) {
 watch(carousel, (api) => {
   api?.on("select", () => {
     selected.value = api.selectedScrollSnap();
+    if (active.value) fullResolutionPhotos.value.add(selected.value);
   });
 });
 
@@ -28,6 +31,7 @@ async function open(index: number, trigger: HTMLButtonElement) {
   if (active.value || !props.photos[index] || !dialog.value) return;
   opener = trigger;
   selected.value = index;
+  fullResolutionPhotos.value = new Set([index]);
   active.value = true;
   scrollPosition = { top: window.scrollY, left: window.scrollX };
   await nextTick();
@@ -55,6 +59,7 @@ function restorePage() {
 
 function onClose() {
   active.value = false;
+  fullResolutionPhotos.value.clear();
   restorePage();
 }
 
@@ -105,7 +110,9 @@ defineExpose({ open });
           >
             <img
               v-if="active"
-              :src="photo.src"
+              :src="fullResolutionPhotos.has(index) ? photo.fullSrc : photo.src"
+              :srcset="fullResolutionPhotos.has(index) ? undefined : albumSrcset(photo.src, photo.width > photo.height ? 960 : 640)"
+              sizes="100vw"
               :alt="photo.alt"
               :width="photo.width"
               :height="photo.height"

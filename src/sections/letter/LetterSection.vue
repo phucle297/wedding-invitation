@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { families } from "../families/content";
 import { date } from "../../content/date";
+import { albumSrcset } from "../../content/images";
 import CallaSprig from "../../components/CallaSprig.vue";
 </script>
 
@@ -12,11 +13,14 @@ import CallaSprig from "../../components/CallaSprig.vue";
         <div class="envelope-lining"></div>
         <img
           class="keepsake-photo"
-          src="/assets/album/02.jpg"
+          src="/assets/album/02.webp"
+          :srcset="albumSrcset('/assets/album/02.webp')"
+          sizes="auto, (min-width: 720px) 300px, 45vw"
           alt=""
           width="1067"
           height="1600"
           loading="lazy"
+          decoding="async"
         />
         <div class="envelope-pocket"></div>
         <span class="wax-seal">P<span>&amp;</span>Đ</span>
@@ -25,9 +29,12 @@ import CallaSprig from "../../components/CallaSprig.vue";
         <img
           v-for="image in ['09', '10', '11']"
           :key="image"
-          :src="`/assets/album/${image}.jpg`"
+          :src="`/assets/album/${image}.webp`"
+          :srcset="albumSrcset(`/assets/album/${image}.webp`, image === '11' ? 960 : 640)"
+          sizes="auto, (min-width: 720px) 130px, 20vw"
           alt=""
           loading="lazy"
+          decoding="async"
           width="1067"
           height="1600"
         />
@@ -43,7 +50,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
       <p class="eyebrow">Gửi bạn, một lời mời</p>
       <h2 id="letter-title">Save the date</h2>
       <blockquote>{{ families.letter }}</blockquote>
-      <p class="letter-date">{{ date.weekday }} · {{ date.display }}</p>
+      <p class="letter-date">{{ date.weekday }}, {{ date.display }}</p>
     </div>
   </section>
 </template>
@@ -180,7 +187,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
 }
 blockquote {
   font-family: var(--display);
-  font-size: 1.125rem;
+  font-size: var(--text-detail);
   line-height: 1.6;
   max-width: 27em;
   margin: 20px auto;

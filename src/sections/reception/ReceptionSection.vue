@@ -92,7 +92,7 @@ onBeforeUnmount(() => frameObserver?.disconnect());
       </header>
 
       <div class="invitation-date-block">
-        <p class="invitation-day">{{ reception.eyebrow }} · {{ date.weekday }}</p>
+        <p class="invitation-day">{{ reception.eyebrow }}</p>
         <time class="invitation-date" :datetime="date.isoReception" :aria-label="date.aria">
           <span v-for="part in date.parts" :key="part.label">{{ part.value }}</span>
         </time>
@@ -224,6 +224,7 @@ address {
   display: flex;
   align-items: center;
   font: 600 clamp(1.8rem, 8.5cqw, 3rem)/1 var(--heading);
+  text-transform: uppercase;
   font-variant-numeric: lining-nums;
   white-space: nowrap;
 }
@@ -235,6 +236,7 @@ address {
 .invitation-lunar {
   margin: 8px 0 0;
   font: 0.8125rem/1.4 var(--heading);
+  text-transform: uppercase;
 }
 .invitation-gratitude > p:first-child {
   margin: 0;
@@ -259,6 +261,7 @@ address {
   gap: 8px;
   font: 600 2.7rem/1 var(--heading);
   font-style: italic;
+  text-transform: uppercase;
 }
 .invitation-monogram::before,
 .invitation-monogram::after {
@@ -283,6 +286,7 @@ address {
 .invitation-hours {
   margin: 0;
   font: 0.9375rem/1.7 var(--heading);
+  text-transform: uppercase;
 }
 .invitation-hours div {
   display: flex;

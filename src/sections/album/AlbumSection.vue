@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, watch } from "vue";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { albumSrcset } from "../../content/images";
 import { album } from "./content";
 import PhotoLightbox from "./PhotoLightbox.vue";
 
@@ -80,13 +81,14 @@ function openPhoto(index: number, event: MouseEvent) {
 <template>
   <figure class="photo-interlude album-cover">
     <img
-      src="/assets/album/album-cover.jpg"
-      srcset="/assets/album/11.jpg 1600w, /assets/album/album-cover.jpg 3200w"
-      sizes="(min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
+      src="/assets/album/album-cover.webp"
+      :srcset="albumSrcset('/assets/album/album-cover.webp', 1920)"
+      sizes="auto, (min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
       alt="Duy Phúc và Linh Đan trong khu vườn xanh"
       width="1600"
       height="900"
       loading="lazy"
+      decoding="async"
     />
     <figcaption lang="en">Our memories</figcaption>
   </figure>
@@ -114,6 +116,8 @@ function openPhoto(index: number, event: MouseEvent) {
         <span class="shot-content">
           <img
             :src="photo.src"
+            :srcset="albumSrcset(photo.src, photo.width > photo.height ? 960 : 640)"
+            sizes="auto, (min-width: 1392px) 635px, (min-width: 1024px) calc((100vw - 122px) / 2), (min-width: 720px) 313px, calc((100vw - 58px) / 2)"
             :alt="photo.alt"
             :width="photo.width"
             :height="photo.height"
@@ -137,7 +141,9 @@ function openPhoto(index: number, event: MouseEvent) {
       @click="toggleAlbum"
     >
       {{ opened ? "Thu gọn album" : "Xem tất cả ảnh" }}
-      <span aria-hidden="true">{{ opened ? "−" : "↗" }}</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path :d="opened ? 'M7 12h10' : 'M7 17 17 7M7 7h10v10'" />
+      </svg>
     </button>
     <PhotoLightbox ref="lightbox" :photos="album.photos" />
   </section>
@@ -207,5 +213,8 @@ function openPhoto(index: number, event: MouseEvent) {
   display: flex;
   gap: 26px;
   margin: 32px auto 0;
+}
+.album-toggle svg {
+  flex-shrink: 0;
 }
 </style>

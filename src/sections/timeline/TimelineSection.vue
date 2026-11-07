@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import { albumSrcset } from "../../content/images";
 import { timeline } from "./content";
 </script>
 
 <template>
   <figure class="photo-interlude together-cover">
     <img
-      src="/assets/album/together.jpg"
+      src="/assets/album/together.webp"
+      :srcset="albumSrcset('/assets/album/together.webp', 1200)"
+      sizes="auto, (min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
       alt="Duy Phúc và Linh Đan giữa hai vế cầu thang trong sảnh lớn"
       width="1600"
       height="1067"
       loading="lazy"
+      decoding="async"
     />
     <figcaption lang="en">Together, always.</figcaption>
   </figure>
@@ -168,12 +172,12 @@ import { timeline } from "./content";
 }
 .day time {
   display: block;
-  font: 600 2.5rem/1.2 var(--display);
+  font: 600 var(--text-number)/1.2 var(--display);
   font-variant-numeric: lining-nums tabular-nums;
 }
 .day strong {
   display: block;
-  font: 1.3rem/1.6 var(--display);
+  font: var(--text-subtitle)/1.6 var(--display);
 }
 .day li span {
   display: block;
@@ -195,9 +199,6 @@ import { timeline } from "./content";
   }
   .day li > div {
     max-width: 175px;
-  }
-  .day strong {
-    font-size: 1.25rem;
   }
 }
 </style>

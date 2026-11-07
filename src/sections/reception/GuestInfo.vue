@@ -104,7 +104,7 @@ small {
 }
 strong {
   font-family: var(--display);
-  font-size: 1.8rem;
+  font-size: var(--text-feature);
   font-weight: 500;
   line-height: 1.2;
 }

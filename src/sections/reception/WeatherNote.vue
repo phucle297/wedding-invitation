@@ -73,10 +73,10 @@ onBeforeUnmount(() => controller.abort());
   background: var(--cream);
   background-image: var(--paper-grain);
 }
-h3 { font: 500 2.2rem/1.2 var(--heading); margin: 18px 0 24px; }
+h3 { font: 500 var(--text-feature)/1.2 var(--heading); text-transform: uppercase; margin: 18px 0 24px; }
 .weather-reading { display: flex; align-items: center; gap: 24px; margin: 24px 0; }
-.weather-reading strong { font: 4rem/1 var(--display); }
-.weather-reading strong span { font-size: 1.5rem; vertical-align: top; }
+.weather-reading strong { font: var(--text-number)/1 var(--display); }
+.weather-reading strong span { font-size: var(--text-detail); vertical-align: top; }
 small { display: block; margin-top: 8px; font-size: var(--text-small); }
 .weather-status, .weather-disclaimer, small { color: var(--ink-soft); }
 .weather-disclaimer { font-size: var(--text-small); line-height: 1.8; }

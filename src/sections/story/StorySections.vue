@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { couple } from "../../content/couple";
+import { albumSrcset } from "../../content/images";
 
 const scenes = [
   {
@@ -38,11 +39,14 @@ const scenes = [
       <figure>
         <div class="portrait-frame groom-portrait">
           <img
-            src="/assets/album/groom.jpg"
+            src="/assets/album/groom.webp"
+            :srcset="albumSrcset('/assets/album/groom.webp')"
+            sizes="auto, (min-width: 1024px) 360px, (min-width: 720px) 300px, 42vw"
             alt="Chú rể Duy Phúc"
             width="1067"
             height="1600"
             loading="lazy"
+            decoding="async"
           />
         </div>
         <figcaption>
@@ -54,11 +58,14 @@ const scenes = [
       <figure>
         <div class="portrait-frame bride-portrait">
           <img
-            src="/assets/album/bride.jpg"
+            src="/assets/album/bride.webp"
+            :srcset="albumSrcset('/assets/album/bride.webp')"
+            sizes="auto, (min-width: 1024px) 360px, (min-width: 720px) 300px, 42vw"
             alt="Cô dâu Linh Đan"
             width="1067"
             height="1600"
             loading="lazy"
+            decoding="async"
           />
         </div>
         <figcaption>
@@ -92,11 +99,14 @@ const scenes = [
       <article v-for="scene in scenes" :key="scene.title" class="journey-scene">
         <figure class="journey-frame">
           <img
-            :src="`/assets/album/${scene.image}.jpg`"
+            :src="`/assets/album/${scene.image}.webp`"
+            :srcset="albumSrcset(`/assets/album/${scene.image}.webp`)"
+            sizes="auto, (min-width: 1024px) 540px, (min-width: 720px) 300px, 40vw"
             :alt="scene.alt"
             width="1067"
             height="1600"
             loading="lazy"
+            decoding="async"
           />
         </figure>
         <span class="journey-dot" aria-hidden="true"></span>
@@ -190,7 +200,8 @@ figcaption {
 }
 figcaption span {
   display: block;
-  font: 500 2rem/1.25 var(--heading);
+  font: 500 var(--text-feature)/1.25 var(--heading);
+  text-transform: uppercase;
 }
 figcaption small {
   display: block;
@@ -295,7 +306,7 @@ figcaption em {
   top: 50%;
 }
 .journey-copy h3 {
-  font: 2rem/1.15 var(--script-vi);
+  font: var(--text-script)/1.25 var(--script-vi);
   letter-spacing: 0.015em;
   margin: 0 0 16px;
 }
@@ -335,7 +346,7 @@ figcaption em {
   background-position: right bottom, center;
 }
 .vow blockquote {
-  font: 2.8rem/1.4 var(--script-vi);
+  font: var(--section-title)/1.4 var(--script-vi);
   margin: 28px 0;
 }
 .vow-line {
@@ -351,9 +362,6 @@ figcaption em {
   .portraits figure:nth-child(2) {
     padding-top: 55px;
   }
-  figcaption span {
-    font-size: 1.5rem;
-  }
   .journey {
     padding: 60px 24px 30px;
   }
@@ -368,11 +376,7 @@ figcaption em {
     top: 50px;
   }
   .journey-copy h3 {
-    font-size: 2.1rem;
     margin-bottom: 10px;
-  }
-  .vow blockquote {
-    font-size: 2.1rem;
   }
 }
 </style>

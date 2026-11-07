@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { couple } from "../../content/couple";
 import { date } from "../../content/date";
+import { albumSrcset } from "../../content/images";
 import { phrases } from "../../content/phrases";
 </script>
 
@@ -8,11 +9,14 @@ import { phrases } from "../../content/phrases";
   <div class="closing-spread">
     <figure class="photo-interlude closing-photo">
       <img
-        src="/assets/album/09.jpg"
+        src="/assets/album/09.webp"
+        :srcset="albumSrcset('/assets/album/09.webp')"
+        sizes="auto, (min-width: 1024px) 50vw, (min-width: 720px) 720px, 100vw"
         alt="Duy Phúc và Linh Đan bên nhau dưới lớp voan"
         width="1067"
         height="1600"
         loading="lazy"
+        decoding="async"
       />
     </figure>
     <section class="thanks" aria-labelledby="thanks-title">
@@ -25,9 +29,10 @@ import { phrases } from "../../content/phrases";
     </section>
   </div>
   <footer class="colophon">
-    <a class="footer-names" href="#mo-dau"
-      >{{ couple.groom.short }} <em>&amp;</em> {{ couple.bride.short }}</a
-    >
+    <a class="footer-names" href="#mo-dau">
+      <span>{{ couple.groom.short }} <em>&amp;</em></span>
+      <span>{{ couple.bride.short }}</span>
+    </a>
     <p>
       {{ phrases.footerPlace }} <span aria-hidden="true">·</span>
       {{ date.display }}
@@ -48,23 +53,24 @@ import { phrases } from "../../content/phrases";
   text-align: center;
 }
 .thanks h2 {
-  font: 4rem/1.2 var(--script);
+  font: var(--text-display)/1.2 var(--script);
   margin: 22px 0;
 }
 .thanks > p:not(.eyebrow) {
   color: var(--ink-soft);
-  font: 1.3rem/1.7 var(--display);
+  font: var(--text-detail)/1.7 var(--display);
 }
 .thanks-signature {
   display: block;
   margin-top: 30px;
   color: var(--bronze);
   font-family: var(--script-vi);
-  font-size: 1.8rem;
+  font-size: var(--text-script);
 }
 .colophon {
   position: relative;
   isolation: isolate;
+  container-type: inline-size;
   text-align: center;
   padding: 44px 24px;
   color: var(--ink);
@@ -81,10 +87,21 @@ import { phrases } from "../../content/phrases";
   pointer-events: none;
 }
 .footer-names {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.32em;
+  row-gap: 0.04em;
   color: inherit;
   font-family: var(--heading);
-  font-size: 2.2rem;
+  text-transform: uppercase;
+  /* Fit "DUY PHÚC & LINH ĐAN" on one line. Below the floor, wrap before the next name. */
+  font-size: clamp(1.5rem, calc(100cqi / 11.2), 2.2rem);
+  line-height: 1.15;
   text-decoration: none;
+}
+.footer-names span {
+  white-space: nowrap;
 }
 .footer-names em {
   color: var(--bronze);
@@ -94,6 +111,7 @@ import { phrases } from "../../content/phrases";
   font-size: var(--text-small);
   letter-spacing: 0.02em;
   margin: 12px 0 24px;
+  white-space: nowrap;
 }
 .colophon p span {
   margin: 0 12px;
@@ -101,6 +119,12 @@ import { phrases } from "../../content/phrases";
 @media (max-width: 759px) {
   .thanks {
     padding-block: 60px;
+  }
+}
+@media (max-width: 600px) {
+  .thanks {
+    min-height: 420px;
+    padding-block: 48px;
   }
 }
 </style>

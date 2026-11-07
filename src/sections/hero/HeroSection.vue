@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { couple } from "../../content/couple";
 import { date } from "../../content/date";
+import { albumSrcset } from "../../content/images";
 import { hero } from "./content";
 </script>
 
@@ -8,10 +9,13 @@ import { hero } from "./content";
   <header class="hero satin" id="mo-dau">
     <div class="hero-photo">
       <img
-        src="/assets/album/13.jpg"
+        src="/assets/album/13.webp"
+        :srcset="albumSrcset('/assets/album/13.webp')"
+        sizes="(min-width: 1420px) 610px, (min-width: 1024px) 43vw, (min-width: 720px) 425px, 59vw"
         alt="Duy Phúc và Linh Đan trong sảnh ngập nắng"
         width="1067"
         height="1600"
+        loading="eager"
         fetchpriority="high"
       />
     </div>
@@ -24,10 +28,13 @@ import { hero } from "./content";
       <p class="hero-message">{{ hero.message }}</p>
       <div class="hero-keepsake">
         <img
-          src="/assets/album/11.jpg"
+          src="/assets/album/11.webp"
+          :srcset="albumSrcset('/assets/album/11.webp', 960)"
+          sizes="(min-width: 1024px) 210px, (min-width: 720px) 202px, 30vw"
           alt="Một khoảnh khắc bên nhau trong khu vườn"
           width="1600"
           height="1067"
+          decoding="async"
         />
       </div>
       <a class="hero-scroll" href="#loi-ngo"
@@ -35,7 +42,7 @@ import { hero } from "./content";
       >
     </div>
     <p class="hero-date">
-      <span>{{ date.weekday }} · Đà Nẵng</span>{{ date.gate }}
+      <span>{{ date.weekday }}, Đà Nẵng</span>{{ date.display }}
     </p>
   </header>
 </template>
@@ -93,6 +100,7 @@ import { hero } from "./content";
 h1 {
   width: 28%;
   text-align: center;
+  text-transform: uppercase;
   margin: 22px 0 26px;
   font-size: 2.3rem;
   line-height: 1.3;
