@@ -1,18 +1,45 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { nav } from "./content";
 
 const expanded = ref(false);
+const navigation = ref<HTMLElement | null>(null);
+const menuToggle = ref<HTMLButtonElement | null>(null);
+
+function closeOnEscape() {
+  if (!expanded.value) return;
+  expanded.value = false;
+  menuToggle.value?.focus();
+}
+
+function closeOnOutsidePress(event: PointerEvent) {
+  if (event.target instanceof Node && !navigation.value?.contains(event.target)) {
+    expanded.value = false;
+  }
+}
+
+onMounted(() => document.addEventListener("pointerdown", closeOnOutsidePress));
+onBeforeUnmount(() => document.removeEventListener("pointerdown", closeOnOutsidePress));
 </script>
 
 <template>
-  <nav class="topnav" aria-label="Trong thiệp" @keydown.esc="expanded = false">
+  <nav ref="navigation" class="topnav" aria-label="Trong thiệp" @keydown.esc="closeOnEscape">
     <a class="brand" href="#mo-dau" @click="expanded = false"
       >Phúc <em>&amp;</em> Đan</a
     >
     <ul id="invitation-links" :class="{ 'is-expanded': expanded }">
-      <li v-for="item in nav" :key="item.href">
-        <a :href="item.href" @click="expanded = false">{{ item.label }}</a>
+      <li class="menu-heading" aria-hidden="true">Trong thiệp mời</li>
+      <li v-for="(item, index) in nav" :key="item.href">
+        <a :href="item.href" @click="expanded = false">
+          <span class="menu-number" aria-hidden="true">0{{ index + 1 }}</span>
+          <span>{{ item.label }}</span>
+          <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" />
+          </svg>
+        </a>
+      </li>
+      <li class="menu-rsvp">
+        <a href="#xac-nhan" @click="expanded = false">Xác nhận tham dự <span aria-hidden="true">↗</span></a>
       </li>
     </ul>
     <div class="nav-actions">
@@ -20,6 +47,7 @@ const expanded = ref(false);
         >Xác nhận tham dự</a
       >
       <button
+        ref="menuToggle"
         class="menu-toggle"
         type="button"
         :aria-expanded="expanded"
@@ -27,7 +55,11 @@ const expanded = ref(false);
         @click="expanded = !expanded"
       >
         <span>{{ expanded ? "Đóng" : "Mục lục" }}</span
-        ><span aria-hidden="true">{{ expanded ? "−" : "+" }}</span>
+        >
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" aria-hidden="true">
+          <path v-if="expanded" d="m5 5 10 10M15 5 5 15" />
+          <path v-else d="M3 6h14M7 10h10M3 14h14" />
+        </svg>
       </button>
     </div>
   </nav>
@@ -81,8 +113,15 @@ const expanded = ref(false);
   font-size: var(--text-small);
   cursor: pointer;
 }
-.menu-toggle > span:last-child {
-  font-size: 1.2rem;
+.menu-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+.menu-heading,
+.menu-number,
+.menu-arrow,
+.menu-rsvp {
+  display: none;
 }
 ul {
   position: absolute;
@@ -111,33 +150,86 @@ ul a {
 }
 @media (max-width: 600px) {
   .topnav {
-    padding-inline: 18px;
+    padding: 10px 20px;
   }
   .brand {
-    font-size: 1.35rem;
-  }
-  .nav-actions {
-    gap: 12px;
+    font-size: 1.5rem;
   }
   .nav-rsvp {
-    line-height: 1.4;
+    display: none;
   }
   .menu-toggle {
-    gap: 8px;
+    justify-content: space-between;
+    gap: 14px;
+    min-width: 108px;
+    padding-inline: 16px;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: var(--cream);
+    color: var(--ink);
   }
-}
-@media (max-width: 360px) {
-  .topnav {
+  .menu-toggle[aria-expanded="true"] {
+    background: var(--champagne);
+  }
+  ul {
+    inset: calc(100% + 8px) 12px auto;
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-height: calc(100dvh - 88px);
+    overflow-y: auto;
+    padding: 18px 20px 20px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--cream);
+    box-shadow: 0 16px 40px #3f342a24;
+  }
+  .menu-heading {
+    display: block;
+    padding-bottom: 8px;
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  ul a {
+    gap: 16px;
+    min-height: 56px;
+    font-size: var(--text-detail);
+  }
+  .menu-number {
+    display: block;
+    color: var(--bronze);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .menu-arrow {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin-left: auto;
+    color: var(--bronze);
+  }
+  .menu-rsvp {
+    display: block;
+    margin-top: 18px;
+  }
+  .menu-rsvp a {
+    justify-content: center;
     gap: 12px;
+    min-height: 48px;
+    padding: 8px 16px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--espresso);
+    color: var(--paper);
+    font-size: var(--text-body);
   }
-  .brand {
-    font-size: 1.15rem;
+  ul a:hover {
+    color: var(--bronze);
   }
-  .nav-actions {
-    gap: 8px;
-  }
-  .nav-rsvp {
-    max-width: 7em;
+  .menu-rsvp a:hover {
+    background: var(--bronze);
+    color: var(--paper);
   }
 }
 </style>
