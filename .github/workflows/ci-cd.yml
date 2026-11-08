@@ -9,11 +9,14 @@ jobs:
   pull-request-checks:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    container:
+      image: oven/bun:1.4.4-debian
+      options: --user root
     steps:
+      - name: Install git
+        run: apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
       - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run build
@@ -21,11 +24,14 @@ jobs:
   build:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    container:
+      image: oven/bun:1.4.4-debian
+      options: --user root
     steps:
+      - name: Install git
+        run: apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
       - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run build
