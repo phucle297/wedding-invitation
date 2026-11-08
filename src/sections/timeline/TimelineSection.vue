@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { albumSrcset } from "../../content/images";
 import { timeline } from "./content";
+import LazyImage from "../../components/LazyImage.vue";
 </script>
 
 <template>
   <figure class="photo-interlude together-cover">
-    <img
+    <LazyImage
+      fill
       src="/assets/album/together.webp"
       :srcset="albumSrcset('/assets/album/together.webp', 1200)"
       sizes="auto, (min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
@@ -140,6 +142,8 @@ import { timeline } from "./content";
   stroke: var(--cream);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 .day {
   position: relative;

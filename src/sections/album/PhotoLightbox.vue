@@ -4,6 +4,7 @@ import emblaCarouselVue from "embla-carousel-vue";
 import { albumSrcset } from "../../content/images";
 import { phrases } from "../../content/phrases";
 import type { AlbumPhoto } from "./content";
+import LazyImage from "../../components/LazyImage.vue";
 
 const props = defineProps<{ photos: AlbumPhoto[] }>();
 const dialog = ref<HTMLDialogElement | null>(null);
@@ -108,7 +109,7 @@ defineExpose({ open });
             :aria-label="`${index + 1} / ${photos.length}`"
             :aria-hidden="index !== selected"
           >
-            <img
+            <LazyImage
               v-if="active"
               :src="fullResolutionPhotos.has(index) ? photo.fullSrc : photo.src"
               :srcset="fullResolutionPhotos.has(index) ? undefined : albumSrcset(photo.src, photo.width > photo.height ? 960 : 640)"
@@ -225,7 +226,13 @@ defineExpose({ open });
   min-height: 0;
   height: 100%;
 }
-.light-slide img {
+.light-slide .lazy-media {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.light-slide :deep(img) {
   display: block;
   width: auto;
   height: auto;

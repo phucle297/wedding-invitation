@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { couple } from "../../content/couple";
 import { albumSrcset } from "../../content/images";
+import LazyImage from "../../components/LazyImage.vue";
 
 const scenes = [
   {
@@ -38,7 +39,8 @@ const scenes = [
     <div class="portraits">
       <figure>
         <div class="portrait-frame bride-portrait">
-          <img
+          <LazyImage
+            fill
             src="/assets/album/bride.webp"
             :srcset="albumSrcset('/assets/album/bride.webp')"
             sizes="auto, (min-width: 1024px) 360px, (min-width: 720px) 300px, 42vw"
@@ -57,7 +59,8 @@ const scenes = [
       </figure>
       <figure>
         <div class="portrait-frame groom-portrait">
-          <img
+          <LazyImage
+            fill
             src="/assets/album/groom.webp"
             :srcset="albumSrcset('/assets/album/groom.webp')"
             sizes="auto, (min-width: 1024px) 360px, (min-width: 720px) 300px, 42vw"
@@ -98,7 +101,8 @@ const scenes = [
       </div>
       <article v-for="scene in scenes" :key="scene.title" class="journey-scene">
         <figure class="journey-frame">
-          <img
+          <LazyImage
+            fill
             :src="`/assets/album/${scene.image}.webp`"
             :srcset="albumSrcset(`/assets/album/${scene.image}.webp`)"
             sizes="auto, (min-width: 1024px) 540px, (min-width: 720px) 300px, 40vw"
@@ -109,7 +113,7 @@ const scenes = [
             decoding="async"
           />
         </figure>
-        <span class="journey-dot" aria-hidden="true"></span>
+        <span class="journey-dot" aria-hidden="true"><span class="journey-dot-fill"></span></span>
         <div class="journey-copy">
           <h3>{{ scene.title }}</h3>
           <p>{{ scene.text }}</p>
@@ -185,13 +189,13 @@ const scenes = [
 .groom-portrait {
   border-radius: 0 95px 0 0;
 }
-.portrait-frame img {
+.portrait-frame :deep(img) {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center 30%;
 }
-.bride-portrait img {
+.bride-portrait :deep(img) {
   transform: scaleX(-1);
 }
 figcaption {
@@ -283,13 +287,14 @@ figcaption em {
   padding: 30px 0 44px 40px;
 }
 .journey-frame {
+  position: relative;
   margin: 0;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 50%;
   background: #e7e7e2;
 }
-.journey-frame img {
+.journey-frame :deep(img) {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -304,6 +309,13 @@ figcaption em {
   background: var(--paper);
   left: 6px;
   top: 50%;
+}
+.journey-dot-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--bronze);
+  opacity: 0;
 }
 .journey-copy h3 {
   font: var(--text-script)/1.25 var(--script-vi);

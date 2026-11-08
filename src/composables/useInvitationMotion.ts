@@ -5,6 +5,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// The iOS address bar resizes the viewport mid-scroll and would rebuild every trigger.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: WatchSource<boolean>) {
   let media: gsap.MatchMedia | null = null;
 
@@ -289,29 +292,46 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
             desktop ? ".timeline-desktop" : ".timeline-line",
           )[0];
           const timelinePath = timelineSvg.querySelector<SVGPathElement>(".timeline-progress");
-          const timelineCursor = timelineSvg.querySelector<SVGCircleElement>(".timeline-cursor");
-          if (!timelinePath || !timelineCursor) return;
+          const thumbElement = timelineSvg.querySelector<SVGCircleElement>(".timeline-cursor");
+          if (!timelinePath || !thumbElement) return;
+          const thumb = thumbElement;
           const pathLength = timelinePath.getTotalLength();
+          const samples = 200;
+          const pointTable = new Float32Array((samples + 1) * 2);
+          for (let i = 0; i <= samples; i += 1) {
+            const point = timelinePath.getPointAtLength((i / samples) * pathLength);
+            pointTable[i * 2] = point.x;
+            pointTable[i * 2 + 1] = point.y;
+          }
+          function pointAt(progress: number) {
+            const clamped = Math.min(1, Math.max(0, progress));
+            const scaled = clamped * samples;
+            const index = Math.floor(scaled);
+            const next = Math.min(index + 1, samples);
+            const mix = scaled - index;
+            return {
+              x: pointTable[index * 2] * (1 - mix) + pointTable[next * 2] * mix,
+              y: pointTable[index * 2 + 1] * (1 - mix) + pointTable[next * 2 + 1] * mix,
+            };
+          }
           const lineProgress = { value: 0 };
           const setLineOffset = gsap.quickSetter(timelinePath, "strokeDashoffset");
-          const setCursor = gsap.quickSetter(timelineCursor, "attr");
-          const firstPoint = timelinePath.getPointAtLength(0);
-          function positionCursor(point: { x: number; y: number }) {
-            const scaleX = timelineSvg.viewBox.baseVal.width / timelineSvg.clientWidth;
-            const scaleY = timelineSvg.viewBox.baseVal.height / timelineSvg.clientHeight;
-            // The path stretches with its container; the thumb stays circular in pixels.
-            setCursor({
-              cx: point.x,
-              cy: point.y,
-              transform: `translate(${point.x} ${point.y}) scale(${scaleX} ${scaleY}) translate(${-point.x} ${-point.y})`,
-            });
+          const setCursorCenter = gsap.quickSetter(thumb, "attr");
+          const firstPoint = pointAt(0);
+          // Scale is constant until the SVG box changes, so the thumb stays round without a layout read.
+          function measureCursorScale() {
+            const width = timelineSvg.clientWidth;
+            const height = timelineSvg.clientHeight;
+            if (width < 1 || height < 1) return;
+            const scaleX = timelineSvg.viewBox.baseVal.width / width;
+            const scaleY = timelineSvg.viewBox.baseVal.height / height;
+            thumb.style.transform = `scale(${scaleX}, ${scaleY})`;
           }
           gsap.set(timelinePath, { strokeDashoffset: 1 });
-          gsap.set(timelineCursor, {
-            autoAlpha: 1,
-            attr: { cx: firstPoint.x, cy: firstPoint.y, transform: "" },
-          });
-          positionCursor(firstPoint);
+          gsap.set(thumb, { autoAlpha: 1 });
+          thumb.removeAttribute("transform");
+          setCursorCenter({ cx: firstPoint.x, cy: firstPoint.y });
+          measureCursorScale();
 
           gsap.to(lineProgress, {
             value: 1,
@@ -321,20 +341,15 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
               start: desktop ? "top 75%" : "top 65%",
               end: desktop ? "bottom 40%" : "bottom 65%",
               scrub: true,
-              onRefresh() {
-                positionCursor({
-                  x: timelineCursor.cx.baseVal.value,
-                  y: timelineCursor.cy.baseVal.value,
-                });
-              },
+              onRefresh: measureCursorScale,
             },
             onUpdate() {
               // Give horizontal segments their own scroll distance instead of skipping them.
-              const distance = lineProgress.value * pathLength;
-              const point = timelinePath.getPointAtLength(distance);
+              const progress = lineProgress.value;
+              const point = pointAt(progress);
               // Keep fractional offsets; CSS tween auto-rounding makes a 0–1 path jump.
-              setLineOffset(1 - distance / pathLength);
-              positionCursor(point);
+              setLineOffset(1 - progress);
+              setCursorCenter({ cx: point.x, cy: point.y });
             },
           });
 
@@ -359,13 +374,15 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
           });
 
           const journey = select(".journey-track")[0];
-          gsap.set(select(".journey-cursor"), { autoAlpha: 1 });
+          const journeyLine = journey.querySelector<HTMLElement>(".journey-line");
+          gsap.set(select(".journey-cursor"), { autoAlpha: 1, xPercent: -50, yPercent: -50 });
           gsap.timeline({
             scrollTrigger: {
               trigger: journey,
               start: "top 65%",
               end: "bottom 65%",
               scrub: true,
+              invalidateOnRefresh: true,
             },
           }).fromTo(
             select(".journey-progress"),
@@ -377,8 +394,13 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
             0,
           ).fromTo(
             select(".journey-cursor"),
-            { top: "0%" },
-            { top: "100%", ease: "none" },
+            { xPercent: -50, yPercent: -50, y: 0 },
+            {
+              xPercent: -50,
+              yPercent: -50,
+              y: () => journeyLine?.offsetHeight ?? 0,
+              ease: "none",
+            },
             0,
           );
           select(".journey-scene").forEach((scene, index) => {
@@ -412,23 +434,22 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
                 { scale: 1.12, ease: "none" },
                 0,
               );
-            gsap.fromTo(
-              scene.querySelector(".journey-dot"),
-              { scale: 0.7 },
-              {
-                scale: 1.35,
-                backgroundColor: getComputedStyle(rootElement)
-                  .getPropertyValue("--bronze")
-                  .trim(),
-                ease: "none",
-                scrollTrigger: {
-                  trigger: scene,
-                  start: "top 65%",
-                  end: "center 50%",
-                  scrub: true,
-                },
+            const dot = scene.querySelector(".journey-dot");
+            gsap.timeline({
+              scrollTrigger: {
+                trigger: scene,
+                start: "top 65%",
+                end: "center 50%",
+                scrub: true,
               },
-            );
+            })
+              .fromTo(dot, { scale: 0.7 }, { scale: 1.35, ease: "none" }, 0)
+              .fromTo(
+                dot?.querySelector(".journey-dot-fill") ?? null,
+                { opacity: 0 },
+                { opacity: 1, ease: "none" },
+                0,
+              );
           });
 
           select(".portrait-frame").forEach((frame, index) => {
@@ -451,9 +472,10 @@ export function useInvitationMotion(root: Ref<HTMLElement | null>, entered: Watc
           return () => {
             // quickSetter writes are not tweens, so restore them on media changes.
             timelinePath.style.removeProperty("stroke-dashoffset");
-            timelineCursor.setAttribute("cx", String(firstPoint.x));
-            timelineCursor.setAttribute("cy", String(firstPoint.y));
-            timelineCursor.removeAttribute("transform");
+            thumb.setAttribute("cx", String(firstPoint.x));
+            thumb.setAttribute("cy", String(firstPoint.y));
+            thumb.style.removeProperty("transform");
+            thumb.removeAttribute("transform");
           };
         },
         rootElement,

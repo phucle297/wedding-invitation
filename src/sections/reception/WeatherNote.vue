@@ -79,7 +79,6 @@ onBeforeUnmount(() => controller.abort());
   border: 1px solid var(--line);
   padding: clamp(24px, 4vw, 40px);
   background: var(--cream);
-  background-image: var(--paper-grain);
 }
 h3 { font: 500 var(--text-feature)/1.2 var(--heading); text-transform: uppercase; margin: 18px 0 24px; }
 .weather-reading { display: flex; align-items: center; gap: 24px; margin: 24px 0; }

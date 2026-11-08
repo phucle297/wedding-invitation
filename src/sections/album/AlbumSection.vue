@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { albumSrcset } from "../../content/images";
 import { album } from "./content";
 import PhotoLightbox from "./PhotoLightbox.vue";
+import LazyImage from "../../components/LazyImage.vue";
 
 const props = defineProps({
   entered: { type: Boolean, default: false },
@@ -80,7 +81,8 @@ function openPhoto(index: number, event: MouseEvent) {
 
 <template>
   <figure class="photo-interlude album-cover">
-    <img
+    <LazyImage
+      fill
       src="/assets/album/album-cover.webp"
       :srcset="albumSrcset('/assets/album/album-cover.webp', 1920)"
       sizes="auto, (min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
@@ -114,7 +116,7 @@ function openPhoto(index: number, event: MouseEvent) {
         @click="openPhoto(index, $event)"
       >
         <span class="shot-content">
-          <img
+          <LazyImage
             :src="photo.src"
             :srcset="albumSrcset(photo.src, photo.width > photo.height ? 960 : 640)"
             sizes="auto, (min-width: 1392px) 635px, (min-width: 1024px) calc((100vw - 122px) / 2), (min-width: 720px) 313px, calc((100vw - 58px) / 2)"
@@ -155,7 +157,7 @@ function openPhoto(index: number, event: MouseEvent) {
   aspect-ratio: 16 / 9;
   max-height: 900px;
 }
-.album-cover > img {
+.album-cover :deep(img) {
   height: 100%;
   object-fit: cover;
 }
@@ -187,13 +189,13 @@ function openPhoto(index: number, event: MouseEvent) {
   position: relative;
   pointer-events: none;
 }
-.shot img {
+.shot :deep(img) {
   display: block;
   width: 100%;
   height: auto;
   object-fit: contain;
 }
-.shot-cover img {
+.shot-cover :deep(img) {
   aspect-ratio: 2 / 3;
   object-fit: cover;
   object-position: 60% center;

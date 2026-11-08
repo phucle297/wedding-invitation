@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import StationeryFrame from "../../components/StationeryFrame.vue";
+import LazyImage from "../../components/LazyImage.vue";
 import { reception } from "./content";
 import { date } from "../../content/date";
 import { phrases } from "../../content/phrases";
@@ -10,7 +11,7 @@ import { phrases } from "../../content/phrases";
     <article class="venue">
       <StationeryFrame beaded />
       <div class="invitation-copy">
-        <img class="invitation-bouquet" src="/assets/ornaments/floral-bouquet.webp" width="490" height="390" alt="" loading="lazy" />
+        <LazyImage class="invitation-bouquet" src="/assets/ornaments/floral-bouquet.webp" width="490" height="390" alt="" loading="lazy" />
         <p class="invitation-title">Thiệp Mời</p>
         <p class="invitation-salutation">{{ phrases.invite }}</p>
         <p class="invitation-addressee">{{ phrases.addressee }}</p>
@@ -60,6 +61,7 @@ import { phrases } from "../../content/phrases";
   padding: 13% 12% 28%;
 }
 .invitation-bouquet { display: block; width: 34%; height: auto; margin: 0 auto 3%; }
+.invitation-bouquet :deep(img) { display: block; width: 100%; height: auto; }
 .invitation-title { margin: 0 0 7%; font: clamp(2.5rem, 11cqw, 4.5rem)/1.25 var(--script-vi); text-transform: none; }
 .invitation-salutation { margin: 0; font-size: clamp(.875rem, 3.3cqw, 1.25rem); text-transform: uppercase; }
 .invitation-addressee {
