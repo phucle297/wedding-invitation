@@ -16,6 +16,7 @@ jobs:
       - name: Install git
         run: apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
       - uses: actions/checkout@v7
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run build
@@ -30,6 +31,7 @@ jobs:
       - name: Install git
         run: apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
       - uses: actions/checkout@v7
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run build
