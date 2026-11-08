@@ -200,8 +200,8 @@ defineProps({
   z-index: 2;
   left: 6%;
   right: 6%;
-  top: 22%;
-  height: 64%;
+  top: 19%;
+  height: 70%;
   overflow: hidden;
   visibility: hidden;
 }
@@ -537,8 +537,8 @@ defineProps({
   .slot {
     left: 8%;
     right: 8%;
-    top: 18%;
-    height: 64%;
+    top: 15%;
+    height: 70%;
   }
   .monogram {
     font-size: 7cqw;
