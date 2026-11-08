@@ -48,10 +48,11 @@ escaped before writing to Sheets.
 
 The Biên Hòa form (`bh`) also sends shuttle fields. `transport` is `shuttle` or
 `own`. A shuttle guest then sends `outbound` (`trip-1`, `trip-2`, `self`, or
-`none`) and `returnRide` (`same` or `self`). The car, pickup, and drop-off are plain
-text in `vehicle`, `station`, and `returnStation`, up to 120 characters. The page
-offers them as selects; this script does not keep those lists, so renaming a car
-or a stop does not require a new Apps Script deployment. Guests who are not attending
+`none`) and `returnRide` (`self` or `shuttle`). A trip sends the car and pickup as
+plain text in `vehicle` and `station`. A return shuttle sends `returnVehicle` and
+`returnStation`, also plain text up to 120 characters. Either direction can be
+used alone. The page offers the choices; this script does not keep those lists,
+so renaming a car or a stop does not require a new Apps Script deployment. Guests who are not attending
 omit these fields. Older clients, including `main`, still omit them and remain
 valid: the script stores the original payload shape and leaves the shuttle
 columns blank. A receipt for every successful save now includes `version: 2`.

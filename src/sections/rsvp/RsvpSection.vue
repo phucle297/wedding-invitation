@@ -2,7 +2,7 @@
 import { computed, nextTick, onUnmounted, ref, watch } from "vue";
 import { rsvp } from "./content";
 import { shuttle, shuttleStations, shuttleTrips, shuttleVehicles } from "./shuttle";
-import type { OutboundChoice, ReturnChoice, TransportChoice, TripId } from "./shuttle";
+import type { OutboundChoice, TransportChoice, TripId } from "./shuttle";
 import { submitRsvp } from "./submitRsvp";
 import type { RsvpSubmission } from "./submitRsvp";
 
@@ -12,9 +12,8 @@ const count = ref<number | string>(1);
 const note = ref("");
 const transport = ref<"" | TransportChoice>("");
 const outbound = ref<"" | OutboundChoice>("");
-const vehicle = ref("");
 const station = ref("");
-const returnRide = ref<"" | ReturnChoice>("");
+const returnChoice = ref("");
 const returnStation = ref("");
 const status = ref("");
 const website = ref("");
@@ -26,11 +25,11 @@ const routeDialog = ref<HTMLElement | null>(null);
 const absent = computed(() => attend.value === rsvp.absentValue);
 const usingShuttle = computed(() => !absent.value && transport.value === "shuttle");
 const pickedTrip = computed(() => shuttleTrips.find((trip) => trip.id === outbound.value) ?? null);
-const tripVehicles = computed(() => shuttleVehicles.filter((car) => car.tripId === outbound.value));
+const returningByCar = computed(() => returnChoice.value !== "" && returnChoice.value !== "self");
 let submission: { fingerprint: string; requestId: string } | null = null;
 let restoreFocus: HTMLElement | null = null;
 
-watch([name, attend, count, note, transport, outbound, vehicle, station, returnRide, returnStation], () => {
+watch([name, attend, count, note, transport, outbound, station, returnChoice, returnStation], () => {
   sent.value = false;
   status.value = "";
 });
@@ -39,34 +38,31 @@ watch(attend, (value) => {
   if (value === rsvp.absentValue) {
     transport.value = "";
     outbound.value = "";
-    vehicle.value = "";
     station.value = "";
-    returnRide.value = "";
+    returnChoice.value = "";
     returnStation.value = "";
   }
 });
 
-watch(transport, (value, previous) => {
-  if (value === "shuttle" && previous !== "shuttle") openRoute();
+watch(transport, (value) => {
   if (value !== "shuttle") {
     outbound.value = "";
-    vehicle.value = "";
     station.value = "";
-    returnRide.value = "";
+    returnChoice.value = "";
     returnStation.value = "";
   }
 });
 
-watch(outbound, () => {
+watch(outbound, (value) => {
   station.value = "";
-  returnStation.value = "";
-  const cars = shuttleVehicles.filter((car) => car.tripId === outbound.value);
-  vehicle.value = cars.length === 1 ? cars[0].name : "";
-  if (!pickedTrip.value) returnRide.value = "";
+  if ((value === "trip-1" || value === "trip-2") && !returnChoice.value) {
+    const car = shuttleVehicles.find((item) => item.tripId === value);
+    if (car) returnChoice.value = car.name;
+  }
 });
 
-watch(returnRide, (value) => {
-  if (value !== "same") {
+watch(returnChoice, (value) => {
+  if (value === "self" || value === "") {
     returnStation.value = "";
     return;
   }
@@ -74,7 +70,7 @@ watch(returnRide, (value) => {
 });
 
 watch(station, (value) => {
-  if (returnRide.value === "same" && !returnStation.value) returnStation.value = value;
+  if (returningByCar.value && !returnStation.value) returnStation.value = value;
 });
 
 watch(routeOpen, async (open) => {
@@ -121,30 +117,26 @@ function onRouteKeydown(event: KeyboardEvent) {
   }
 }
 
-function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "vehicle" | "station" | "returnRide" | "returnStation"> | undefined {
+function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "vehicle" | "station" | "returnRide" | "returnVehicle" | "returnStation"> | undefined {
   if (absent.value || transport.value === "") return undefined;
   if (transport.value === "own") return { transport: "own" };
-  if (outbound.value === "self" || outbound.value === "none") {
-    return { transport: "shuttle", outbound: outbound.value, returnRide: "self" };
-  }
-  if (!pickedTrip.value || returnRide.value !== "same" && returnRide.value !== "self") return undefined;
-  if (returnRide.value === "same") {
-    return {
-      transport: "shuttle",
-      outbound: pickedTrip.value.id,
-      vehicle: vehicle.value.trim(),
-      station: station.value.trim(),
-      returnRide: "same",
-      returnStation: returnStation.value.trim(),
-    };
-  }
-  return {
+  if (!outbound.value || returnChoice.value === "") return undefined;
+  const ride: Pick<RsvpSubmission, "transport" | "outbound" | "vehicle" | "station" | "returnRide" | "returnVehicle" | "returnStation"> = {
     transport: "shuttle",
-    outbound: pickedTrip.value.id,
-    vehicle: vehicle.value.trim(),
-    station: station.value.trim(),
-    returnRide: "self",
+    outbound: outbound.value,
   };
+  if (pickedTrip.value) {
+    ride.vehicle = carsFor(pickedTrip.value.id);
+    ride.station = station.value.trim();
+  }
+  if (returnChoice.value === "self") {
+    ride.returnRide = "self";
+    return ride;
+  }
+  ride.returnRide = "shuttle";
+  ride.returnVehicle = returnChoice.value.trim();
+  ride.returnStation = returnStation.value.trim();
+  return ride;
 }
 
 async function onSubmit() {
@@ -167,19 +159,15 @@ async function onSubmit() {
     status.value = rsvp.messages.needOutbound;
     return;
   }
-  if (pickedTrip.value && !vehicle.value.trim()) {
-    status.value = rsvp.messages.needVehicle;
-    return;
-  }
   if (pickedTrip.value && !station.value) {
     status.value = rsvp.messages.needStation;
     return;
   }
-  if (pickedTrip.value && returnRide.value !== "same" && returnRide.value !== "self") {
+  if (usingShuttle.value && !returnChoice.value) {
     status.value = rsvp.messages.needReturn;
     return;
   }
-  if (returnRide.value === "same" && !returnStation.value.trim()) {
+  if (returningByCar.value && !returnStation.value.trim()) {
     status.value = rsvp.messages.needReturnStation;
     return;
   }
@@ -322,13 +310,6 @@ function carsFor(tripId: TripId) {
         </label>
       </fieldset>
       <div v-if="pickedTrip" class="field">
-        <label for="guest-vehicle">{{ shuttle.vehicleLabel }}</label>
-        <select id="guest-vehicle" v-model="vehicle" :disabled="pending" required>
-          <option disabled value="">{{ shuttle.vehiclePlaceholder }}</option>
-          <option v-for="car in tripVehicles" :key="car.name" :value="car.name">{{ car.name }}</option>
-        </select>
-      </div>
-      <div v-if="pickedTrip" class="field">
         <label for="guest-station">{{ shuttle.stationLabel }}</label>
         <select id="guest-station" v-model="station" :disabled="pending" required>
           <option disabled value="">{{ shuttle.stationPlaceholder }}</option>
@@ -337,18 +318,18 @@ function carsFor(tripId: TripId) {
           </option>
         </select>
       </div>
-      <fieldset v-if="pickedTrip">
+      <fieldset v-if="usingShuttle">
         <legend>{{ shuttle.returnLegend }}</legend>
-        <label class="choice">
-          <input v-model="returnRide" type="radio" name="return-ride" value="same" :disabled="pending" required />
-          <span>{{ shuttle.returnSame }}</span>
+        <label v-for="car in shuttleVehicles" :key="car.name" class="choice">
+          <input v-model="returnChoice" type="radio" name="return-ride" :value="car.name" :disabled="pending" required />
+          <span>{{ car.name }}</span>
         </label>
         <label class="choice">
-          <input v-model="returnRide" type="radio" name="return-ride" value="self" :disabled="pending" required />
+          <input v-model="returnChoice" type="radio" name="return-ride" value="self" :disabled="pending" required />
           <span>{{ shuttle.returnSelf }}</span>
         </label>
       </fieldset>
-      <div v-if="pickedTrip && returnRide === 'same'" class="field">
+      <div v-if="returningByCar" class="field">
         <label for="guest-return-station">{{ shuttle.returnStationLabel }}</label>
         <select id="guest-return-station" v-model="returnStation" :disabled="pending" required>
           <option disabled value="">{{ shuttle.returnStationPlaceholder }}</option>

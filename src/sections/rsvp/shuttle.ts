@@ -7,7 +7,7 @@ export const shuttleTrips = [
 export type TripId = (typeof shuttleTrips)[number]["id"];
 export type TransportChoice = "shuttle" | "own";
 export type OutboundChoice = TripId | "self" | "none";
-export type ReturnChoice = "same" | "self";
+export type ReturnChoice = "self" | "shuttle";
 
 /** Car names are display text. Apps Script does not keep this list. */
 export const shuttleVehicles = [
@@ -27,22 +27,19 @@ export const shuttleStations = [
 
 export const shuttle = {
   legend: "Xe đưa đón",
-  note: "Bên nhà mình cung cấp xe cho khách với 2 chuyến.",
+  note: "Chiều đi và chiều về chọn riêng. Có thể tự đi, rồi đi xe về.",
   useLabel: "Mình dùng xe đưa đón",
   ownLabel: "Mình tự sắp xếp",
   viewRoute: "Xem lộ trình",
   routeTitle: "Lộ trình xe đưa đón",
-  routeLead: "Hai chuyến cùng các trạm, khác giờ xuất phát. Xe đến The Mira Central Park trước giờ đón khách 11:00. Chiều về, xe trả đúng trạm đã chọn.",
+  routeLead: "Hai chuyến cùng các trạm, khác giờ xuất phát. Xe đến The Mira Central Park trước giờ đón khách 11:00. Chiều về chọn xe và trạm trả riêng.",
   closeRoute: "Đóng",
   outboundLegend: "Chiều đi",
   selfOutbound: "Tự đi",
   noneOutbound: "Không đi",
-  vehicleLabel: "Tên xe",
-  vehiclePlaceholder: "Chọn xe",
   stationLabel: "Trạm đón",
   stationPlaceholder: "Chọn trạm đón",
   returnLegend: "Chiều về",
-  returnSame: "Xe chở về theo đúng xe cũ",
   returnSelf: "Tự về",
   returnStationLabel: "Trạm trả",
   returnStationPlaceholder: "Chọn trạm trả",

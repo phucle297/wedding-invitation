@@ -13,6 +13,7 @@ export interface RsvpSubmission {
   vehicle?: string;
   station?: string;
   returnRide?: ReturnChoice;
+  returnVehicle?: string;
   returnStation?: string;
 }
 

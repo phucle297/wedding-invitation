@@ -8,7 +8,6 @@ const TRANSPORT_LABEL = { own: "Tự sắp xếp", shuttle: "Dùng xe" };
 const OUTBOUND_LABEL = {
   "trip-1": "Chuyến 1", "trip-2": "Chuyến 2", self: "Tự đi", none: "Không đi",
 };
-const RETURN_LABEL = { same: "Xe cũ", self: "Tự về" };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function output_(value, receipt) {
@@ -29,38 +28,40 @@ function placeText_(value) {
 }
 
 function ride_(value, attendance) {
-  const keys = ["transport", "outbound", "vehicle", "station", "returnRide", "returnStation"];
+  const keys = ["transport", "outbound", "vehicle", "station", "returnRide", "returnVehicle", "returnStation"];
   const present = keys.filter((key) => Object.prototype.hasOwnProperty.call(value, key));
   if (present.length === 0) return { legacy: true };
   if (attendance !== "attending") return null;
-  const { transport, outbound, vehicle, station, returnRide, returnStation } = value;
+  const { transport, outbound, vehicle, station, returnRide, returnVehicle, returnStation } = value;
   if (transport === "own") {
     return present.length === 1 ? { legacy: false, transport: "own" } : null;
   }
   if (transport !== "shuttle") return null;
-  if (outbound === "self" || outbound === "none") {
-    if (present.indexOf("vehicle") !== -1 || present.indexOf("station") !== -1 ||
-        present.indexOf("returnStation") !== -1 || returnRide !== "self") return null;
-    return { legacy: false, transport: "shuttle", outbound: outbound, returnRide: "self" };
+  const going = outbound === "trip-1" || outbound === "trip-2";
+  if (!going && outbound !== "self" && outbound !== "none") return null;
+  const ride = { legacy: false, transport: "shuttle", outbound: outbound };
+  if (going) {
+    const car = placeText_(vehicle);
+    const pickup = placeText_(station);
+    if (!car || !pickup) return null;
+    ride.vehicle = car;
+    ride.station = pickup;
+  } else if (present.indexOf("vehicle") !== -1 || present.indexOf("station") !== -1) {
+    return null;
   }
-  if (outbound !== "trip-1" && outbound !== "trip-2") return null;
-  const car = placeText_(vehicle);
-  const pickup = placeText_(station);
-  if (!car || !pickup) return null;
   if (returnRide === "self") {
-    if (present.indexOf("returnStation") !== -1) return null;
-    return {
-      legacy: false, transport: "shuttle", outbound: outbound, vehicle: car,
-      station: pickup, returnRide: "self",
-    };
+    if (present.indexOf("returnVehicle") !== -1 || present.indexOf("returnStation") !== -1) return null;
+    ride.returnRide = "self";
+    return ride;
   }
-  if (returnRide !== "same") return null;
+  if (returnRide !== "shuttle") return null;
+  const back = placeText_(returnVehicle);
   const dropoff = placeText_(returnStation);
-  if (!dropoff) return null;
-  return {
-    legacy: false, transport: "shuttle", outbound: outbound, vehicle: car, station: pickup,
-    returnRide: "same", returnStation: dropoff,
-  };
+  if (!back || !dropoff) return null;
+  ride.returnRide = "shuttle";
+  ride.returnVehicle = back;
+  ride.returnStation = dropoff;
+  return ride;
 }
 
 function validate_(value) {
@@ -92,6 +93,7 @@ function storedPayload_(rsvp) {
     if (rsvp.vehicle) stored.vehicle = rsvp.vehicle;
     if (rsvp.station) stored.station = rsvp.station;
     if (rsvp.returnRide) stored.returnRide = rsvp.returnRide;
+    if (rsvp.returnVehicle) stored.returnVehicle = rsvp.returnVehicle;
     if (rsvp.returnStation) stored.returnStation = rsvp.returnStation;
   }
   return JSON.stringify(stored);
@@ -104,7 +106,7 @@ function transportCells_(rsvp) {
     rsvp.outbound ? cellText_(OUTBOUND_LABEL[rsvp.outbound]) : "",
     rsvp.vehicle ? cellText_(rsvp.vehicle) : "",
     rsvp.station ? cellText_(rsvp.station) : "",
-    rsvp.returnRide ? cellText_(RETURN_LABEL[rsvp.returnRide]) : "",
+    rsvp.returnRide === "self" ? "Tự về" : rsvp.returnVehicle ? cellText_(rsvp.returnVehicle) : "",
     rsvp.returnStation ? cellText_(rsvp.returnStation) : "",
   ];
 }

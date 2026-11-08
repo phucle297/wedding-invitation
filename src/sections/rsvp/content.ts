@@ -18,7 +18,6 @@ export const rsvp = {
     needAttend: "Chọn quý khách tham dự phần nào.",
     needTransport: "Chọn quý khách có dùng xe đưa đón không.",
     needOutbound: "Chọn chiều đi.",
-    needVehicle: "Chọn tên xe.",
     needStation: "Chọn trạm đón.",
     needReturn: "Chọn chiều về.",
     needReturnStation: "Chọn trạm trả.",
