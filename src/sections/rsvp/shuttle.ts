@@ -9,6 +9,12 @@ export type TransportChoice = "shuttle" | "own";
 export type OutboundChoice = TripId | "self" | "none";
 export type ReturnChoice = "same" | "self";
 
+/** Car names are display text. Apps Script does not keep this list. */
+export const shuttleVehicles = [
+  { name: "Xe 1", tripId: "trip-1" },
+  { name: "Xe 2", tripId: "trip-2" },
+] as const;
+
 export const shuttleStations = [
   { name: "Công viên 30/4, Quận 1", times: { "trip-1": "07:00", "trip-2": "07:45" } },
   { name: "Landmark 81, Bình Thạnh", times: { "trip-1": "07:20", "trip-2": "08:05" } },
@@ -31,6 +37,8 @@ export const shuttle = {
   outboundLegend: "Chiều đi",
   selfOutbound: "Tự đi",
   noneOutbound: "Không đi",
+  vehicleLabel: "Tên xe",
+  vehiclePlaceholder: "Chọn xe",
   stationLabel: "Trạm đón",
   stationPlaceholder: "Chọn trạm đón",
   returnLegend: "Chiều về",

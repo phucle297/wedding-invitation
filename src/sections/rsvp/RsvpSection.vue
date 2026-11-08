@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onUnmounted, ref, watch } from "vue";
 import { rsvp } from "./content";
-import { shuttle, shuttleStations, shuttleTrips } from "./shuttle";
+import { shuttle, shuttleStations, shuttleTrips, shuttleVehicles } from "./shuttle";
 import type { OutboundChoice, ReturnChoice, TransportChoice, TripId } from "./shuttle";
 import { submitRsvp } from "./submitRsvp";
 import type { RsvpSubmission } from "./submitRsvp";
@@ -12,6 +12,7 @@ const count = ref<number | string>(1);
 const note = ref("");
 const transport = ref<"" | TransportChoice>("");
 const outbound = ref<"" | OutboundChoice>("");
+const vehicle = ref("");
 const station = ref("");
 const returnRide = ref<"" | ReturnChoice>("");
 const returnStation = ref("");
@@ -25,10 +26,11 @@ const routeDialog = ref<HTMLElement | null>(null);
 const absent = computed(() => attend.value === rsvp.absentValue);
 const usingShuttle = computed(() => !absent.value && transport.value === "shuttle");
 const pickedTrip = computed(() => shuttleTrips.find((trip) => trip.id === outbound.value) ?? null);
+const tripVehicles = computed(() => shuttleVehicles.filter((car) => car.tripId === outbound.value));
 let submission: { fingerprint: string; requestId: string } | null = null;
 let restoreFocus: HTMLElement | null = null;
 
-watch([name, attend, count, note, transport, outbound, station, returnRide, returnStation], () => {
+watch([name, attend, count, note, transport, outbound, vehicle, station, returnRide, returnStation], () => {
   sent.value = false;
   status.value = "";
 });
@@ -37,6 +39,7 @@ watch(attend, (value) => {
   if (value === rsvp.absentValue) {
     transport.value = "";
     outbound.value = "";
+    vehicle.value = "";
     station.value = "";
     returnRide.value = "";
     returnStation.value = "";
@@ -47,6 +50,7 @@ watch(transport, (value, previous) => {
   if (value === "shuttle" && previous !== "shuttle") openRoute();
   if (value !== "shuttle") {
     outbound.value = "";
+    vehicle.value = "";
     station.value = "";
     returnRide.value = "";
     returnStation.value = "";
@@ -56,6 +60,8 @@ watch(transport, (value, previous) => {
 watch(outbound, () => {
   station.value = "";
   returnStation.value = "";
+  const cars = shuttleVehicles.filter((car) => car.tripId === outbound.value);
+  vehicle.value = cars.length === 1 ? cars[0].name : "";
   if (!pickedTrip.value) returnRide.value = "";
 });
 
@@ -115,7 +121,7 @@ function onRouteKeydown(event: KeyboardEvent) {
   }
 }
 
-function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "station" | "returnRide" | "returnStation"> | undefined {
+function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "vehicle" | "station" | "returnRide" | "returnStation"> | undefined {
   if (absent.value || transport.value === "") return undefined;
   if (transport.value === "own") return { transport: "own" };
   if (outbound.value === "self" || outbound.value === "none") {
@@ -126,6 +132,7 @@ function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "st
     return {
       transport: "shuttle",
       outbound: pickedTrip.value.id,
+      vehicle: vehicle.value.trim(),
       station: station.value.trim(),
       returnRide: "same",
       returnStation: returnStation.value.trim(),
@@ -134,6 +141,7 @@ function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "st
   return {
     transport: "shuttle",
     outbound: pickedTrip.value.id,
+    vehicle: vehicle.value.trim(),
     station: station.value.trim(),
     returnRide: "self",
   };
@@ -157,6 +165,10 @@ async function onSubmit() {
   }
   if (usingShuttle.value && !outbound.value) {
     status.value = rsvp.messages.needOutbound;
+    return;
+  }
+  if (pickedTrip.value && !vehicle.value.trim()) {
+    status.value = rsvp.messages.needVehicle;
     return;
   }
   if (pickedTrip.value && !station.value) {
@@ -198,8 +210,8 @@ async function onSubmit() {
   }
 }
 
-function stationTime(tripId: TripId, times: Record<TripId, string>) {
-  return times[tripId];
+function carsFor(tripId: TripId) {
+  return shuttleVehicles.filter((car) => car.tripId === tripId).map((car) => car.name).join(", ");
 }
 </script>
 
@@ -298,7 +310,7 @@ function stationTime(tripId: TripId, times: Record<TripId, string>) {
             :disabled="pending"
             required
           />
-          <span>{{ trip.label }} · {{ trip.depart }}</span>
+          <span>{{ trip.label }} · {{ trip.depart }} · {{ carsFor(trip.id) }}</span>
         </label>
         <label class="choice">
           <input v-model="outbound" type="radio" name="outbound" value="self" :disabled="pending" required />
@@ -309,6 +321,13 @@ function stationTime(tripId: TripId, times: Record<TripId, string>) {
           <span>{{ shuttle.noneOutbound }}</span>
         </label>
       </fieldset>
+      <div v-if="pickedTrip" class="field">
+        <label for="guest-vehicle">{{ shuttle.vehicleLabel }}</label>
+        <select id="guest-vehicle" v-model="vehicle" :disabled="pending" required>
+          <option disabled value="">{{ shuttle.vehiclePlaceholder }}</option>
+          <option v-for="car in tripVehicles" :key="car.name" :value="car.name">{{ car.name }}</option>
+        </select>
+      </div>
       <div v-if="pickedTrip" class="field">
         <label for="guest-station">{{ shuttle.stationLabel }}</label>
         <select id="guest-station" v-model="station" :disabled="pending" required>
@@ -380,11 +399,11 @@ function stationTime(tripId: TripId, times: Record<TripId, string>) {
           <p class="route-lead">{{ shuttle.routeLead }}</p>
           <div class="route-list">
             <section v-for="trip in shuttleTrips" :key="trip.id" class="route-trip">
-              <h4>{{ trip.label }}</h4>
+              <h4>{{ trip.label }} · {{ carsFor(trip.id) }}</h4>
               <p>Xuất phát {{ trip.depart }}</p>
               <ol>
                 <li v-for="stop in shuttleStations" :key="stop.name">
-                  <time :datetime="stationTime(trip.id, stop.times)">{{ stop.times[trip.id] }}</time>
+                  <time :datetime="stop.times[trip.id]">{{ stop.times[trip.id] }}</time>
                   <span>{{ stop.name }}</span>
                 </li>
                 <li class="destination">

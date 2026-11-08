@@ -48,10 +48,10 @@ escaped before writing to Sheets.
 
 The Biên Hòa form (`bh`) also sends shuttle fields. `transport` is `shuttle` or
 `own`. A shuttle guest then sends `outbound` (`trip-1`, `trip-2`, `self`, or
-`none`) and `returnRide` (`same` or `self`). Pickup and drop-off are plain text
-in `station` and `returnStation`, up to 120 characters. The page offers them as
-selects; this script does not keep the station list, so renaming or adding a
-stop does not require a new Apps Script deployment. Guests who are not attending
+`none`) and `returnRide` (`same` or `self`). The car, pickup, and drop-off are plain
+text in `vehicle`, `station`, and `returnStation`, up to 120 characters. The page
+offers them as selects; this script does not keep those lists, so renaming a car
+or a stop does not require a new Apps Script deployment. Guests who are not attending
 omit these fields. Older clients, including `main`, still omit them and remain
 valid: the script stores the original payload shape and leaves the shuttle
 columns blank. A receipt for every successful save now includes `version: 2`.
@@ -59,7 +59,7 @@ The Biên Hòa page treats a shuttle submission as unconfirmed until it receives
 that version, so deploy this script before sharing the `bh` form.
 
 The RSVP tab contains Request ID, Thời gian, Họ tên, Tham dự, Số người, Lời nhắn,
-Payload, and, after this deployment, Xe đưa đón, Chiều đi, Trạm đón, Chiều về,
+Payload, and, after this deployment, Xe đưa đón, Chiều đi, Tên xe, Trạm đón, Chiều về,
 Trạm trả. An existing header row with only the first seven titles is extended
 in place. Do not rename the shuttle titles or edit the Request ID/Payload
 columns, and do not sort columns separately.

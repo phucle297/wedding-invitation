@@ -10,6 +10,7 @@ export interface RsvpSubmission {
   website: string;
   transport?: TransportChoice;
   outbound?: OutboundChoice;
+  vehicle?: string;
   station?: string;
   returnRide?: ReturnChoice;
   returnStation?: string;

