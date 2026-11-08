@@ -21,9 +21,6 @@
   --text-display: 4rem;
   --section-title: clamp(2.25rem, 3.5vw, 3rem);
   --pad: 42px;
-  --paper-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23757570' opacity='.1' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
-  --paper-fibers: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23a8a8a0' stroke-width='.6' opacity='.22'%3E%3Cpath d='M12 28l5 9m38 4 7-3m42-18 2 13m39 19 9 2m44-31-4 10M24 94l10 3m42-14-3 11m48-13 6 6m57-5-6 5m38 31 4 8M10 158l8-5m44-13 3 9m38-5 9 5m42-20 3 12m45 11 8-6M33 213l-3-11m46 18 9-4m44-20 3 9m42 12 8-5m31 21 3-10'/%3E%3C/svg%3E");
-  --paper-emboss: url("data:image/svg+xml,%3Csvg viewBox='0 0 260 260' xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ddded8' stroke-width='1'%3E%3Cpath d='M35 255C90 182 93 105 112 12M65 211C14 180 27 145 39 128C69 145 79 175 65 211ZM82 165C127 150 148 119 140 91C101 100 83 123 82 165ZM99 89C58 66 68 30 80 10C102 33 109 54 99 89ZM158 260C192 207 197 150 224 100M185 213C151 184 157 159 168 147C192 164 198 185 185 213ZM202 163C229 162 249 139 247 119C221 124 206 139 202 163Z'/%3E%3C/svg%3E");
   color: var(--ink);
   background-color: #ffffff;
 }
@@ -31,8 +28,6 @@
   max-width: 720px;
   margin-inline: auto;
   background-color: var(--paper);
-  background-image: var(--paper-fibers), var(--paper-grain);
-  background-size: 240px, 110px;
   box-shadow: 0 0 60px #30302c0a;
 }
 .invite .block {
@@ -81,31 +76,18 @@
 }
 .satin {
   background-color: var(--champagne);
-  background-image:
-    var(--paper-grain),
-    radial-gradient(ellipse at 15% 8%, #ffffffb3, transparent 65%),
-    linear-gradient(125deg, var(--cream), var(--champagne) 65%, #efe5d3);
 }
 .invite .block.letter {
   width: 100%;
   max-width: none;
   padding-inline: var(--pad);
   background-color: var(--paper);
-  background-image: var(--paper-fibers), var(--paper-grain);
-  background-size: 240px, 180px;
 }
 .invite .guest-info {
-  background-image:
-    repeating-linear-gradient(0deg, #a1845406 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(90deg, #a1845405 0 1px, transparent 1px 4px);
+  background-color: var(--cream);
 }
 .invite .thanks {
-  background-image: var(--paper-emboss), var(--paper-grain);
-  background-repeat: no-repeat, repeat;
-  background-position:
-    right bottom,
-    center;
-  background-size: 210px, 180px;
+  background-color: var(--cream);
 }
 .fine-rule {
   display: block;
@@ -136,14 +118,15 @@
   width: 100%;
   aspect-ratio: 2;
 }
-.photo-interlude > img {
+.photo-interlude img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
   display: block;
+  will-change: transform;
 }
-.invite .together-cover > img {
+.invite .together-cover img {
   object-position: center bottom;
 }
 .photo-interlude > figcaption {

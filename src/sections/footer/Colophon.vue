@@ -3,12 +3,14 @@ import { couple } from "../../content/couple";
 import { date } from "../../content/date";
 import { albumSrcset } from "../../content/images";
 import { phrases } from "../../content/phrases";
+import LazyImage from "../../components/LazyImage.vue";
 </script>
 
 <template>
   <div class="closing-spread">
     <figure class="photo-interlude closing-photo">
-      <img
+      <LazyImage
+        fill
         src="/assets/album/09.webp"
         :srcset="albumSrcset('/assets/album/09.webp')"
         sizes="auto, (min-width: 1024px) 50vw, (min-width: 720px) 720px, 100vw"
@@ -76,15 +78,6 @@ import { phrases } from "../../content/phrases";
   color: var(--ink);
   background: var(--champagne);
   border-top: 1px solid var(--line);
-}
-.colophon::before {
-  position: absolute;
-  content: "";
-  inset: 0;
-  opacity: 0.13;
-  z-index: -1;
-  background-image: var(--paper-grain);
-  pointer-events: none;
 }
 .footer-names {
   display: flex;

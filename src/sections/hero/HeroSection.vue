@@ -63,12 +63,14 @@ import { hero } from "./content";
   height: 67%;
   overflow: hidden;
   border-radius: 160px 160px 0 0;
+  will-change: transform;
 }
 .hero-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: 50% 40%;
+  will-change: transform;
 }
 .hero-copy {
   position: relative;

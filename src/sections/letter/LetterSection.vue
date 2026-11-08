@@ -3,6 +3,7 @@ import { families } from "../families/content";
 import { date } from "../../content/date";
 import { albumSrcset } from "../../content/images";
 import CallaSprig from "../../components/CallaSprig.vue";
+import LazyImage from "../../components/LazyImage.vue";
 </script>
 
 <template>
@@ -11,7 +12,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
       <CallaSprig class="letter-botanical" />
       <div class="paper-envelope">
         <div class="envelope-lining"></div>
-        <img
+        <LazyImage
           class="keepsake-photo"
           src="/assets/album/02.webp"
           :srcset="albumSrcset('/assets/album/02.webp')"
@@ -26,7 +27,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
         <span class="wax-seal">P<span>&amp;</span>Đ</span>
       </div>
       <div class="photo-strip">
-        <img
+        <LazyImage
           v-for="image in ['09', '10', '11']"
           :key="image"
           :src="`/assets/album/${image}.webp`"
@@ -95,9 +96,13 @@ import CallaSprig from "../../components/CallaSprig.vue";
   height: 108%;
   left: 11%;
   bottom: 22%;
+  transform: rotate(-5deg);
+}
+.keepsake-photo :deep(img) {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border: 9px solid #ffffff;
-  transform: rotate(-5deg);
 }
 .envelope-pocket {
   position: absolute;
@@ -141,14 +146,16 @@ import CallaSprig from "../../components/CallaSprig.vue";
   transform: rotate(-14deg);
   box-shadow: 2px 5px 12px #40372526;
 }
-.photo-strip img {
+.photo-strip :deep(img) {
   display: block;
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
+}
+.photo-strip .lazy-media {
   margin-bottom: 6px;
 }
-.photo-strip img:last-child {
+.photo-strip .lazy-media:last-child {
   margin: 0;
 }
 .date-tag {
