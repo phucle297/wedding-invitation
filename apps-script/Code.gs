@@ -3,6 +3,22 @@
 const SPREADSHEET_ID = "1c7TpzxU7pS5JtdgGbt_1cFwR336KVPWPQqdzLD1ARc0";
 const RSVP_TAB = "RSVP";
 const HEADERS = ["Request ID", "Thời gian", "Họ tên", "Tham dự", "Số người", "Lời nhắn", "Payload"];
+const EXTRA = ["Xe đưa đón", "Chiều đi", "Trạm", "Chiều về"];
+// Station ids and names must match src/sections/rsvp/shuttle.ts.
+const STATIONS = {
+  "cong-vien-30-4": "Công viên 30/4, Quận 1",
+  "landmark-81": "Landmark 81, Bình Thạnh",
+  "hang-xanh": "Ngã tư Hàng Xanh",
+  "vincom-thu-duc": "Vincom Thủ Đức",
+  "binh-phuoc": "Ngã tư Bình Phước",
+  "mien-dong": "Bến xe Miền Đông mới",
+  "suoi-tien": "Cổng KDL Suối Tiên",
+};
+const TRANSPORT_LABEL = { own: "Tự sắp xếp", shuttle: "Dùng xe" };
+const OUTBOUND_LABEL = {
+  "trip-1": "Chuyến 1", "trip-2": "Chuyến 2", self: "Tự đi", none: "Không đi",
+};
+const RETURN_LABEL = { same: "Xe cũ", self: "Tự về" };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function output_(value, receipt) {
@@ -15,6 +31,26 @@ function output_(value, receipt) {
   ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+function ride_(value, attendance) {
+  const keys = ["transport", "outbound", "station", "returnRide"];
+  const present = keys.filter((key) => Object.prototype.hasOwnProperty.call(value, key));
+  if (present.length === 0) return { legacy: true };
+  if (attendance !== "attending") return null;
+  const { transport, outbound, station, returnRide } = value;
+  if (transport === "own") {
+    return present.length === 1 ? { legacy: false, transport: "own" } : null;
+  }
+  if (transport !== "shuttle") return null;
+  if (outbound === "self" || outbound === "none") {
+    if (present.indexOf("station") !== -1 || returnRide !== "self") return null;
+    return { legacy: false, transport: "shuttle", outbound: outbound, returnRide: "self" };
+  }
+  if (outbound !== "trip-1" && outbound !== "trip-2") return null;
+  if (typeof station !== "string" || !Object.prototype.hasOwnProperty.call(STATIONS, station)) return null;
+  if (returnRide !== "same" && returnRide !== "self") return null;
+  return { legacy: false, transport: "shuttle", outbound: outbound, station: station, returnRide: returnRide };
+}
+
 function validate_(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const { requestId, name, attendance, count, note = "", website } = value;
@@ -24,7 +60,52 @@ function validate_(value) {
       !Number.isInteger(count) || count < 1 || count > 10 ||
       typeof note !== "string" || note.length > 400 ||
       (website !== undefined && (typeof website !== "string" || website.trim() !== ""))) return null;
-  return { requestId: requestId.toLowerCase(), name: name.trim(), attendance, count, note: note.trim() };
+  const ride = ride_(value, attendance);
+  if (!ride) return null;
+  return {
+    requestId: requestId.toLowerCase(), name: name.trim(), attendance, count, note: note.trim(),
+    ...ride,
+  };
+}
+
+function storedPayload_(rsvp) {
+  // Legacy key order must stay stable so a retry still matches rows written before shuttle columns.
+  const stored = {
+    requestId: rsvp.requestId, name: rsvp.name, attendance: rsvp.attendance,
+    count: rsvp.count, note: rsvp.note,
+  };
+  if (!rsvp.legacy) {
+    stored.transport = rsvp.transport;
+    if (rsvp.outbound) stored.outbound = rsvp.outbound;
+    if (rsvp.station) stored.station = rsvp.station;
+    if (rsvp.returnRide) stored.returnRide = rsvp.returnRide;
+  }
+  return JSON.stringify(stored);
+}
+
+function transportCells_(rsvp) {
+  if (rsvp.legacy) return ["", "", "", ""];
+  return [
+    cellText_(TRANSPORT_LABEL[rsvp.transport]),
+    rsvp.outbound ? cellText_(OUTBOUND_LABEL[rsvp.outbound]) : "",
+    rsvp.station ? cellText_(STATIONS[rsvp.station]) : "",
+    rsvp.returnRide ? cellText_(RETURN_LABEL[rsvp.returnRide]) : "",
+  ];
+}
+
+function ensureHeaders_(sheet) {
+  const width = HEADERS.length + EXTRA.length;
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, width).setValues([HEADERS.concat(EXTRA)]);
+  }
+  const headers = sheet.getRange(1, 1, 1, width).getValues()[0];
+  const base = headers.slice(0, HEADERS.length);
+  if (JSON.stringify(base) !== JSON.stringify(HEADERS)) return false;
+  const extra = headers.slice(HEADERS.length);
+  const blank = extra.every((cell) => cell === "");
+  if (!blank && JSON.stringify(extra) !== JSON.stringify(EXTRA)) return false;
+  if (blank) sheet.getRange(1, HEADERS.length + 1, 1, EXTRA.length).setValues([EXTRA]);
+  return true;
 }
 
 // Do not let Sheets interpret guest-entered text as a formula.
@@ -54,12 +135,8 @@ function doPost(e) {
     if (!lock.tryLock(5000)) return respond({ ok: false, error: "service_unavailable" });
     const book = SpreadsheetApp.openById(SPREADSHEET_ID);
     const sheet = book.getSheetByName(RSVP_TAB) || book.insertSheet(RSVP_TAB);
-    if (sheet.getLastRow() === 0) sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
-    const headers = sheet.getRange(1, 1, 1, HEADERS.length).getValues()[0];
-    if (JSON.stringify(headers) !== JSON.stringify(HEADERS)) {
-      return respond({ ok: false, error: "service_unavailable" });
-    }
-    const payload = JSON.stringify(rsvp);
+    if (!ensureHeaders_(sheet)) return respond({ ok: false, error: "service_unavailable" });
+    const payload = storedPayload_(rsvp);
     const lastRow = sheet.getLastRow();
     if (lastRow > 1) {
       const match = sheet.getRange(2, 1, lastRow - 1, 1).createTextFinder(rsvp.requestId)
@@ -67,7 +144,7 @@ function doPost(e) {
       if (match) {
         const saved = sheet.getRange(match.getRow(), 7).getValue();
         return respond(saved === payload
-          ? { ok: true, requestId: rsvp.requestId }
+          ? { ok: true, requestId: rsvp.requestId, version: 2 }
           : { ok: false, error: "idempotency_conflict" });
       }
     }
@@ -75,12 +152,12 @@ function doPost(e) {
     sheet.appendRow([
       rsvp.requestId, new Date(), cellText_(rsvp.name), rsvp.attendance,
       rsvp.count, cellText_(rsvp.note), payload,
-    ]);
+    ].concat(transportCells_(rsvp)));
     SpreadsheetApp.flush();
     if (sheet.getRange(row, 7).getValue() !== payload) {
       return respond({ ok: false, error: "service_unavailable" });
     }
-    return respond({ ok: true, requestId: rsvp.requestId });
+    return respond({ ok: true, requestId: rsvp.requestId, version: 2 });
   } catch {
     // Do not log submitted guest data or Google account errors.
     return respond({ ok: false, error: "service_unavailable" });

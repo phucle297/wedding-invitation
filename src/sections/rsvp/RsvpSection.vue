@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, onUnmounted, ref, watch } from "vue";
 import { rsvp } from "./content";
+import { shuttle, shuttleStations, shuttleTrips } from "./shuttle";
+import type { OutboundChoice, ReturnChoice, TransportChoice, TripId } from "./shuttle";
 import { submitRsvp } from "./submitRsvp";
 import type { RsvpSubmission } from "./submitRsvp";
 
@@ -8,18 +10,109 @@ const name = ref("");
 const attend = ref("");
 const count = ref<number | string>(1);
 const note = ref("");
+const transport = ref<"" | TransportChoice>("");
+const outbound = ref<"" | OutboundChoice>("");
+const station = ref("");
+const returnRide = ref<"" | ReturnChoice>("");
 const status = ref("");
 const website = ref("");
 const pending = ref(false);
 const sent = ref(false);
+const routeOpen = ref(false);
 const nameInput = ref<HTMLInputElement | null>(null);
+const routeDialog = ref<HTMLElement | null>(null);
 const absent = computed(() => attend.value === rsvp.absentValue);
+const usingShuttle = computed(() => !absent.value && transport.value === "shuttle");
+const pickedTrip = computed(() => shuttleTrips.find((trip) => trip.id === outbound.value) ?? null);
 let submission: { fingerprint: string; requestId: string } | null = null;
+let restoreFocus: HTMLElement | null = null;
 
-watch([name, attend, count, note], () => {
+watch([name, attend, count, note, transport, outbound, station, returnRide], () => {
   sent.value = false;
   status.value = "";
 });
+
+watch(attend, (value) => {
+  if (value === rsvp.absentValue) {
+    transport.value = "";
+    outbound.value = "";
+    station.value = "";
+    returnRide.value = "";
+  }
+});
+
+watch(transport, (value, previous) => {
+  if (value === "shuttle" && previous !== "shuttle") openRoute();
+  if (value !== "shuttle") {
+    outbound.value = "";
+    station.value = "";
+    returnRide.value = "";
+  }
+});
+
+watch(outbound, () => {
+  station.value = "";
+  if (!pickedTrip.value) returnRide.value = "";
+});
+
+watch(routeOpen, async (open) => {
+  document.body.style.overflow = open ? "hidden" : "";
+  if (!open) return;
+  await nextTick();
+  routeDialog.value?.focus();
+});
+
+onUnmounted(() => {
+  document.body.style.overflow = "";
+});
+
+function openRoute() {
+  restoreFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  routeOpen.value = true;
+}
+
+function closeRoute() {
+  routeOpen.value = false;
+  restoreFocus?.focus();
+  restoreFocus = null;
+}
+
+function onRouteKeydown(event: KeyboardEvent) {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeRoute();
+    return;
+  }
+  if (event.key !== "Tab" || !routeDialog.value) return;
+  const items = [...routeDialog.value.querySelectorAll<HTMLElement>(
+    "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])",
+  )].filter((item) => !item.hasAttribute("disabled"));
+  if (items.length === 0) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last?.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first?.focus();
+  }
+}
+
+function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "station" | "returnRide"> | undefined {
+  if (absent.value || transport.value === "") return undefined;
+  if (transport.value === "own") return { transport: "own" };
+  if (outbound.value === "self" || outbound.value === "none") {
+    return { transport: "shuttle", outbound: outbound.value, returnRide: "self" };
+  }
+  if (!pickedTrip.value || returnRide.value !== "same" && returnRide.value !== "self") return undefined;
+  return {
+    transport: "shuttle",
+    outbound: pickedTrip.value.id,
+    station: station.value,
+    returnRide: returnRide.value,
+  };
+}
 
 async function onSubmit() {
   if (pending.value || sent.value) return;
@@ -33,12 +126,30 @@ async function onSubmit() {
     status.value = rsvp.messages.needAttend;
     return;
   }
+  if (!absent.value && transport.value !== "shuttle" && transport.value !== "own") {
+    status.value = rsvp.messages.needTransport;
+    return;
+  }
+  if (usingShuttle.value && !outbound.value) {
+    status.value = rsvp.messages.needOutbound;
+    return;
+  }
+  if (pickedTrip.value && !station.value) {
+    status.value = rsvp.messages.needStation;
+    return;
+  }
+  if (pickedTrip.value && returnRide.value !== "same" && returnRide.value !== "self") {
+    status.value = rsvp.messages.needReturn;
+    return;
+  }
+  const ride = transportPayload();
   const payload: Omit<RsvpSubmission, "requestId"> = {
     name: guest,
     attendance: attend.value,
     count: absent.value ? 1 : Number(count.value),
     note: note.value.trim(),
     website: website.value,
+    ...ride,
   };
   const fingerprint = JSON.stringify(payload);
   if (submission?.fingerprint !== fingerprint) {
@@ -56,6 +167,10 @@ async function onSubmit() {
   } finally {
     pending.value = false;
   }
+}
+
+function stationTime(tripId: TripId, times: Record<TripId, string>) {
+  return times[tripId];
 }
 </script>
 
@@ -101,7 +216,7 @@ async function onSubmit() {
           <span>{{ choice.label }}</span>
         </label>
       </fieldset>
-      <div v-show="!absent" class="field">
+      <div v-if="!absent" class="field">
         <label for="guest-count">{{ rsvp.countLabel }}</label>
         <input
           id="guest-count"
@@ -110,10 +225,81 @@ async function onSubmit() {
           inputmode="numeric"
           min="1"
           max="10"
-          :required="!absent"
-          :disabled="pending || absent"
+          required
+          :disabled="pending"
         />
       </div>
+      <fieldset v-if="!absent">
+        <legend>{{ shuttle.legend }}</legend>
+        <p class="field-note">{{ shuttle.note }}</p>
+        <label class="choice">
+          <input
+            v-model="transport"
+            type="radio"
+            name="transport"
+            value="shuttle"
+            :disabled="pending"
+            required
+          />
+          <span>{{ shuttle.useLabel }}</span>
+        </label>
+        <label class="choice">
+          <input
+            v-model="transport"
+            type="radio"
+            name="transport"
+            value="own"
+            :disabled="pending"
+            required
+          />
+          <span>{{ shuttle.ownLabel }}</span>
+        </label>
+        <button class="text-btn route-link" type="button" :disabled="pending" @click="openRoute">
+          {{ shuttle.viewRoute }}
+        </button>
+      </fieldset>
+      <fieldset v-if="usingShuttle">
+        <legend>{{ shuttle.outboundLegend }}</legend>
+        <label v-for="trip in shuttleTrips" :key="trip.id" class="choice">
+          <input
+            v-model="outbound"
+            type="radio"
+            name="outbound"
+            :value="trip.id"
+            :disabled="pending"
+            required
+          />
+          <span>{{ trip.label }} · {{ trip.depart }}</span>
+        </label>
+        <label class="choice">
+          <input v-model="outbound" type="radio" name="outbound" value="self" :disabled="pending" required />
+          <span>{{ shuttle.selfOutbound }}</span>
+        </label>
+        <label class="choice">
+          <input v-model="outbound" type="radio" name="outbound" value="none" :disabled="pending" required />
+          <span>{{ shuttle.noneOutbound }}</span>
+        </label>
+      </fieldset>
+      <div v-if="pickedTrip" class="field">
+        <label for="guest-station">{{ shuttle.stationLabel }}</label>
+        <select id="guest-station" v-model="station" :disabled="pending" required>
+          <option disabled value="">{{ shuttle.stationPlaceholder }}</option>
+          <option v-for="stop in shuttleStations" :key="stop.id" :value="stop.id">
+            {{ stop.times[pickedTrip.id] }} · {{ stop.name }}
+          </option>
+        </select>
+      </div>
+      <fieldset v-if="pickedTrip">
+        <legend>{{ shuttle.returnLegend }}</legend>
+        <label class="choice">
+          <input v-model="returnRide" type="radio" name="return-ride" value="same" :disabled="pending" required />
+          <span>{{ shuttle.returnSame }}</span>
+        </label>
+        <label class="choice">
+          <input v-model="returnRide" type="radio" name="return-ride" value="self" :disabled="pending" required />
+          <span>{{ shuttle.returnSelf }}</span>
+        </label>
+      </fieldset>
       <div class="field">
         <label for="guest-note">
           {{ rsvp.noteLabel }}
@@ -133,6 +319,47 @@ async function onSubmit() {
       <p class="form-status" role="status">{{ status }}</p>
       <p class="privacy-note">Thông tin chỉ dùng để sắp xếp tiệc cưới.</p>
     </form>
+    <Teleport to="body">
+      <div
+        v-if="routeOpen"
+        class="route-backdrop"
+        @click.self="closeRoute"
+        @keydown="onRouteKeydown"
+      >
+        <div
+          ref="routeDialog"
+          class="route-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="route-title"
+          tabindex="-1"
+        >
+          <div class="route-bar">
+            <p class="route-kicker">{{ shuttle.legend }}</p>
+            <button class="text-btn route-close" type="button" @click="closeRoute">{{ shuttle.closeRoute }}</button>
+          </div>
+          <h3 id="route-title">{{ shuttle.routeTitle }}</h3>
+          <p class="route-lead">{{ shuttle.routeLead }}</p>
+          <div class="route-list">
+            <section v-for="trip in shuttleTrips" :key="trip.id" class="route-trip">
+              <h4>{{ trip.label }}</h4>
+              <p>Xuất phát {{ trip.depart }}</p>
+              <ol>
+                <li v-for="stop in shuttleStations" :key="stop.id">
+                  <time :datetime="stationTime(trip.id, stop.times)">{{ stop.times[trip.id] }}</time>
+                  <span>{{ stop.name }}</span>
+                </li>
+                <li class="destination">
+                  <time :datetime="trip.arrive">{{ trip.arrive }}</time>
+                  <span>{{ shuttle.destination }}</span>
+                </li>
+              </ol>
+            </section>
+          </div>
+          <button class="btn btn-ink" type="button" @click="closeRoute">{{ shuttle.closeRoute }}</button>
+        </div>
+      </div>
+    </Teleport>
   </section>
 </template>
 
@@ -184,6 +411,12 @@ legend {
   color: var(--ink-soft);
 }
 
+.field-note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
 .optional {
   letter-spacing: 0;
   text-transform: none;
@@ -192,7 +425,8 @@ legend {
 
 input[type="text"],
 input[type="number"],
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 12px 2px;
   border: 0;
@@ -202,9 +436,17 @@ textarea {
   transition: border-color 0.2s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+select {
+  min-height: 48px;
+  padding: 12px;
+  font: inherit;
+  font-size: 16px;
+}
+
 input[type="text"]:focus,
 input[type="number"]:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   border-bottom-color: var(--ink);
 }
 
@@ -243,6 +485,11 @@ fieldset {
   font-weight: 500;
 }
 
+.route-link {
+  margin: 2px 0 0;
+  padding-inline: 0;
+}
+
 .form-status {
   min-height: 1.4em;
   margin: 14px 0 0;
@@ -252,4 +499,139 @@ fieldset {
   color: var(--ink);
 }
 
+.route-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  align-items: end;
+  background: rgba(42, 39, 36, 0.46);
+}
+
+.route-dialog {
+  --ink: #3f342a;
+  --ink-soft: #756655;
+  --espresso: #685033;
+  --line: #94734638;
+  --paper: #fffdf9;
+  width: min(720px, 100%);
+  max-height: min(92vh, 820px);
+  margin-inline: auto;
+  overflow: auto;
+  padding: 28px 22px calc(22px + env(safe-area-inset-bottom));
+  border: 1px solid #94734655;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: left;
+  box-shadow: 0 24px 60px rgba(48, 48, 44, 0.18);
+}
+
+.route-dialog:focus {
+  outline: none;
+}
+
+.route-kicker,
+.route-lead,
+.route-trip p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.route-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -8px 0 8px;
+  padding-block: 4px 8px;
+  background: var(--paper);
+}
+
+.route-close {
+  margin: 0;
+  padding: 8px 0 8px 12px;
+  color: var(--espresso);
+}
+
+.route-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.route-dialog h3 {
+  margin: 8px 0 12px;
+  font-family: var(--script-vi, "Great Vibes", cursive);
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.route-lead {
+  max-width: 40em;
+  font-size: 0.98rem;
+}
+
+.route-list {
+  display: grid;
+  gap: 22px;
+  margin: 22px 0;
+}
+
+.route-trip h4 {
+  margin: 0 0 4px;
+  font-family: var(--heading, "Cormorant SC", serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.route-trip ol {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.route-trip li {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+
+.route-trip time {
+  color: var(--espresso);
+  font-variant-numeric: tabular-nums;
+}
+
+.route-trip .destination span {
+  font-weight: 500;
+}
+
+.route-dialog .btn {
+  width: 100%;
+}
+
+@media (min-width: 720px) {
+  .route-backdrop {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .route-dialog {
+    padding: 36px 36px 28px;
+  }
+
+  .route-list {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  .route-dialog .btn {
+    width: auto;
+    min-width: 140px;
+  }
+}
 </style>

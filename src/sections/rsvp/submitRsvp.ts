@@ -1,4 +1,5 @@
 import { rsvp } from "./content";
+import type { OutboundChoice, ReturnChoice, TransportChoice } from "./shuttle";
 
 export interface RsvpSubmission {
   requestId: string;
@@ -7,6 +8,10 @@ export interface RsvpSubmission {
   count: number;
   note: string;
   website: string;
+  transport?: TransportChoice;
+  outbound?: OutboundChoice;
+  station?: string;
+  returnRide?: ReturnChoice;
 }
 
 export function submitRsvp(submission: RsvpSubmission): Promise<void> {
@@ -50,7 +55,10 @@ export function submitRsvp(submission: RsvpSubmission): Promise<void> {
         !("nonce" in value) || value.nonce !== nonce) return;
       if ("ok" in value && value.ok === true &&
         "requestId" in value && value.requestId === submission.requestId) {
-        finish();
+        // Shuttle answers are only stored after the Apps Script deployment understands them.
+        const shuttleSaved = !submission.transport ||
+          ("version" in value && value.version === 2);
+        finish(shuttleSaved ? undefined : new Error("service_unavailable"));
       } else {
         finish(new Error("error" in value && value.error === "service_unavailable"
           ? "service_unavailable" : "unconfirmed_submission"));

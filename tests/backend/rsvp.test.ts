@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
+import { shuttleStations, shuttleTrips } from "../../src/sections/rsvp/shuttle";
 
 const script = readFileSync(new URL("../../apps-script/Code.gs", import.meta.url), "utf8");
 const origin = "https://invitation.example";
@@ -114,8 +115,12 @@ describe("Direct RSVP → Google Apps Script", () => {
   beforeEach(() => { google = googleHarness(); });
 
   test("saves Unicode data without a token and returns only a matching receipt", () => {
-    expect(google.post()).toEqual({ type: "wedding-rsvp", nonce, ok: true, requestId: valid.requestId });
+    expect(google.post()).toEqual({
+      type: "wedding-rsvp", nonce, ok: true, requestId: valid.requestId, version: 2,
+    });
     expect(google.rows[1]?.slice(2, 6)).toEqual(["Nguyễn An", "attending", 2, "Hẹn gặp hai bạn!"]);
+    expect(google.rows[0]?.slice(7, 11)).toEqual(["Xe đưa đón", "Chiều đi", "Trạm", "Chiều về"]);
+    expect(google.rows[1]?.slice(7, 11)).toEqual(["", "", "", ""]);
     expect(google.locked).toBe(false);
   });
 
@@ -159,6 +164,60 @@ describe("Direct RSVP → Google Apps Script", () => {
     for (const fields of [{ nonce: "invalid" }, { origin: "*" }, { origin: 'https://site.example/</script>' }]) {
       expect(google.html(valid, fields)).toBe("Invalid request");
     }
+    expect(google.rows).toHaveLength(0);
+  });
+
+  test("saves a Biên Hòa shuttle choice beside the original columns", () => {
+    const body = {
+      ...valid,
+      requestId: crypto.randomUUID(),
+      transport: "shuttle",
+      outbound: "trip-1",
+      station: "cong-vien-30-4",
+      returnRide: "same",
+    };
+    expect(google.post(body)).toMatchObject({ ok: true, version: 2, requestId: body.requestId });
+    expect(google.rows[1]?.slice(7, 11)).toEqual([
+      "Dùng xe", "Chuyến 1", "Công viên 30/4, Quận 1", "Xe cũ",
+    ]);
+    expect(JSON.parse(String(google.rows[1]?.[6]))).toMatchObject({
+      transport: "shuttle", outbound: "trip-1", station: "cong-vien-30-4", returnRide: "same",
+    });
+    expect(google.post({
+      ...valid, requestId: crypto.randomUUID(), transport: "shuttle", outbound: "self", returnRide: "self",
+    }).ok).toBe(true);
+    expect(google.rows[2]?.slice(7, 11)).toEqual(["Dùng xe", "Tự đi", "", "Tự về"]);
+    expect(google.post({
+      ...valid, requestId: crypto.randomUUID(), transport: "own",
+    }).ok).toBe(true);
+    expect(google.rows[3]?.slice(7, 11)).toEqual(["Tự sắp xếp", "", "", ""]);
+  });
+
+  test("keeps shuttle stops aligned with the invitation and migrates old headers", () => {
+    for (const trip of shuttleTrips) expect(script).toContain(`"${trip.id}"`);
+    for (const stop of shuttleStations) expect(script).toContain(`"${stop.id}": "${stop.name}"`);
+    google.post();
+    google.rows[0] = google.rows[0]!.slice(0, 7);
+    const next = { ...valid, requestId: crypto.randomUUID(), transport: "own" as const };
+    expect(google.post(next).ok).toBe(true);
+    expect(google.rows[0]?.slice(7, 11)).toEqual(["Xe đưa đón", "Chiều đi", "Trạm", "Chiều về"]);
+    google.rows[0]![7] = "Sai";
+    expect(google.post({ ...next, requestId: crypto.randomUUID() }).error).toBe("service_unavailable");
+    expect(google.rows).toHaveLength(3);
+  });
+
+  test.each([
+    { attendance: "absent", transport: "shuttle", outbound: "trip-1", station: "mien-dong", returnRide: "same" },
+    { transport: "taxi" },
+    { transport: "own", outbound: "self" },
+    { transport: "shuttle" },
+    { transport: "shuttle", outbound: "trip-2", returnRide: "same" },
+    { transport: "shuttle", outbound: "trip-2", station: "unknown", returnRide: "self" },
+    { transport: "shuttle", outbound: "self", station: "hang-xanh", returnRide: "self" },
+    { transport: "shuttle", outbound: "none", returnRide: "same" },
+    { transport: "shuttle", outbound: "trip-1", station: "suoi-tien", returnRide: "bus" },
+  ])("rejects a malformed shuttle answer before writing: %j", (fields) => {
+    expect(google.post({ ...valid, requestId: crypto.randomUUID(), ...fields }).error).toBe("invalid_request");
     expect(google.rows).toHaveLength(0);
   });
 

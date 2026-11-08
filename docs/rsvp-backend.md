@@ -46,8 +46,22 @@ must be `attending` or `absent`, and count an integer from 1 to 10. Payload text
 limited to 16,384 characters. Guest text beginning with formula characters is
 escaped before writing to Sheets.
 
+The Biên Hòa form (`bh`) also sends shuttle fields. `transport` is `shuttle` or
+`own`. A shuttle guest then sends `outbound` (`trip-1`, `trip-2`, `self`, or
+`none`), a known `station` id when they chose a trip, and `returnRide` (`same`
+or `self`). Station ids live in `src/sections/rsvp/shuttle.ts` and must stay
+identical in `apps-script/Code.gs`. Guests who are not attending omit these
+fields. Older clients, including `main`, still omit them and remain valid: the
+script stores the original payload shape and leaves the four shuttle columns
+blank. A receipt for every successful save now includes `version: 2`. The Biên
+Hòa page treats a shuttle submission as unconfirmed until it receives that
+version, so deploy this script before sharing the `bh` form.
+
 The RSVP tab contains Request ID, Thời gian, Họ tên, Tham dự, Số người, Lời nhắn,
-and Payload. Do not edit the Request ID/Payload columns or sort columns separately.
+Payload, and, after this deployment, Xe đưa đón, Chiều đi, Trạm, Chiều về. An
+existing header row with only the first seven titles is extended in place. Do
+not rename the shuttle titles or edit the Request ID/Payload columns, and do not
+sort columns separately.
 Existing rows remain compatible. The script locks lookup plus append, flushes,
 and verifies the stored payload before acknowledging. Identical retries reuse
 the saved row; a different payload with the same ID is rejected. A guest who
