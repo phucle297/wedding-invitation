@@ -1,7 +1,7 @@
 export const families = {
   title: "Hai gia đình",
   letter:
-    "Trân trọng báo tin lễ thành hôn của con chúng tôi. Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi.",
+    "Chúng mình sắp cùng nhau bước sang một chương mới. Sự hiện diện của bạn sẽ khiến ngày vui của chúng mình thêm trọn vẹn.",
   groups: [
     {
       label: "Nhà trai",
