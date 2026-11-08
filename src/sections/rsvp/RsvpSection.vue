@@ -14,6 +14,7 @@ const transport = ref<"" | TransportChoice>("");
 const outbound = ref<"" | OutboundChoice>("");
 const station = ref("");
 const returnRide = ref<"" | ReturnChoice>("");
+const returnStation = ref("");
 const status = ref("");
 const website = ref("");
 const pending = ref(false);
@@ -27,7 +28,7 @@ const pickedTrip = computed(() => shuttleTrips.find((trip) => trip.id === outbou
 let submission: { fingerprint: string; requestId: string } | null = null;
 let restoreFocus: HTMLElement | null = null;
 
-watch([name, attend, count, note, transport, outbound, station, returnRide], () => {
+watch([name, attend, count, note, transport, outbound, station, returnRide, returnStation], () => {
   sent.value = false;
   status.value = "";
 });
@@ -38,6 +39,7 @@ watch(attend, (value) => {
     outbound.value = "";
     station.value = "";
     returnRide.value = "";
+    returnStation.value = "";
   }
 });
 
@@ -47,12 +49,26 @@ watch(transport, (value, previous) => {
     outbound.value = "";
     station.value = "";
     returnRide.value = "";
+    returnStation.value = "";
   }
 });
 
 watch(outbound, () => {
   station.value = "";
+  returnStation.value = "";
   if (!pickedTrip.value) returnRide.value = "";
+});
+
+watch(returnRide, (value) => {
+  if (value !== "same") {
+    returnStation.value = "";
+    return;
+  }
+  if (!returnStation.value) returnStation.value = station.value;
+});
+
+watch(station, (value) => {
+  if (returnRide.value === "same" && !returnStation.value) returnStation.value = value;
 });
 
 watch(routeOpen, async (open) => {
@@ -99,18 +115,27 @@ function onRouteKeydown(event: KeyboardEvent) {
   }
 }
 
-function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "station" | "returnRide"> | undefined {
+function transportPayload(): Pick<RsvpSubmission, "transport" | "outbound" | "station" | "returnRide" | "returnStation"> | undefined {
   if (absent.value || transport.value === "") return undefined;
   if (transport.value === "own") return { transport: "own" };
   if (outbound.value === "self" || outbound.value === "none") {
     return { transport: "shuttle", outbound: outbound.value, returnRide: "self" };
   }
   if (!pickedTrip.value || returnRide.value !== "same" && returnRide.value !== "self") return undefined;
+  if (returnRide.value === "same") {
+    return {
+      transport: "shuttle",
+      outbound: pickedTrip.value.id,
+      station: station.value.trim(),
+      returnRide: "same",
+      returnStation: returnStation.value.trim(),
+    };
+  }
   return {
     transport: "shuttle",
     outbound: pickedTrip.value.id,
-    station: station.value,
-    returnRide: returnRide.value,
+    station: station.value.trim(),
+    returnRide: "self",
   };
 }
 
@@ -140,6 +165,10 @@ async function onSubmit() {
   }
   if (pickedTrip.value && returnRide.value !== "same" && returnRide.value !== "self") {
     status.value = rsvp.messages.needReturn;
+    return;
+  }
+  if (returnRide.value === "same" && !returnStation.value.trim()) {
+    status.value = rsvp.messages.needReturnStation;
     return;
   }
   const ride = transportPayload();
@@ -284,7 +313,7 @@ function stationTime(tripId: TripId, times: Record<TripId, string>) {
         <label for="guest-station">{{ shuttle.stationLabel }}</label>
         <select id="guest-station" v-model="station" :disabled="pending" required>
           <option disabled value="">{{ shuttle.stationPlaceholder }}</option>
-          <option v-for="stop in shuttleStations" :key="stop.id" :value="stop.id">
+          <option v-for="stop in shuttleStations" :key="stop.name" :value="stop.name">
             {{ stop.times[pickedTrip.id] }} · {{ stop.name }}
           </option>
         </select>
@@ -300,6 +329,15 @@ function stationTime(tripId: TripId, times: Record<TripId, string>) {
           <span>{{ shuttle.returnSelf }}</span>
         </label>
       </fieldset>
+      <div v-if="pickedTrip && returnRide === 'same'" class="field">
+        <label for="guest-return-station">{{ shuttle.returnStationLabel }}</label>
+        <select id="guest-return-station" v-model="returnStation" :disabled="pending" required>
+          <option disabled value="">{{ shuttle.returnStationPlaceholder }}</option>
+          <option v-for="stop in shuttleStations" :key="stop.name" :value="stop.name">
+            {{ stop.name }}
+          </option>
+        </select>
+      </div>
       <div class="field">
         <label for="guest-note">
           {{ rsvp.noteLabel }}
@@ -345,7 +383,7 @@ function stationTime(tripId: TripId, times: Record<TripId, string>) {
               <h4>{{ trip.label }}</h4>
               <p>Xuất phát {{ trip.depart }}</p>
               <ol>
-                <li v-for="stop in shuttleStations" :key="stop.id">
+                <li v-for="stop in shuttleStations" :key="stop.name">
                   <time :datetime="stationTime(trip.id, stop.times)">{{ stop.times[trip.id] }}</time>
                   <span>{{ stop.name }}</span>
                 </li>

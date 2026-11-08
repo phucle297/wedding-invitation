@@ -12,6 +12,7 @@ export interface RsvpSubmission {
   outbound?: OutboundChoice;
   station?: string;
   returnRide?: ReturnChoice;
+  returnStation?: string;
 }
 
 export function submitRsvp(submission: RsvpSubmission): Promise<void> {

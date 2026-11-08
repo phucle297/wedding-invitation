@@ -20,6 +20,7 @@ export const rsvp = {
     needOutbound: "Chọn chiều đi.",
     needStation: "Chọn trạm đón.",
     needReturn: "Chọn chiều về.",
+    needReturnStation: "Chọn trạm trả.",
     saved: "Gia đình đã nhận được xác nhận của bạn. Cảm ơn bạn rất nhiều!",
     unavailable: "Hệ thống đang tạm gián đoạn, chưa thể xác nhận đã lưu. Bạn vui lòng thử lại sau; gửi lại không tạo bản trùng.",
     failed: "Chưa thể xác nhận đã gửi. Vui lòng kiểm tra kết nối và thử lại; gửi lại không tạo bản trùng.",

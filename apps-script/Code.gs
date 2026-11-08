@@ -3,17 +3,7 @@
 const SPREADSHEET_ID = "1c7TpzxU7pS5JtdgGbt_1cFwR336KVPWPQqdzLD1ARc0";
 const RSVP_TAB = "RSVP";
 const HEADERS = ["Request ID", "Thời gian", "Họ tên", "Tham dự", "Số người", "Lời nhắn", "Payload"];
-const EXTRA = ["Xe đưa đón", "Chiều đi", "Trạm", "Chiều về"];
-// Station ids and names must match src/sections/rsvp/shuttle.ts.
-const STATIONS = {
-  "cong-vien-30-4": "Công viên 30/4, Quận 1",
-  "landmark-81": "Landmark 81, Bình Thạnh",
-  "hang-xanh": "Ngã tư Hàng Xanh",
-  "vincom-thu-duc": "Vincom Thủ Đức",
-  "binh-phuoc": "Ngã tư Bình Phước",
-  "mien-dong": "Bến xe Miền Đông mới",
-  "suoi-tien": "Cổng KDL Suối Tiên",
-};
+const EXTRA = ["Xe đưa đón", "Chiều đi", "Trạm đón", "Chiều về", "Trạm trả"];
 const TRANSPORT_LABEL = { own: "Tự sắp xếp", shuttle: "Dùng xe" };
 const OUTBOUND_LABEL = {
   "trip-1": "Chuyến 1", "trip-2": "Chuyến 2", self: "Tự đi", none: "Không đi",
@@ -31,24 +21,41 @@ function output_(value, receipt) {
   ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+function placeText_(value) {
+  if (typeof value !== "string") return null;
+  const text = value.trim();
+  if (!text || text.length > 120) return null;
+  return text;
+}
+
 function ride_(value, attendance) {
-  const keys = ["transport", "outbound", "station", "returnRide"];
+  const keys = ["transport", "outbound", "station", "returnRide", "returnStation"];
   const present = keys.filter((key) => Object.prototype.hasOwnProperty.call(value, key));
   if (present.length === 0) return { legacy: true };
   if (attendance !== "attending") return null;
-  const { transport, outbound, station, returnRide } = value;
+  const { transport, outbound, station, returnRide, returnStation } = value;
   if (transport === "own") {
     return present.length === 1 ? { legacy: false, transport: "own" } : null;
   }
   if (transport !== "shuttle") return null;
   if (outbound === "self" || outbound === "none") {
-    if (present.indexOf("station") !== -1 || returnRide !== "self") return null;
+    if (present.indexOf("station") !== -1 || present.indexOf("returnStation") !== -1 || returnRide !== "self") return null;
     return { legacy: false, transport: "shuttle", outbound: outbound, returnRide: "self" };
   }
   if (outbound !== "trip-1" && outbound !== "trip-2") return null;
-  if (typeof station !== "string" || !Object.prototype.hasOwnProperty.call(STATIONS, station)) return null;
-  if (returnRide !== "same" && returnRide !== "self") return null;
-  return { legacy: false, transport: "shuttle", outbound: outbound, station: station, returnRide: returnRide };
+  const pickup = placeText_(station);
+  if (!pickup) return null;
+  if (returnRide === "self") {
+    if (present.indexOf("returnStation") !== -1) return null;
+    return { legacy: false, transport: "shuttle", outbound: outbound, station: pickup, returnRide: "self" };
+  }
+  if (returnRide !== "same") return null;
+  const dropoff = placeText_(returnStation);
+  if (!dropoff) return null;
+  return {
+    legacy: false, transport: "shuttle", outbound: outbound, station: pickup,
+    returnRide: "same", returnStation: dropoff,
+  };
 }
 
 function validate_(value) {
@@ -79,17 +86,19 @@ function storedPayload_(rsvp) {
     if (rsvp.outbound) stored.outbound = rsvp.outbound;
     if (rsvp.station) stored.station = rsvp.station;
     if (rsvp.returnRide) stored.returnRide = rsvp.returnRide;
+    if (rsvp.returnStation) stored.returnStation = rsvp.returnStation;
   }
   return JSON.stringify(stored);
 }
 
 function transportCells_(rsvp) {
-  if (rsvp.legacy) return ["", "", "", ""];
+  if (rsvp.legacy) return ["", "", "", "", ""];
   return [
     cellText_(TRANSPORT_LABEL[rsvp.transport]),
     rsvp.outbound ? cellText_(OUTBOUND_LABEL[rsvp.outbound]) : "",
-    rsvp.station ? cellText_(STATIONS[rsvp.station]) : "",
+    rsvp.station ? cellText_(rsvp.station) : "",
     rsvp.returnRide ? cellText_(RETURN_LABEL[rsvp.returnRide]) : "",
+    rsvp.returnStation ? cellText_(rsvp.returnStation) : "",
   ];
 }
 
