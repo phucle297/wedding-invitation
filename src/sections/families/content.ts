@@ -1,17 +1,17 @@
 export const families = {
   title: "Hai gia đình",
   letter:
-    "Trân trọng báo tin lễ thành hôn của con chúng tôi. Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi.",
+    "Chúng mình sắp cùng nhau bước sang một chương mới. Sự hiện diện của bạn sẽ khiến ngày vui của chúng mình thêm trọn vẹn.",
   groups: [
-    {
-      label: "Nhà trai",
-      people: ["Ông Lê Đàm Duy Minh", "Bà Trần Thị Đức Hạnh"],
-      place: "P. Hòa Cường, TP. Đà Nẵng",
-    },
     {
       label: "Nhà gái",
       people: ["Ông Phạm Đình Toàn", "Bà Nguyễn Thị Hồng Nhung"],
       place: "P. Tam Hiệp, TP. Đồng Nai",
+    },
+    {
+      label: "Nhà trai",
+      people: ["Ông Lê Đàm Duy Minh", "Bà Trần Thị Đức Hạnh"],
+      place: "P. Hòa Cường, TP. Đà Nẵng",
     },
   ],
 };

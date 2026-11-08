@@ -174,6 +174,11 @@
 .invite .family-section .where {
   font-size: var(--text-small);
 }
+.invite .invitation-details {
+  display: grid;
+  gap: 36px;
+  padding: 0 16px 56px;
+}
 .invite .place {
   text-align: center;
   border-top: 1px solid var(--line);
@@ -181,15 +186,6 @@
 }
 .invite .place h2 {
   margin: 12px 0 22px;
-}
-.invite .place .when {
-  font-family: var(--display);
-  font-size: var(--text-feature);
-  line-height: 1.4;
-  text-wrap: balance;
-}
-.invite .place .where {
-  font-size: var(--text-detail);
 }
 .invite .couple-section {
   width: 100%;
@@ -501,32 +497,10 @@
     max-width: 22em;
   }
   .invite .invitation-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    align-items: center;
-    gap: 0 7%;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 5%;
     padding: 0 var(--desktop-gutter) 100px;
-  }
-  .invite .invitation-details > .block {
-    width: 100%;
-    padding-block: 42px;
-  }
-  .invite .invitation-details .family-section {
-    align-self: end;
-  }
-  .invite .invitation-details .family-section article p:not(.where) {
-    font-size: clamp(1.125rem, 1.35vw, 1.25rem);
-  }
-  .invite .invitation-details .place {
-    align-self: start;
-    grid-area: 2 / 1;
-    padding-top: 56px;
-  }
-  .invite .invitation-details .hotel {
-    grid-area: 1 / 2 / 3 / 3;
-    padding: 24px;
-    width: 100%;
   }
   .invite .together-cover {
     aspect-ratio: 2.7;

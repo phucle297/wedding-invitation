@@ -3,5 +3,5 @@ export const phrases = {
   openEnvelope: "Chạm để mở thiệp",
   addressee: "Quý khách",
   closePhoto: "Đóng",
-  footerPlace: "Đà Nẵng",
+  footerPlace: "Đồng Nai",
 };

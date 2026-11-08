@@ -2,8 +2,9 @@
 import { reception } from "./content";
 import WeatherNote from "./WeatherNote.vue";
 
+const mapPlace = `${reception.name}, ${reception.addressLines.join(" ")}`;
 const mapEmbedUrl = `https://maps.google.com/maps?${new URLSearchParams({
-  q: "Minh Toàn Galaxy Hotel, 306 Đường 2/9, Đà Nẵng",
+  q: mapPlace,
   output: "embed",
   hl: "vi",
 })}`;
@@ -35,7 +36,7 @@ const mapEmbedUrl = `https://maps.google.com/maps?${new URLSearchParams({
       <div class="venue-map">
         <iframe
           :src="mapEmbedUrl"
-          title="Bản đồ Minh Toàn Galaxy Hotel, 306 Đường 2/9, Đà Nẵng"
+          :title="`Bản đồ ${mapPlace}`"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           allowfullscreen

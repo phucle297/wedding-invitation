@@ -12,7 +12,7 @@ import { phrases } from "../../content/phrases";
         src="/assets/album/09.webp"
         :srcset="albumSrcset('/assets/album/09.webp')"
         sizes="auto, (min-width: 1024px) 50vw, (min-width: 720px) 720px, 100vw"
-        alt="Duy Phúc và Linh Đan bên nhau dưới lớp voan"
+        alt="Linh Đan và Duy Phúc bên nhau dưới lớp voan"
         width="1067"
         height="1600"
         loading="lazy"
@@ -23,15 +23,15 @@ import { phrases } from "../../content/phrases";
       <p class="eyebrow">Vì có bạn, ngày vui thêm trọn vẹn</p>
       <h2 id="thanks-title" lang="en">Thank you!</h2>
       <p>
-        Sự hiện diện của bạn là niềm vui<br />và vinh hạnh của hai gia đình.
+        Cảm ơn bạn đã cùng chúng mình<br />viết nên một kỷ niệm thật đẹp.
       </p>
       <span class="thanks-signature">Hẹn gặp bạn trong ngày trọng đại!</span>
     </section>
   </div>
   <footer class="colophon">
     <a class="footer-names" href="#mo-dau">
-      <span>{{ couple.groom.short }} <em>&amp;</em></span>
-      <span>{{ couple.bride.short }}</span>
+      <span>{{ couple.bride.short }} <em>&amp;</em></span>
+      <span>{{ couple.groom.short }}</span>
     </a>
     <p>
       {{ phrases.footerPlace }} <span aria-hidden="true">·</span>
@@ -95,7 +95,7 @@ import { phrases } from "../../content/phrases";
   color: inherit;
   font-family: var(--heading);
   text-transform: uppercase;
-  /* Fit "DUY PHÚC & LINH ĐAN" on one line. Below the floor, wrap before the next name. */
+  /* Fit "LINH ĐAN & DUY PHÚC" on one line. Below the floor, wrap before the next name. */
   font-size: clamp(1.5rem, calc(100cqi / 11.2), 2.2rem);
   line-height: 1.15;
   text-decoration: none;

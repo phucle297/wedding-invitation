@@ -1,23 +1,26 @@
+import { date } from "../../content/date";
+import { reception } from "../reception/content";
+
 export const timeline = {
   title: "Trong ngày",
   items: [
     {
-      time: "09:30",
-      datetime: "2026-12-06T09:30+07:00",
-      title: "Lễ thành hôn",
+      time: date.ceremonyTime,
+      datetime: date.isoCeremony,
+      title: "Lễ vu quy",
       detail: "Tại tư gia",
     },
     {
-      time: "11:00",
-      datetime: "2026-12-06T11:00+07:00",
+      time: reception.hours[0].time,
+      datetime: date.isoWelcome,
       title: "Đón khách",
-      detail: "Sảnh Venus, tầng 2",
+      detail: reception.hall,
     },
     {
-      time: "12:00",
-      datetime: "2026-12-06T12:00+07:00",
+      time: date.receptionTime,
+      datetime: date.isoReception,
       title: "Khai tiệc",
-      detail: "Minh Toàn Galaxy Hotel",
+      detail: reception.name,
     },
   ],
 };

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { date } from "../../content/date";
+import { reception } from "./content";
 
 const temperature = ref<number | null>(null);
 const condition = ref("");
@@ -17,14 +18,21 @@ function describe(code: number) {
   if ((code >= 71 && code <= 77) || code === 85 || code === 86) return "Có tuyết";
   if (code >= 51 && code <= 57) return "Mưa phùn";
   if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return "Có mưa";
-  return "Thời tiết tại Đà Nẵng";
+  return `Thời tiết tại ${reception.weather.place}`;
 }
 
 onMounted(async () => {
   try {
-    // Da Nang city coordinates from Open-Meteo's geocoding API, not the venue pin.
+    // City coordinates from Open-Meteo's geocoding API, not the venue pin.
+    const parameters = new URLSearchParams({
+      latitude: String(reception.weather.latitude),
+      longitude: String(reception.weather.longitude),
+      current: "temperature_2m,weather_code",
+      timezone: "Asia/Ho_Chi_Minh",
+      forecast_days: "1",
+    });
     const response = await fetch(
-      "https://api.open-meteo.com/v1/forecast?latitude=16.06778&longitude=108.22083&current=temperature_2m,weather_code&timezone=Asia%2FHo_Chi_Minh&forecast_days=1",
+      `https://api.open-meteo.com/v1/forecast?${parameters}`,
       { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(10000)]) },
     );
     if (!response.ok) throw new Error("Weather unavailable");
@@ -53,7 +61,7 @@ onBeforeUnmount(() => controller.abort());
 <template>
   <aside class="weather-note" aria-labelledby="weather-title">
     <p class="eyebrow">Chuẩn bị cho chuyến đi</p>
-    <h3 id="weather-title">Thời tiết Đà Nẵng</h3>
+    <h3 id="weather-title">Thời tiết {{ reception.weather.place }}</h3>
     <div role="status" aria-live="polite">
       <p v-if="loading" class="weather-status">Đang cập nhật thời tiết…</p>
       <p v-else-if="failed" class="weather-status">Chưa tải được thời tiết. Bạn vui lòng kiểm tra lại trước khi đi nhé.</p>

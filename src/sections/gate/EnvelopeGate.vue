@@ -9,7 +9,7 @@ defineProps({
 
 defineEmits(["open"]);
 
-const label = `Mở thiệp mời lễ cưới của ${couple.groom.full} và ${couple.bride.full}, ngày ${date.aria}`;
+const label = `Mở thiệp mời lễ cưới của ${couple.bride.full} và ${couple.groom.full}, ngày ${date.aria}`;
 </script>
 
 <template>

@@ -84,7 +84,7 @@ function openPhoto(index: number, event: MouseEvent) {
       src="/assets/album/album-cover.webp"
       :srcset="albumSrcset('/assets/album/album-cover.webp', 1920)"
       sizes="auto, (min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
-      alt="Duy Phúc và Linh Đan trong khu vườn xanh"
+      alt="Linh Đan và Duy Phúc trong khu vườn xanh"
       width="1600"
       height="900"
       loading="lazy"

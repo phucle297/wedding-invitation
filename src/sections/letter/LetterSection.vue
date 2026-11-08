@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { families } from "../families/content";
+import { couple } from "../../content/couple";
 import { date } from "../../content/date";
 import { albumSrcset } from "../../content/images";
 import CallaSprig from "../../components/CallaSprig.vue";
@@ -23,7 +24,7 @@ import CallaSprig from "../../components/CallaSprig.vue";
           decoding="async"
         />
         <div class="envelope-pocket"></div>
-        <span class="wax-seal">P<span>&amp;</span>Đ</span>
+        <span class="wax-seal">{{ couple.bride.mark }}<span>&amp;</span>{{ couple.groom.mark }}</span>
       </div>
       <div class="photo-strip">
         <img

@@ -3,6 +3,7 @@ import { couple } from "../../content/couple";
 import { date } from "../../content/date";
 import { albumSrcset } from "../../content/images";
 import { hero } from "./content";
+import { reception } from "../reception/content";
 </script>
 
 <template>
@@ -12,7 +13,7 @@ import { hero } from "./content";
         src="/assets/album/13.webp"
         :srcset="albumSrcset('/assets/album/13.webp')"
         sizes="(min-width: 1420px) 610px, (min-width: 1024px) 43vw, (min-width: 720px) 425px, 59vw"
-        alt="Duy Phúc và Linh Đan trong sảnh ngập nắng"
+        alt="Linh Đan và Duy Phúc trong sảnh ngập nắng"
         width="1067"
         height="1600"
         loading="eager"
@@ -22,8 +23,8 @@ import { hero } from "./content";
     <div class="hero-copy">
       <p class="hero-script" lang="en">The<br /><span>wedding of</span></p>
       <h1>
-        <span>{{ couple.groom.short }}</span
-        ><em>&amp;</em><span>{{ couple.bride.short }}</span>
+        <span>{{ couple.bride.short }}</span
+        ><em>&amp;</em><span>{{ couple.groom.short }}</span>
       </h1>
       <p class="hero-message">{{ hero.message }}</p>
       <div class="hero-keepsake">
@@ -42,7 +43,7 @@ import { hero } from "./content";
       >
     </div>
     <p class="hero-date">
-      <span>{{ date.weekday }}, Đà Nẵng</span>{{ date.display }}
+      <span>{{ date.weekday }}, {{ reception.city }}</span>{{ date.display }}
     </p>
   </header>
 </template>

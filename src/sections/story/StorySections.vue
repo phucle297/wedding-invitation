@@ -6,19 +6,19 @@ const scenes = [
   {
     title: "Gặp gỡ",
     image: "13",
-    alt: "Duy Phúc và Linh Đan bên khung cửa",
+    alt: "Linh Đan và Duy Phúc bên khung cửa",
     text: "Giữa bao điều đẹp đẽ, có một người để cùng sẻ chia.",
   },
   {
     title: "Đồng hành",
     image: "10",
-    alt: "Duy Phúc và Linh Đan cùng nhau trong khu vườn",
+    alt: "Linh Đan và Duy Phúc cùng nhau trong khu vườn",
     text: "Không chỉ là một khoảnh khắc. Là những ngày có nhau.",
   },
   {
     title: "Về chung một nhà",
     image: "09",
-    alt: "Khoảnh khắc gần gũi của Duy Phúc và Linh Đan",
+    alt: "Khoảnh khắc gần gũi của Linh Đan và Duy Phúc",
     text: "Một chương mới, một mái nhà. Và những điều bình dị đang chờ phía trước.",
   },
 ];
@@ -37,25 +37,6 @@ const scenes = [
     </div>
     <div class="portraits">
       <figure>
-        <div class="portrait-frame groom-portrait">
-          <img
-            src="/assets/album/groom.webp"
-            :srcset="albumSrcset('/assets/album/groom.webp')"
-            sizes="auto, (min-width: 1024px) 360px, (min-width: 720px) 300px, 42vw"
-            alt="Chú rể Duy Phúc"
-            width="1067"
-            height="1600"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <figcaption>
-          <span>{{ couple.groom.short }}</span
-          ><small>{{ couple.groom.full }}</small
-          ><em>{{ couple.groom.role }}</em>
-        </figcaption>
-      </figure>
-      <figure>
         <div class="portrait-frame bride-portrait">
           <img
             src="/assets/album/bride.webp"
@@ -72,6 +53,25 @@ const scenes = [
           <span>{{ couple.bride.short }}</span
           ><small>{{ couple.bride.full }}</small
           ><em>{{ couple.bride.role }}</em>
+        </figcaption>
+      </figure>
+      <figure>
+        <div class="portrait-frame groom-portrait">
+          <img
+            src="/assets/album/groom.webp"
+            :srcset="albumSrcset('/assets/album/groom.webp')"
+            sizes="auto, (min-width: 1024px) 360px, (min-width: 720px) 300px, 42vw"
+            alt="Chú rể Duy Phúc"
+            width="1067"
+            height="1600"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <figcaption>
+          <span>{{ couple.groom.short }}</span
+          ><small>{{ couple.groom.full }}</small
+          ><em>{{ couple.groom.role }}</em>
         </figcaption>
       </figure>
       <img
@@ -182,7 +182,7 @@ const scenes = [
   overflow: hidden;
   border-radius: 95px 0 0 0;
 }
-.bride-portrait {
+.groom-portrait {
   border-radius: 0 95px 0 0;
 }
 .portrait-frame img {
@@ -191,7 +191,7 @@ const scenes = [
   object-fit: cover;
   object-position: center 30%;
 }
-.groom-portrait img {
+.bride-portrait img {
   transform: scaleX(-1);
 }
 figcaption {

@@ -9,7 +9,7 @@ import { timeline } from "./content";
       src="/assets/album/together.webp"
       :srcset="albumSrcset('/assets/album/together.webp', 1200)"
       sizes="auto, (min-width: 1024px) 100vw, (min-width: 720px) 720px, 100vw"
-      alt="Duy Phúc và Linh Đan giữa hai vế cầu thang trong sảnh lớn"
+      alt="Linh Đan và Duy Phúc giữa hai vế cầu thang trong sảnh lớn"
       width="1600"
       height="1067"
       loading="lazy"

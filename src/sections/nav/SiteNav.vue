@@ -25,7 +25,7 @@ onBeforeUnmount(() => document.removeEventListener("pointerdown", closeOnOutside
 <template>
   <nav ref="navigation" class="topnav" aria-label="Trong thiệp" @keydown.esc="closeOnEscape">
     <a class="brand" href="#mo-dau" @click="expanded = false"
-      >Phúc <em>&amp;</em> Đan</a
+      >Đan <em>&amp;</em> Phúc</a
     >
     <ul id="invitation-links" :class="{ 'is-expanded': expanded }">
       <li class="menu-heading" aria-hidden="true">Trong thiệp mời</li>
