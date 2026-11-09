@@ -67,7 +67,7 @@ function googleHarness() {
     LockService: { getScriptLock: () => lock },
     SpreadsheetApp: {
       openById(id: string) {
-        expect(id).toBe("1c7TpzxU7pS5JtdgGbt_1cFwR336KVPWPQqdzLD1ARc0");
+        expect(id).toBe("1p0KG88IGdCcjXlxcEkaAJliSro5MCtxkKqA78j7M29E");
         return {
           getSheetByName: () => exists ? sheet : null,
           insertSheet(name: string) { expect(name).toBe("RSVP"); exists = true; return sheet; },

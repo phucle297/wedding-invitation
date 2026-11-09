@@ -1,6 +1,7 @@
 // Deploy as a web app: execute as yourself, access Anyone. Keep the Sheet restricted.
 // The public form posts directly here; no Cloudflare Function or shared token is needed.
-const SPREADSHEET_ID = "1c7TpzxU7pS5JtdgGbt_1cFwR336KVPWPQqdzLD1ARc0";
+// Biên Hòa: deploy separately from the main invitation's Apps Script.
+const SPREADSHEET_ID = "1p0KG88IGdCcjXlxcEkaAJliSro5MCtxkKqA78j7M29E";
 const RSVP_TAB = "RSVP";
 const HEADERS = ["Request ID", "Thời gian", "Họ tên", "Tham dự", "Số người", "Lời nhắn", "Payload"];
 const EXTRA = ["Xe đưa đón", "Chiều đi", "Tên xe", "Trạm đón", "Chiều về", "Trạm trả"];

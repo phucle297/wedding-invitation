@@ -4,18 +4,29 @@ The static website submits directly to the Google Apps Script web app. There is
 no `/api/rsvp`, Cloudflare Function, database, or shared API token to configure.
 This works with static hosting, including Cloudflare Pages and S3.
 
-## One-time update to the existing Google deployment
+## Biên Hòa deployment (`bh` branch)
 
-1. Replace the code in your Apps Script editor with `apps-script/Code.gs` and save.
-2. Choose **Deploy → Manage deployments → Edit → New version → Deploy**.
-   Keep **Execute as: Me** and **Who has access: Anyone**. Editing the existing
-   deployment keeps its `/exec` URL. Saving alone does not update deployed code.
-3. The public web-app URL is already in `src/sections/rsvp/content.ts`. If you
-   create a different deployment, update `scriptUrl` there.
+This branch's `apps-script/Code.gs` writes to the dedicated
+[Biên Hòa spreadsheet](https://docs.google.com/spreadsheets/d/1p0KG88IGdCcjXlxcEkaAJliSro5MCtxkKqA78j7M29E/edit).
+Use a separate Apps Script project and deployment so the main invitation keeps
+writing to its original spreadsheet.
+
+1. Open that spreadsheet and choose **Extensions → Apps Script**. Replace the
+   editor's `Code.gs` with `apps-script/Code.gs` from this branch and save.
+2. Choose **Deploy → New deployment → Web app**. Set **Execute as: Me** and
+   **Who has access: Anyone**, authorize access, then deploy.
+3. Copy the new web-app `/exec` URL into `scriptUrl` in
+   `src/sections/rsvp/content.ts` on `bh` only. This branch is configured with the
+   [BH deployment](https://script.google.com/macros/s/AKfycbwx_ILCFzydE1crX71T-Q9IyDXGWSa_28nk5qKoTwW3M1I_tdg4OLgCWUxBlPj464HMXw/exec).
+   Changing the spreadsheet ID alone does not connect the website to a new deployment.
 4. Deploy the static website normally. No Cloudflare variables or secrets are
    used. The old `RSVP_API_TOKEN` and `RSVP_SCRIPT_URL` settings can be deleted.
 5. Submit a test RSVP and confirm one row appears in the spreadsheet's RSVP tab.
    A retry of identical content with the same request ID must not add a second row.
+
+For later updates to the BH script, choose **Deploy → Manage deployments → Edit
+→ New version → Deploy** to keep its `/exec` URL. Saving alone does not update
+deployed code. Do not edit the main invitation's Apps Script project.
 
 The spreadsheet remains **Restricted**. Only the Apps Script owner's account
 needs permission to edit it. Never enable public spreadsheet editing.
