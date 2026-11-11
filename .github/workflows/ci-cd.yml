@@ -1,28 +1,12 @@
-name: CI/CD
+name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, bh]
   pull_request:
 
 jobs:
-  pull-request-checks:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    container:
-      image: oven/bun:1.4.4-debian
-      options: --user root
-    steps:
-      - name: Install git
-        run: apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
-      - uses: actions/checkout@v7
-      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - run: bun install --frozen-lockfile
-      - run: bun run check
-      - run: bun run build
-
   build:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     container:
       image: oven/bun:1.4.4-debian
@@ -40,27 +24,3 @@ jobs:
           name: dist
           path: dist/
           retention-days: 1
-
-  deploy:
-    if: >-
-      vars.AWS_ROLE_ARN != '' &&
-      vars.AWS_REGION != '' &&
-      vars.S3_BUCKET != '' &&
-      vars.CLOUDFRONT_DISTRIBUTION_ID != ''
-    needs: build
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v8
-        with:
-          name: dist
-          path: dist/
-      - uses: aws-actions/configure-aws-credentials@v6
-        with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-      - run: aws s3 sync dist/ "s3://${{ vars.S3_BUCKET }}" --delete
-      - run: aws cloudfront create-invalidation --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" --paths "/*"
