@@ -15,9 +15,13 @@ function paintTheme(color: string) {
 function onOpen() {
   if (envelopeOpen.value) return;
   envelopeOpen.value = true;
+  // Let the inner card finish rising, then leave time to read it before fading.
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const readingDelay = reducedMotion ? 0 : 2500;
+  const fadeDuration = reducedMotion ? 0 : 700;
   window.setTimeout(() => {
     document.documentElement.classList.add("gate-out");
-  }, 1050);
+  }, readingDelay);
   window.setTimeout(() => {
     document.documentElement.classList.remove("has-gate", "gate-out");
     entered.value = true;
@@ -26,7 +30,7 @@ function onOpen() {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
       document.getElementById("invite")?.focus({ preventScroll: true });
     });
-  }, 1450);
+  }, readingDelay + fadeDuration);
 }
 </script>
 

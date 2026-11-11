@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="url(#gold-foil)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="gold-foil" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#80602f"/>
+      <stop offset=".3" stop-color="#b08b4c"/>
+      <stop offset=".48" stop-color="#cfb57b"/>
+      <stop offset=".58" stop-color="#9b763b"/>
+      <stop offset="1" stop-color="#78582b"/>
+    </linearGradient>
+    <g id="joy">
+      <path d="M8 14h34M25 5v26M4 31h42M16 58l3 5m15-5-3 5M5 69h40"/>
+      <path d="M12 40h26v12H12zM12 78h26v14H12z"/>
+    </g>
+  </defs>
+  <use href="#joy"/>
+  <use href="#joy" x="50"/>
+</svg>

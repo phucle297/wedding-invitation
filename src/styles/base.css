@@ -146,10 +146,14 @@ h1, h2, h3 {
 
 .has-gate.gate-out .gate {
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.7s ease;
 }
 
 .has-gate .invite { visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .has-gate.gate-out .gate { transition: none; }
+}
 
 #mo-dau,
 #loi-ngo,
