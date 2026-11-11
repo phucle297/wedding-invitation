@@ -27,16 +27,34 @@ defineProps({
       </div>
       <div class="slot">
         <article class="card">
+          <img
+            class="card-botanical card-botanical-top"
+            src="/assets/ornaments/botanical.svg"
+            width="240"
+            height="360"
+            alt=""
+          />
+          <img
+            class="card-botanical card-botanical-bottom"
+            src="/assets/ornaments/botanical.svg"
+            width="240"
+            height="360"
+            alt=""
+          />
           <p class="card-title">Thiệp mời lễ cưới</p>
-          <p class="monogram">
-            {{ couple.groom.mark }} <span>&amp;</span> {{ couple.bride.mark }}
-          </p>
           <p class="names">
             {{ couple.groom.full }}<span>&amp;</span>{{ couple.bride.full }}
           </p>
           <p class="when">
             <span>{{ date.weekday }}</span>{{ date.display }}
           </p>
+          <img
+            class="card-flourish"
+            src="/assets/ornaments/flourish.svg"
+            width="200"
+            height="60"
+            alt=""
+          />
         </article>
       </div>
 
@@ -210,7 +228,7 @@ defineProps({
 }
 .velvet.is-open .slot {
   visibility: visible;
-  transition: visibility 0s linear 0.4s;
+  transition: visibility 0s linear 0.5s;
 }
 .card {
   position: absolute;
@@ -230,7 +248,7 @@ defineProps({
     0 3px 3px #66543d29,
     2px 12px 18px -6px #66543d40;
   transform: translateY(calc(100% + 32px));
-  transition: transform 0.42s cubic-bezier(0.16, 0.84, 0.24, 1) 0.4s;
+  transition: transform 0.85s cubic-bezier(0.16, 0.84, 0.24, 1) 0.5s;
 }
 .card::after {
   content: "";
@@ -240,34 +258,45 @@ defineProps({
   box-shadow: 0 1px 0 #ffffffb3;
   pointer-events: none;
 }
+.card-botanical {
+  position: absolute;
+  width: clamp(48px, 14%, 88px);
+  height: auto;
+  opacity: 0.45;
+  pointer-events: none;
+}
+.card-botanical-top {
+  top: 22px;
+  left: 20px;
+}
+.card-botanical-bottom {
+  right: 20px;
+  bottom: 22px;
+  transform: rotate(180deg);
+}
+.card-flourish {
+  width: 76px;
+  height: auto;
+  margin-top: 12px;
+  opacity: 0.7;
+  pointer-events: none;
+}
 .velvet.is-open .card {
   transform: translateY(0);
 }
 .card-title {
   margin: 0 0 8px;
   font-family: var(--heading);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.monogram {
-  margin: 0;
-  font-family: var(--heading);
-  text-transform: uppercase;
-  font-size: 3.8rem;
-  line-height: 1.1;
-  color: #a47e34;
-}
-.monogram span {
-  font-family: var(--script);
-  font-size: 0.65em;
-}
 .names {
   margin: 12px 0 0;
   font-family: var(--script-vi);
-  font-size: clamp(1.25rem, 5.8vw, 2.1rem);
+  font-size: clamp(1.1rem, 6.4vw, 2.3rem);
   line-height: 1.25;
   text-align: center;
   text-wrap: balance;
@@ -283,7 +312,7 @@ defineProps({
   margin: 16px 0 0;
   font-family: var(--heading);
   letter-spacing: 0.04em;
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   line-height: 1.4;
 }
 .when span {
@@ -564,16 +593,16 @@ defineProps({
     top: 15%;
     height: 70%;
   }
-  .monogram {
-    font-size: 5cqw;
+  .card-title {
+    font-size: max(0.85rem, 1.8cqw);
   }
   .names {
     margin-top: 1cqw;
-    font-size: 3.6cqw;
+    font-size: 4.5cqw;
   }
   .when {
     margin-top: 1.5cqw;
-    font-size: max(1rem, 1.8cqw);
+    font-size: max(1.15rem, 2.4cqw);
   }
 }
 
@@ -611,15 +640,18 @@ defineProps({
     font-size: 2.2rem;
     line-height: 1.05;
   }
-  .monogram {
-    font-size: 3.2rem;
+  .card-botanical-top {
+    display: none;
+  }
+  .card-botanical-bottom {
+    width: 32px;
   }
   .names {
-    font-size: clamp(1.25rem, 5.8vw, 1.65rem);
+    font-size: clamp(1.1rem, 6.4vw, 1.85rem);
   }
   .when {
     margin-top: 8px;
-    font-size: 1rem;
+    font-size: 1.15rem;
     line-height: 1.4;
   }
   .hint {
