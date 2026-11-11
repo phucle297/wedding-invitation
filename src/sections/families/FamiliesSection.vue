@@ -3,10 +3,9 @@ import { families } from "./content";
 </script>
 
 <template>
-  <section class="block family-section" aria-labelledby="family-title">
-    <h2 id="family-title">{{ families.title }}</h2>
+  <section class="block family-section" aria-label="Gia đình cô dâu và chú rể">
     <div class="families">
-      <article v-for="group in families.groups" :key="group.label">
+      <article v-for="group in families.groups" :key="group.label" :aria-label="group.label">
         <h3>{{ group.label }}</h3>
         <p v-for="person in group.people" :key="person">{{ person }}</p>
         <p class="where">{{ group.place }}</p>
@@ -19,10 +18,6 @@ import { families } from "./content";
 .block {
   text-align: center;
   padding-top: 28px;
-}
-
-.block h2 {
-  font-size: var(--section-title);
 }
 
 .families {

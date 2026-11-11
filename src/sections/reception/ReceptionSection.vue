@@ -24,7 +24,7 @@ import { phrases } from "../../content/phrases";
           </template>
         </address>
         <time class="invitation-date" :datetime="date.isoReception" :aria-label="date.aria">
-          <span>{{ date.weekday }}<small>Đón khách {{ reception.hours[0]?.time }}</small></span>
+          <span>{{ date.weekday }}<small>{{ reception.hours[0]?.time }}</small></span>
           <strong>{{ String(date.markedDay).padStart(2, "0") }}</strong>
           <span>Tháng {{ date.month }}<small>{{ date.year }}</small></span>
         </time>
@@ -45,7 +45,7 @@ import { phrases } from "../../content/phrases";
   --ink: #913b3e;
   padding: 22px;
   color: var(--ink);
-  font-family: var(--heading);
+  font-family: var(--invitation-serif);
   text-align: center;
   text-transform: uppercase;
 }
@@ -58,39 +58,48 @@ import { phrases } from "../../content/phrases";
 }
 .invitation-copy {
   position: relative;
-  padding: 13% 12% 28%;
+  padding: 13% 9% 14%;
 }
-.invitation-bouquet { display: block; width: 34%; height: auto; margin: 0 auto 3%; }
+.invitation-bouquet { display: block; width: 28%; height: auto; margin: 0 auto 2%; }
 .invitation-bouquet :deep(img) { display: block; width: 100%; height: auto; }
-.invitation-title { margin: 0 0 7%; font: clamp(2.5rem, 11cqw, 4.5rem)/1.25 var(--script-vi); text-transform: none; }
-.invitation-salutation { margin: 0; font-size: clamp(.875rem, 3.3cqw, 1.25rem); text-transform: uppercase; }
+.invitation-title { margin: 0 0 5%; font: 10cqw/1.25 var(--script-vi); text-transform: none; }
+.invitation-salutation { margin: 0; font-size: 2.8cqw; text-transform: uppercase; }
 .invitation-addressee {
-  margin: 4% auto 8%;
-  font: clamp(1.5rem, 6cqw, 2.2rem)/1.4 var(--script-vi);
+  margin: 3% auto 5%;
+  font: 5cqw/1.4 var(--script-vi);
   text-transform: none;
 }
-.invitation-intro { margin: 0 0 5%; font-size: clamp(.875rem, 3.1cqw, 1.2rem); line-height: 1.6; text-transform: uppercase; }
-h2 { margin: 0; font-size: clamp(1.75rem, 6.8cqw, 2.7rem); font-weight: 700; line-height: 1.1; text-wrap: balance; }
-.invitation-hall { margin: 5% 0; font-size: clamp(.875rem, 3.3cqw, 1.25rem); text-transform: uppercase; }
-address { font-size: clamp(.8125rem, 3cqw, 1.125rem); font-style: normal; line-height: 1.6; text-transform: uppercase; }
+.invitation-intro { margin: 0 0 3%; font-size: 2.8cqw; line-height: 1.6; text-transform: uppercase; }
+h2 { margin: 0; font: 700 5.6cqw/1.3 var(--invitation-serif); letter-spacing: -0.04em; text-transform: none; white-space: nowrap; }
+.invitation-hall { margin: 3% 0; font-size: 2.8cqw; text-transform: uppercase; }
+address { font-size: 2.5cqw; font-style: normal; line-height: 1.6; text-transform: uppercase; }
 .invitation-date {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 5%;
-  margin: 7% 0 0;
-  font-size: clamp(.875rem, 3.8cqw, 1.5rem);
+  margin: 5% 0 0;
+  font-size: 3.5cqw;
   line-height: 1.4;
   text-transform: uppercase;
 }
 .invitation-date small { display: block; font-size: .9em; }
-.invitation-date strong { font-size: clamp(4rem, 19cqw, 7rem); font-weight: 700; line-height: 1; font-variant-numeric: lining-nums; }
-.invitation-lunar { margin: 4% 0 7%; font-size: clamp(.8125rem, 3cqw, 1.125rem); line-height: 1.5; }
-.invitation-hours { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin: 0; font-size: clamp(.875rem, 3.1cqw, 1.125rem); }
+.invitation-date strong { font-size: 15cqw; font-weight: 700; line-height: 1; font-variant-numeric: lining-nums; }
+.invitation-lunar { margin: 3% 0 4%; font-size: 2.8cqw; line-height: 1.5; text-transform: none; }
+.invitation-hours { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 12px; margin: 0; font-size: 2.6cqw; text-transform: none; }
 .invitation-hours div { display: flex; gap: 4px; }
 .invitation-hours dd { margin: 0; font-variant-numeric: lining-nums; }
-.invitation-gratitude { max-width: 84%; margin: 7% auto 0; font-size: clamp(.875rem, 3.3cqw, 1.25rem); line-height: 1.6; text-wrap: balance; }
+.invitation-gratitude { margin: 3% auto 0; font-size: 2.8cqw; line-height: 1.6; text-transform: none; text-wrap: balance; }
 @media (max-width: 600px) {
   .hotel { padding: 16px 12px; }
+  .invitation-copy { padding-block: 15% 20%; }
+  .invitation-salutation,
+  .invitation-intro,
+  .invitation-hall,
+  .invitation-gratitude { font-size: 3.6cqw; }
+  address { font-size: 3cqw; }
+  .invitation-date { font-size: 4cqw; }
+  .invitation-lunar { font-size: 3.4cqw; }
+  .invitation-hours { font-size: 3.1cqw; gap: 4px 8px; }
 }
 </style>

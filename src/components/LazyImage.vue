@@ -68,9 +68,4 @@ function settle() {
     transform: translateX(100%);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .lazy-skeleton::after {
-    animation: none;
-  }
-}
 </style>

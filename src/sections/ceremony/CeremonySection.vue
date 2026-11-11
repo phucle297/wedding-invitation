@@ -6,11 +6,12 @@ import { date } from "../../content/date";
 
 <template>
   <section class="block place" id="dia-diem" aria-labelledby="place-title">
+    <p class="announcement-intro">Trân trọng báo tin<br /><strong>Lễ vu quy</strong> của con chúng tôi</p>
     <div class="couple-names">
       <p>
         {{ couple.bride.full }}<small>{{ couple.bride.role }}</small>
       </p>
-      <img src="/assets/ornaments/rings.svg" width="80" height="45" alt="" />
+      <img src="/assets/ornaments/wedding-rings.svg" width="120" height="100" alt="" />
       <p>
         {{ couple.groom.full }}<small>{{ couple.groom.role }}</small>
       </p>
@@ -37,31 +38,37 @@ import { date } from "../../content/date";
 .place {
   text-align: center;
 }
+.announcement-intro {
+  margin: 0;
+  font: 3cqw/1.6 var(--invitation-serif);
+  text-transform: uppercase;
+}
 .couple-names {
-  margin: 28px 0 30px;
+  margin: 4% 0 6%;
 }
 .couple-names p {
   margin: 0;
-  font: clamp(2rem, 7cqw, 3.1rem)/1.4 var(--script-vi);
+  font: 8.4cqw/1.4 var(--script-vi);
+  white-space: nowrap;
 }
 .couple-names small {
   display: block;
-  margin-top: 10px;
-  font: 1rem/1.5 var(--heading);
-  text-transform: uppercase;
+  margin-top: 2%;
+  font: 2.8cqw/1.5 var(--invitation-serif);
 }
 .couple-names img {
   display: block;
-  margin: 22px auto;
-  opacity: 0.8;
+  width: 20%;
+  height: auto;
+  margin: 3% auto;
 }
 .ceremony-date {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 5%;
-  margin-top: 22px;
-  font: clamp(1rem, 3.8cqw, 1.5rem)/1.4 var(--heading);
+  margin-top: 5%;
+  font: 3.5cqw/1.4 var(--invitation-serif);
   text-transform: uppercase;
 }
 .ceremony-date small {
@@ -69,20 +76,19 @@ import { date } from "../../content/date";
   font-size: 0.9em;
 }
 .ceremony-date strong {
-  font-size: clamp(4rem, 19cqw, 7rem);
+  font-size: 15cqw;
   line-height: 1;
   font-variant-numeric: lining-nums;
 }
 .ceremony-lunar {
-  max-width: 84%;
-  margin: 18px auto 0;
-  font: 1rem/1.5 var(--heading);
-  text-transform: uppercase;
+  margin: 4% auto 0;
+  font: 2.8cqw/1.5 var(--invitation-serif);
   text-wrap: balance;
 }
-@media (max-width: 400px) {
-  .ceremony-lunar {
-    font-size: 0.875rem;
-  }
+@media (max-width: 600px) {
+  .announcement-intro { font-size: 3.6cqw; }
+  .couple-names small { font-size: 3.6cqw; }
+  .ceremony-date { font-size: 4cqw; }
+  .ceremony-lunar { font-size: 3.4cqw; }
 }
 </style>

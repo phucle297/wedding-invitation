@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { computed, nextTick, onUnmounted, ref, watch } from "vue";
 import { rsvp } from "./content";
-import { shuttle, shuttleStations, shuttleTrips, shuttleVehicles } from "./shuttle";
+import { shuttle, shuttleTrips, shuttleVehicles } from "./shuttle";
 import type { OutboundChoice, TransportChoice, TripId } from "./shuttle";
 import { submitRsvp } from "./submitRsvp";
 import type { RsvpSubmission } from "./submitRsvp";
+import StopSelect from "./StopSelect.vue";
 
 const name = ref("");
+const phone = ref("");
+const birthYear = ref<number | string>("");
+const currentYear = new Date().getFullYear();
 const attend = ref("");
 const count = ref<number | string>(1);
 const note = ref("");
@@ -26,10 +30,14 @@ const absent = computed(() => attend.value === rsvp.absentValue);
 const usingShuttle = computed(() => !absent.value && transport.value === "shuttle");
 const pickedTrip = computed(() => shuttleTrips.find((trip) => trip.id === outbound.value) ?? null);
 const returningByCar = computed(() => returnChoice.value !== "" && returnChoice.value !== "self");
+const returnStops = computed(() => {
+  const car = shuttleVehicles.find((item) => item.name === returnChoice.value);
+  return shuttleTrips.find((trip) => trip.id === car?.tripId)?.stops ?? [];
+});
 let submission: { fingerprint: string; requestId: string } | null = null;
 let restoreFocus: HTMLElement | null = null;
 
-watch([name, attend, count, note, transport, outbound, station, returnChoice, returnStation], () => {
+watch([name, phone, birthYear, attend, count, note, transport, outbound, station, returnChoice, returnStation], () => {
   sent.value = false;
   status.value = "";
 });
@@ -61,23 +69,26 @@ watch(outbound, (value) => {
   }
 });
 
-watch(returnChoice, (value) => {
-  if (value === "self" || value === "") {
+watch(returnChoice, () => {
+  if (!returnStops.value.some((stop) => stop.name === returnStation.value)) {
     returnStation.value = "";
-    return;
   }
-  if (!returnStation.value) returnStation.value = station.value;
+  if (!returnStation.value && returnStops.value.some((stop) => stop.name === station.value)) {
+    returnStation.value = station.value;
+  }
 });
 
 watch(station, (value) => {
-  if (returningByCar.value && !returnStation.value) returnStation.value = value;
+  if (!returnStation.value && returnStops.value.some((stop) => stop.name === value)) {
+    returnStation.value = value;
+  }
 });
 
 watch(routeOpen, async (open) => {
-  document.body.style.overflow = open ? "hidden" : "";
   if (!open) return;
+  document.body.style.overflow = "hidden";
   await nextTick();
-  routeDialog.value?.focus();
+  if (routeOpen.value) routeDialog.value?.focus({ preventScroll: true });
 });
 
 onUnmounted(() => {
@@ -85,13 +96,18 @@ onUnmounted(() => {
 });
 
 function openRoute() {
-  restoreFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  restoreFocus ??= document.activeElement instanceof HTMLElement ? document.activeElement : null;
   routeOpen.value = true;
 }
 
 function closeRoute() {
   routeOpen.value = false;
-  restoreFocus?.focus();
+}
+
+function onRouteClosed() {
+  if (routeOpen.value) return;
+  document.body.style.overflow = "";
+  restoreFocus?.focus({ preventScroll: true });
   restoreFocus = null;
 }
 
@@ -147,6 +163,20 @@ async function onSubmit() {
     nameInput.value?.focus();
     return;
   }
+  const contactPhone = phone.value.replace(/[\s().-]/g, "");
+  if (phone.value.trim() && !/^\+?[0-9]{9,15}$/.test(contactPhone)) {
+    status.value = rsvp.messages.needPhone;
+    await nextTick();
+    document.getElementById("guest-phone")?.focus();
+    return;
+  }
+  const year = birthYear.value === "" ? undefined : Number(birthYear.value);
+  if (year !== undefined && (!Number.isInteger(year) || year < 1900 || year > currentYear)) {
+    status.value = rsvp.messages.needBirthYear;
+    await nextTick();
+    document.getElementById("guest-birth-year")?.focus();
+    return;
+  }
   if (attend.value !== "attending" && attend.value !== "absent") {
     status.value = rsvp.messages.needAttend;
     return;
@@ -161,6 +191,8 @@ async function onSubmit() {
   }
   if (pickedTrip.value && !station.value) {
     status.value = rsvp.messages.needStation;
+    await nextTick();
+    document.getElementById("guest-station")?.focus();
     return;
   }
   if (usingShuttle.value && !returnChoice.value) {
@@ -169,11 +201,15 @@ async function onSubmit() {
   }
   if (returningByCar.value && !returnStation.value.trim()) {
     status.value = rsvp.messages.needReturnStation;
+    await nextTick();
+    document.getElementById("guest-return-station")?.focus();
     return;
   }
   const ride = transportPayload();
   const payload: Omit<RsvpSubmission, "requestId"> = {
     name: guest,
+    ...(contactPhone ? { phone: contactPhone } : {}),
+    ...(year !== undefined ? { birthYear: year } : {}),
     attendance: attend.value,
     count: absent.value ? 1 : Number(count.value),
     note: note.value.trim(),
@@ -191,8 +227,12 @@ async function onSubmit() {
     sent.value = true;
     status.value = rsvp.messages.saved;
   } catch (error) {
-    status.value = error instanceof Error && error.message === "service_unavailable"
-      ? rsvp.messages.unavailable : rsvp.messages.failed;
+    if (error instanceof Error && error.message === "outdated_deployment") {
+      status.value = rsvp.messages.outdated;
+    } else {
+      status.value = error instanceof Error && error.message === "service_unavailable"
+        ? rsvp.messages.unavailable : rsvp.messages.failed;
+    }
   } finally {
     pending.value = false;
   }
@@ -215,20 +255,54 @@ function carsFor(tripId: TripId) {
         <input id="guest-website" v-model="website" type="text" tabindex="-1" autocomplete="off" />
       </div>
       <div class="field">
-        <label for="guest-name">{{ rsvp.nameLabel }}</label>
+        <label for="guest-name">{{ rsvp.nameLabel }} <span class="required" aria-hidden="true">*</span></label>
         <input
           id="guest-name"
           ref="nameInput"
           v-model="name"
           type="text"
           autocomplete="name"
+          aria-describedby="passenger-note"
           maxlength="80"
           :disabled="pending"
           required
         />
       </div>
+      <div class="contact-fields">
+        <div class="field">
+          <label for="guest-phone">{{ rsvp.phoneLabel }}</label>
+          <input
+            id="guest-phone"
+            v-model="phone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            maxlength="24"
+            :disabled="pending"
+            :aria-invalid="status === rsvp.messages.needPhone || undefined"
+            :aria-describedby="status === rsvp.messages.needPhone ? 'passenger-note rsvp-status' : 'passenger-note'"
+          />
+        </div>
+        <div class="field">
+          <label for="guest-birth-year">{{ rsvp.birthYearLabel }}</label>
+          <input
+            id="guest-birth-year"
+            v-model="birthYear"
+            type="number"
+            inputmode="numeric"
+            autocomplete="bday-year"
+            min="1900"
+            :max="currentYear"
+            step="1"
+            :disabled="pending"
+            :aria-invalid="status === rsvp.messages.needBirthYear || undefined"
+            :aria-describedby="status === rsvp.messages.needBirthYear ? 'passenger-note rsvp-status' : 'passenger-note'"
+          />
+        </div>
+      </div>
+      <p id="passenger-note" class="field-note passenger-note">{{ rsvp.passengerNote }}</p>
       <fieldset>
-        <legend>{{ rsvp.attendLegend }}</legend>
+        <legend>{{ rsvp.attendLegend }} <span class="required" aria-hidden="true">*</span></legend>
         <label
           v-for="choice in rsvp.choices"
           :key="choice.value"
@@ -246,7 +320,7 @@ function carsFor(tripId: TripId) {
         </label>
       </fieldset>
       <div v-if="!absent" class="field">
-        <label for="guest-count">{{ rsvp.countLabel }}</label>
+        <label for="guest-count">{{ rsvp.countLabel }} <span class="required" aria-hidden="true">*</span></label>
         <input
           id="guest-count"
           v-model="count"
@@ -259,7 +333,7 @@ function carsFor(tripId: TripId) {
         />
       </div>
       <fieldset v-if="!absent">
-        <legend>{{ shuttle.legend }}</legend>
+        <legend>{{ shuttle.legend }} <span class="required" aria-hidden="true">*</span></legend>
         <p class="field-note">{{ shuttle.note }}</p>
         <label class="choice">
           <input
@@ -288,7 +362,7 @@ function carsFor(tripId: TripId) {
         </button>
       </fieldset>
       <fieldset v-if="usingShuttle">
-        <legend>{{ shuttle.outboundLegend }}</legend>
+        <legend>{{ shuttle.outboundLegend }} <span class="required" aria-hidden="true">*</span></legend>
         <label v-for="trip in shuttleTrips" :key="trip.id" class="choice">
           <input
             v-model="outbound"
@@ -298,7 +372,7 @@ function carsFor(tripId: TripId) {
             :disabled="pending"
             required
           />
-          <span>{{ trip.label }} · {{ trip.depart }} · {{ carsFor(trip.id) }}</span>
+          <span>{{ carsFor(trip.id) }} · {{ trip.depart }} · {{ trip.seats }} chỗ</span>
         </label>
         <label class="choice">
           <input v-model="outbound" type="radio" name="outbound" value="self" :disabled="pending" required />
@@ -310,16 +384,19 @@ function carsFor(tripId: TripId) {
         </label>
       </fieldset>
       <div v-if="pickedTrip" class="field">
-        <label for="guest-station">{{ shuttle.stationLabel }}</label>
-        <select id="guest-station" v-model="station" :disabled="pending" required>
-          <option disabled value="">{{ shuttle.stationPlaceholder }}</option>
-          <option v-for="stop in shuttleStations" :key="stop.name" :value="stop.name">
-            {{ stop.times[pickedTrip.id] }} · {{ stop.name }}
-          </option>
-        </select>
+        <label id="guest-station-label" for="guest-station">{{ shuttle.stationLabel }} <span class="required" aria-hidden="true">*</span></label>
+        <StopSelect
+          id="guest-station"
+          v-model="station"
+          :stops="pickedTrip.stops"
+          :placeholder="shuttle.stationPlaceholder"
+          :disabled="pending"
+          :error="status === rsvp.messages.needStation ? status : undefined"
+          show-time
+        />
       </div>
       <fieldset v-if="usingShuttle">
-        <legend>{{ shuttle.returnLegend }}</legend>
+        <legend>{{ shuttle.returnLegend }} <span class="required" aria-hidden="true">*</span></legend>
         <label v-for="car in shuttleVehicles" :key="car.name" class="choice">
           <input v-model="returnChoice" type="radio" name="return-ride" :value="car.name" :disabled="pending" required />
           <span>{{ car.name }}</span>
@@ -330,13 +407,15 @@ function carsFor(tripId: TripId) {
         </label>
       </fieldset>
       <div v-if="returningByCar" class="field">
-        <label for="guest-return-station">{{ shuttle.returnStationLabel }}</label>
-        <select id="guest-return-station" v-model="returnStation" :disabled="pending" required>
-          <option disabled value="">{{ shuttle.returnStationPlaceholder }}</option>
-          <option v-for="stop in shuttleStations" :key="stop.name" :value="stop.name">
-            {{ stop.name }}
-          </option>
-        </select>
+        <label id="guest-return-station-label" for="guest-return-station">{{ shuttle.returnStationLabel }} <span class="required" aria-hidden="true">*</span></label>
+        <StopSelect
+          id="guest-return-station"
+          v-model="returnStation"
+          :stops="returnStops"
+          :placeholder="shuttle.returnStationPlaceholder"
+          :disabled="pending"
+          :error="status === rsvp.messages.needReturnStation ? status : undefined"
+        />
       </div>
       <div class="field">
         <label for="guest-note">
@@ -354,49 +433,63 @@ function carsFor(tripId: TripId) {
       <button class="btn btn-ink" type="submit" :disabled="pending || sent">
         {{ pending ? "Đang gửi…" : sent ? "Đã gửi xác nhận" : rsvp.submit }}
       </button>
-      <p class="form-status" role="status">{{ status }}</p>
-      <p class="privacy-note">Thông tin chỉ dùng để sắp xếp tiệc cưới.</p>
+      <p id="rsvp-status" class="form-status" role="status">{{ status }}</p>
+      <p class="privacy-note">Thông tin chỉ dùng để sắp xếp tiệc cưới và đối chiếu danh sách xe đưa đón.</p>
     </form>
     <Teleport to="body">
-      <div
-        v-if="routeOpen"
-        class="route-backdrop"
-        @click.self="closeRoute"
-        @keydown="onRouteKeydown"
+      <Transition
+        name="route-modal"
+        @before-enter="(element) => element.removeAttribute('inert')"
+        @before-leave="(element) => element.setAttribute('inert', '')"
+        @after-leave="onRouteClosed"
       >
         <div
-          ref="routeDialog"
-          class="route-dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="route-title"
-          tabindex="-1"
+          v-if="routeOpen"
+          class="route-backdrop"
+          @click.self="closeRoute"
+          @keydown="onRouteKeydown"
         >
-          <div class="route-bar">
-            <p class="route-kicker">{{ shuttle.legend }}</p>
-            <button class="text-btn route-close" type="button" @click="closeRoute">{{ shuttle.closeRoute }}</button>
+          <div
+            ref="routeDialog"
+            class="route-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="route-title"
+            tabindex="-1"
+          >
+            <div class="route-header">
+              <div class="route-bar">
+                <p class="route-kicker">{{ shuttle.legend }}</p>
+                <button class="text-btn route-close" type="button" @click="closeRoute">{{ shuttle.closeRoute }}</button>
+              </div>
+              <h3 id="route-title">{{ shuttle.routeTitle }}</h3>
+            </div>
+            <div class="route-content" role="region" aria-label="Chi tiết lộ trình" tabindex="0">
+              <p class="route-lead">{{ shuttle.routeLead }}</p>
+              <div class="route-list">
+                <section v-for="trip in shuttleTrips" :key="trip.id" class="route-trip">
+                  <h4>{{ carsFor(trip.id) }} · {{ trip.seats }} chỗ</h4>
+                  <p>Xuất phát {{ trip.depart }}</p>
+                  <ol>
+                    <li v-for="stop in trip.stops" :key="stop.name">
+                      <time :datetime="stop.time">{{ stop.time }}</time>
+                      <span>
+                        {{ stop.name }}
+                        <small v-if="stop.address !== stop.name">{{ stop.address }}</small>
+                      </span>
+                    </li>
+                    <li class="destination">
+                      <time :datetime="trip.arrive">{{ trip.arrive }}</time>
+                      <span>{{ shuttle.destination }}</span>
+                    </li>
+                  </ol>
+                </section>
+              </div>
+              <button class="btn btn-ink" type="button" @click="closeRoute">{{ shuttle.closeRoute }}</button>
+            </div>
           </div>
-          <h3 id="route-title">{{ shuttle.routeTitle }}</h3>
-          <p class="route-lead">{{ shuttle.routeLead }}</p>
-          <div class="route-list">
-            <section v-for="trip in shuttleTrips" :key="trip.id" class="route-trip">
-              <h4>{{ trip.label }} · {{ carsFor(trip.id) }}</h4>
-              <p>Xuất phát {{ trip.depart }}</p>
-              <ol>
-                <li v-for="stop in shuttleStations" :key="stop.name">
-                  <time :datetime="stop.times[trip.id]">{{ stop.times[trip.id] }}</time>
-                  <span>{{ stop.name }}</span>
-                </li>
-                <li class="destination">
-                  <time :datetime="trip.arrive">{{ trip.arrive }}</time>
-                  <span>{{ shuttle.destination }}</span>
-                </li>
-              </ol>
-            </section>
-          </div>
-          <button class="btn btn-ink" type="button" @click="closeRoute">{{ shuttle.closeRoute }}</button>
         </div>
-      </div>
+      </Transition>
     </Teleport>
   </section>
 </template>
@@ -440,6 +533,23 @@ form .btn {
   margin-top: 22px;
 }
 
+.contact-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.65fr);
+  gap: 18px;
+}
+.contact-fields .field { min-width: 0; }
+.required { color: #913b3e; font-style: normal; }
+.field-note.passenger-note {
+  margin-top: 8px;
+  padding: 0 4px;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+@media (max-width: 480px) {
+  .contact-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+
 .field label,
 legend {
   display: block;
@@ -462,9 +572,9 @@ legend {
 }
 
 input[type="text"],
+input[type="tel"],
 input[type="number"],
-textarea,
-select {
+textarea {
   width: 100%;
   padding: 12px 2px;
   border: 0;
@@ -474,17 +584,10 @@ select {
   transition: border-color 0.2s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-select {
-  min-height: 48px;
-  padding: 12px;
-  font: inherit;
-  font-size: 16px;
-}
-
 input[type="text"]:focus,
+input[type="tel"]:focus,
 input[type="number"]:focus,
-textarea:focus,
-select:focus {
+textarea:focus {
   border-bottom-color: var(--ink);
 }
 
@@ -542,8 +645,36 @@ fieldset {
   inset: 0;
   z-index: 80;
   display: grid;
-  align-items: end;
+  place-items: center;
+  padding: 16px;
   background: rgba(42, 39, 36, 0.46);
+}
+
+.route-modal-enter-active {
+  transition: opacity 240ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.route-modal-leave-active {
+  transition: opacity 180ms ease-in;
+  pointer-events: none;
+}
+
+.route-modal-enter-active .route-dialog {
+  transition: transform 240ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.route-modal-leave-active .route-dialog {
+  transition: transform 180ms ease-in;
+}
+
+.route-modal-enter-from,
+.route-modal-leave-to {
+  opacity: 0;
+}
+
+.route-modal-enter-from .route-dialog,
+.route-modal-leave-to .route-dialog {
+  transform: translateY(16px) scale(0.98);
 }
 
 .route-dialog {
@@ -552,12 +683,14 @@ fieldset {
   --espresso: #685033;
   --line: #94734638;
   --paper: #fffdf9;
+  display: flex;
+  flex-direction: column;
   width: min(720px, 100%);
-  max-height: min(92vh, 820px);
+  max-height: min(calc(100dvh - 32px), 820px);
   margin-inline: auto;
-  overflow: auto;
-  padding: 28px 22px calc(22px + env(safe-area-inset-bottom));
+  overflow: hidden;
   border: 1px solid #94734655;
+  border-radius: 10px;
   background: var(--paper);
   color: var(--ink);
   text-align: left;
@@ -568,6 +701,19 @@ fieldset {
   outline: none;
 }
 
+.route-header {
+  flex: none;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.route-content {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 22px calc(22px + env(safe-area-inset-bottom));
+}
+
 .route-kicker,
 .route-lead,
 .route-trip p {
@@ -576,15 +722,10 @@ fieldset {
 }
 
 .route-bar {
-  position: sticky;
-  top: 0;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: -8px 0 8px;
-  padding-block: 4px 8px;
-  background: var(--paper);
+  margin-bottom: 8px;
 }
 
 .route-close {
@@ -600,7 +741,7 @@ fieldset {
 }
 
 .route-dialog h3 {
-  margin: 8px 0 12px;
+  margin: 0;
   font-family: var(--script-vi, "Great Vibes", cursive);
   font-size: clamp(2rem, 5vw, 2.6rem);
   font-weight: 500;
@@ -644,6 +785,13 @@ fieldset {
   font-variant-numeric: tabular-nums;
 }
 
+.route-trip small {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
 .route-trip .destination span {
   font-weight: 500;
 }
@@ -654,12 +802,19 @@ fieldset {
 
 @media (min-width: 720px) {
   .route-backdrop {
-    align-items: center;
     padding: 24px;
   }
 
   .route-dialog {
-    padding: 36px 36px 28px;
+    max-height: min(calc(100dvh - 48px), 820px);
+  }
+
+  .route-header {
+    padding: 24px 36px 20px;
+  }
+
+  .route-content {
+    padding: 24px 36px 28px;
   }
 
   .route-list {

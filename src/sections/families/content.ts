@@ -1,5 +1,4 @@
 export const families = {
-  title: "Hai gia đình",
   letter:
     "Chúng mình sắp cùng nhau bước sang một chương mới. Sự hiện diện của bạn sẽ khiến ngày vui của chúng mình thêm trọn vẹn.",
   groups: [

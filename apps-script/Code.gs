@@ -5,6 +5,7 @@ const SPREADSHEET_ID = "1p0KG88IGdCcjXlxcEkaAJliSro5MCtxkKqA78j7M29E";
 const RSVP_SHEET_ID = 736591688;
 const HEADERS = ["Request ID", "Thời gian", "Họ tên", "Tham dự", "Số người", "Lời nhắn", "Payload"];
 const EXTRA = ["Xe đưa đón", "Chiều đi", "Tên xe", "Trạm đón", "Chiều về", "Trạm trả"];
+const CONTACT = ["Số điện thoại", "Năm sinh"];
 const TRANSPORT_LABEL = { own: "Tự sắp xếp", shuttle: "Dùng xe" };
 const OUTBOUND_LABEL = {
   "trip-1": "Chuyến 1", "trip-2": "Chuyến 2", self: "Tự đi", none: "Không đi",
@@ -76,8 +77,17 @@ function validate_(value) {
       (website !== undefined && (typeof website !== "string" || website.trim() !== ""))) return null;
   const ride = ride_(value, attendance);
   if (!ride) return null;
+  let phone;
+  if (value.phone !== undefined) {
+    if (typeof value.phone !== "string" || value.phone.length > 24) return null;
+    phone = value.phone.replace(/[\s().-]/g, "");
+    if (!/^\+?[0-9]{9,15}$/.test(phone)) return null;
+  }
+  const birthYear = value.birthYear;
+  if (birthYear !== undefined && (!Number.isInteger(birthYear) || birthYear < 1900 || birthYear > new Date().getFullYear())) return null;
   return {
     requestId: requestId.toLowerCase(), name: name.trim(), attendance, count, note: note.trim(),
+    phone, birthYear,
     ...ride,
   };
 }
@@ -97,6 +107,8 @@ function storedPayload_(rsvp) {
     if (rsvp.returnVehicle) stored.returnVehicle = rsvp.returnVehicle;
     if (rsvp.returnStation) stored.returnStation = rsvp.returnStation;
   }
+  if (rsvp.phone !== undefined) stored.phone = rsvp.phone;
+  if (rsvp.birthYear !== undefined) stored.birthYear = rsvp.birthYear;
   return JSON.stringify(stored);
 }
 
@@ -113,17 +125,21 @@ function transportCells_(rsvp) {
 }
 
 function ensureHeaders_(sheet) {
-  const width = HEADERS.length + EXTRA.length;
+  const width = HEADERS.length + EXTRA.length + CONTACT.length;
   if (sheet.getLastRow() === 0) {
-    sheet.getRange(1, 1, 1, width).setValues([HEADERS.concat(EXTRA)]);
+    sheet.getRange(1, 1, 1, width).setValues([HEADERS.concat(EXTRA, CONTACT)]);
   }
   const headers = sheet.getRange(1, 1, 1, width).getValues()[0];
   const base = headers.slice(0, HEADERS.length);
   if (JSON.stringify(base) !== JSON.stringify(HEADERS)) return false;
-  const extra = headers.slice(HEADERS.length);
+  const extra = headers.slice(HEADERS.length, HEADERS.length + EXTRA.length);
   const blank = extra.every((cell) => cell === "");
   if (!blank && JSON.stringify(extra) !== JSON.stringify(EXTRA)) return false;
+  const contact = headers.slice(HEADERS.length + EXTRA.length);
+  const contactBlank = contact.every((cell) => cell === "");
+  if (!contactBlank && JSON.stringify(contact) !== JSON.stringify(CONTACT)) return false;
   if (blank) sheet.getRange(1, HEADERS.length + 1, 1, EXTRA.length).setValues([EXTRA]);
+  if (contactBlank) sheet.getRange(1, HEADERS.length + EXTRA.length + 1, 1, CONTACT.length).setValues([CONTACT]);
   return true;
 }
 
@@ -163,7 +179,7 @@ function doPost(e) {
       if (match) {
         const saved = sheet.getRange(match.getRow(), 7).getValue();
         return respond(saved === payload
-          ? { ok: true, requestId: rsvp.requestId, version: 2 }
+          ? { ok: true, requestId: rsvp.requestId, version: 3 }
           : { ok: false, error: "idempotency_conflict" });
       }
     }
@@ -171,12 +187,12 @@ function doPost(e) {
     sheet.appendRow([
       rsvp.requestId, new Date(), cellText_(rsvp.name), rsvp.attendance,
       rsvp.count, cellText_(rsvp.note), payload,
-    ].concat(transportCells_(rsvp)));
+    ].concat(transportCells_(rsvp), [rsvp.phone ? "'" + rsvp.phone : "", rsvp.birthYear ?? ""]));
     SpreadsheetApp.flush();
     if (sheet.getRange(row, 7).getValue() !== payload) {
       return respond({ ok: false, error: "service_unavailable" });
     }
-    return respond({ ok: true, requestId: rsvp.requestId, version: 2 });
+    return respond({ ok: true, requestId: rsvp.requestId, version: 3 });
   } catch {
     // Do not log submitted guest data or Google account errors.
     return respond({ ok: false, error: "service_unavailable" });

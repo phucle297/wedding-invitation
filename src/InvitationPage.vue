@@ -75,25 +75,30 @@ useInvitationMotion(page, () => props.entered);
 }
 .announcement-card {
   position: relative;
-  height: 100%;
+  width: min(100%, 600px);
+  min-height: 100%;
+  margin-inline: auto;
   container-type: inline-size;
 }
-.announcement-copy { position: relative; padding: 15% 10% 17%; }
+.announcement-copy { position: relative; padding: 17% 9% 16%; }
 .announcement-card :deep(.block) { width: 100%; padding: 0; border: 0; color: #913b3e; }
 .announcement-card :deep(.block h2),
 .announcement-card :deep(.families h3),
 .announcement-card :deep(.where) { color: inherit; }
-.announcement-card :deep(.family-section h2) { font-size: 2rem; }
-.announcement-card :deep(.families) { margin-top: 24px; gap: 16px; }
+.announcement-card :deep(.families) { margin: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3%; }
 .announcement-card :deep(.families article) { padding: 0; border: 0; }
-.announcement-card :deep(.families article p:not(.where)) { font: .9375rem/1.6 var(--heading); text-transform: uppercase; }
-.announcement-card :deep(.families .where) { font: .8125rem/1.5 var(--heading); text-transform: uppercase; }
+.announcement-card :deep(.families h3) { margin: 0 0 3%; font: 2.6cqw/1.5 var(--invitation-serif); text-transform: none; }
+.announcement-card :deep(.families article p:not(.where)) { font: 2.35cqw/1.6 var(--invitation-serif); letter-spacing: -0.035em; text-transform: uppercase; white-space: nowrap; }
+.announcement-card :deep(.families .where) { margin-top: 3%; font: 2.25cqw/1.5 var(--invitation-serif); }
 .announcement-card :deep(.family-section::after) { content: none; }
-.announcement-card :deep(.place) { margin-top: 34px; }
-.announcement-card :deep(.place h2) { font: 1rem/1.7 var(--heading); text-transform: uppercase; margin: 0; }
+.announcement-card :deep(.place) { margin-top: 7%; }
+.announcement-card :deep(.place h2) { font: 3cqw/1.6 var(--invitation-serif); text-transform: uppercase; margin: 0; }
 @media (max-width: 600px) {
   .announcement-paper { padding: 16px 12px; }
   .announcement-card :deep(.families) { grid-template-columns: 1fr; gap: 22px; }
-  .announcement-copy { padding: 22% 12% 32%; }
+  .announcement-card :deep(.families h3) { font-size: 3.8cqw; margin-bottom: 2%; }
+  .announcement-card :deep(.families article p:not(.where)) { font-size: 4cqw; }
+  .announcement-card :deep(.families .where) { font-size: 3.4cqw; margin-top: 2%; }
+  .announcement-copy { padding: 20% 10% 22%; }
 }
 </style>

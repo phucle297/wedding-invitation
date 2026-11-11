@@ -176,6 +176,7 @@
   font-size: var(--text-small);
 }
 .invite .invitation-details {
+  --invitation-serif: "Lora", Georgia, serif;
   display: grid;
   gap: 36px;
   padding: 0 16px 56px;
@@ -292,7 +293,7 @@
   background: var(--champagne);
   border: 1px solid var(--line);
 }
-.invite .rsvp :is(input[type="text"], input[type="number"], textarea, select) {
+.invite .rsvp :is(input[type="text"], input[type="tel"], input[type="number"], textarea) {
   background: var(--paper);
   border: 1px solid #94734660;
   padding: 12px;

@@ -39,12 +39,12 @@ onBeforeUnmount(() => document.removeEventListener("pointerdown", closeOnOutside
         </a>
       </li>
       <li class="menu-rsvp">
-        <a href="#xac-nhan" @click="expanded = false">Xác nhận tham dự <span aria-hidden="true">↗</span></a>
+        <a href="#xac-nhan" @click="expanded = false">Đăng ký xe đưa đón <span aria-hidden="true">↗</span></a>
       </li>
     </ul>
     <div class="nav-actions">
       <a class="nav-rsvp" href="#xac-nhan" @click="expanded = false"
-        >Xác nhận tham dự</a
+        >Đăng ký xe đưa đón</a
       >
       <button
         ref="menuToggle"

@@ -11,9 +11,16 @@ defineProps({ open: { type: Boolean, default: false } });
     <div class="envelope" :class="{ 'is-open': open }">
       <div class="slot">
         <article class="card">
-          <img src="/assets/ornaments/floral-bouquet.webp" width="490" height="390" alt="" />
+          <img
+            src="/assets/ornaments/floral-bouquet.webp"
+            width="490"
+            height="390"
+            alt=""
+          />
           <p class="card-title">Thiệp Mời</p>
-          <p class="card-names">{{ couple.bride.full }}<span>&amp;</span>{{ couple.groom.full }}</p>
+          <p class="card-names">
+            {{ couple.bride.full }}<span>&amp;</span>{{ couple.groom.full }}
+          </p>
           <p class="when">{{ date.weekday }}, {{ date.display }}</p>
         </article>
       </div>
@@ -21,7 +28,11 @@ defineProps({ open: { type: Boolean, default: false } });
       <div class="front-copy">
         <div class="name-band">
           <div>
-            <p class="names">{{ couple.bride.short.toLocaleLowerCase("vi") }} <span>&amp;</span> {{ couple.groom.short.toLocaleLowerCase("vi") }}</p>
+            <p class="names">
+              {{ couple.bride.short.toLocaleLowerCase("vi") }}
+              <span>&amp;</span>
+              {{ couple.groom.short.toLocaleLowerCase("vi") }}
+            </p>
             <p class="when">{{ date.weekday }}, {{ date.display }}</p>
           </div>
         </div>
@@ -34,15 +45,46 @@ defineProps({ open: { type: Boolean, default: false } });
         <div class="flap-front">
           <div class="flap-material"></div>
           <svg viewBox="0 0 800 300" preserveAspectRatio="none">
-            <path d="M2 1H798L425 277Q400 297 375 277Z" fill="none" stroke="#fffdf5" stroke-opacity=".8" stroke-width="1.5" vector-effect="non-scaling-stroke" />
-            <path d="M14 5 380 264Q400 282 420 264L786 5" fill="none" stroke="#a18b6a" stroke-width="1" vector-effect="non-scaling-stroke" />
+            <path
+              d="M2 1H798L425 277Q400 297 375 277Z"
+              fill="none"
+              stroke="#fffdf5"
+              stroke-opacity=".8"
+              stroke-width="1.5"
+              vector-effect="non-scaling-stroke"
+            />
+            <path
+              d="M14 5 380 264Q400 282 420 264L786 5"
+              fill="none"
+              stroke="#a18b6a"
+              stroke-width="1"
+              vector-effect="non-scaling-stroke"
+            />
           </svg>
-          <span class="happiness"><img src="/assets/ornaments/double-happiness.svg" width="100" height="100" alt="" /></span>
-          <span class="seal"><img src="/assets/ornaments/gold-seal.webp" width="384" height="384" alt="" /></span>
+          <span class="happiness"
+            ><img
+              src="/assets/ornaments/double-happiness.svg"
+              width="100"
+              height="100"
+              alt=""
+          /></span>
+          <span class="seal"
+            ><img
+              src="/assets/ornaments/gold-seal.webp"
+              width="384"
+              height="384"
+              alt=""
+          /></span>
         </div>
         <div class="flap-back">
           <div class="flap-lining"></div>
-          <span class="seal"><img src="/assets/ornaments/gold-seal.webp" width="384" height="384" alt="" /></span>
+          <span class="seal"
+            ><img
+              src="/assets/ornaments/gold-seal.webp"
+              width="384"
+              height="384"
+              alt=""
+          /></span>
         </div>
       </div>
     </div>
@@ -56,14 +98,17 @@ defineProps({ open: { type: Boolean, default: false } });
   container-type: inline-size;
 }
 .envelope {
-  --flap-fraction: .6;
+  --flap-fraction: 0.6;
+  --envelope-paper: #fffbf2;
   --paper-fibers: url("/assets/ornaments/cotton-paper.svg");
   position: relative;
   isolation: isolate;
   aspect-ratio: 8 / 5;
   perspective: 1700px;
   border-radius: 8px;
-  background: #d9cdb8;
+  outline: 1px solid #b8a586;
+  outline-offset: -1px;
+  background: var(--envelope-paper);
   color: #665033;
   box-shadow:
     0 1px 1px #ffffffcc inset,
@@ -80,15 +125,18 @@ defineProps({ open: { type: Boolean, default: false } });
   background:
     var(--paper-fibers) 0 0 / 340px,
     linear-gradient(120deg, #ffffff30, transparent 40%, #8c76551c),
-    url("/assets/ornaments/pale-gold-paper.webp") center / cover, #f4efe5;
+    url("/assets/ornaments/pale-gold-paper.webp") center / cover,
+    var(--envelope-paper);
 }
 .pocket {
   position: absolute;
   z-index: 2;
   inset: 0;
-  border: 1px solid #c8bba6;
+  border: 1px solid #b8a586;
   border-radius: inherit;
-  box-shadow: 1px 1px 1px #fffdf6 inset, -1px -2px 3px #715c3e33 inset;
+  box-shadow:
+    1px 1px 0 #fffdf6 inset,
+    -1px -2px 3px #715c3e33 inset;
   clip-path: polygon(0 0, 50% 33%, 100% 0, 100% 100%, 0 100%);
 }
 .pocket::after {
@@ -101,8 +149,8 @@ defineProps({ open: { type: Boolean, default: false } });
 .front-copy {
   position: absolute;
   z-index: 5;
-  inset: 68.5% 10% 3%;
-  transition: opacity .25s ease;
+  inset: 65% 10% 3%;
+  transition: opacity 0.25s ease;
 }
 .name-band {
   display: flex;
@@ -122,7 +170,8 @@ defineProps({ open: { type: Boolean, default: false } });
 .happiness img {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(-.5px -.5px .25px #fff8df) drop-shadow(.6px 1px .5px #71552d66);
+  filter: drop-shadow(-0.5px -0.5px 0.25px #fff8df)
+    drop-shadow(0.6px 1px 0.5px #71552d66);
 }
 .seal {
   position: absolute;
@@ -138,7 +187,13 @@ defineProps({ open: { type: Boolean, default: false } });
   z-index: -1;
   inset: -12%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, #66543c40, #8f795126 40%, #b69a660a 68%, transparent);
+  background: radial-gradient(
+    closest-side,
+    #66543c40,
+    #8f795126 40%,
+    #b69a660a 68%,
+    transparent
+  );
   pointer-events: none;
 }
 .seal img {
@@ -153,27 +208,31 @@ defineProps({ open: { type: Boolean, default: false } });
   white-space: nowrap;
   text-transform: capitalize;
 }
-.names span { font-size: .75em; }
+.names span {
+  font-size: 0.75em;
+}
 .when {
   margin: 1cqw 0 0;
   font: 2cqw/1.5 var(--heading);
   text-transform: uppercase;
 }
 .addressee {
-  width: 62%;
-  margin: .6cqw 0 0 auto;
+  width: 35%;
+  margin: 0.6cqw 0 0 auto;
   text-align: center;
+  transform: translateX(4cqw);
 }
 .salute {
   margin: 0;
-  font: 500 1.5cqw/1.5 var(--heading);
+  font: 500 2cqw/1.5 var(--heading);
   text-transform: uppercase;
 }
 .guest {
-  margin: .5cqw 0 0;
-  padding-bottom: .7cqw;
+  margin: 0.9cqw 0 0;
+  padding-bottom: 0.7cqw;
   border-bottom: 1px dotted #9e896b;
-  font: 3cqw/1.2 var(--script-vi);
+  color: #913b3e;
+  font: 3.5cqw/1.2 var(--script-vi);
 }
 .flap {
   position: absolute;
@@ -182,7 +241,7 @@ defineProps({ open: { type: Boolean, default: false } });
   height: calc(100% * var(--flap-fraction));
   transform-origin: center top;
   transform-style: preserve-3d;
-  transition: transform .65s cubic-bezier(.42, 0, .25, 1);
+  transition: transform 0.65s cubic-bezier(0.42, 0, 0.25, 1);
 }
 .flap-front,
 .flap-back {
@@ -192,7 +251,8 @@ defineProps({ open: { type: Boolean, default: false } });
 }
 .flap-front {
   transform: translateZ(1px);
-  filter: drop-shadow(0 1px .4px #fff8e8) drop-shadow(1px 3px 1px #715c3e66) drop-shadow(2px 8px 5px #715c3e3b) drop-shadow(4px 16px 12px #715c3e1a);
+  filter: drop-shadow(0 1px 0.4px #fff8e8) drop-shadow(1px 3px 1px #715c3e66)
+    drop-shadow(2px 8px 5px #715c3e3b) drop-shadow(4px 16px 12px #715c3e1a);
 }
 /* Use a full-size paper sheet before clipping, so motifs never stretch with the flap. */
 .flap-material {
@@ -200,7 +260,8 @@ defineProps({ open: { type: Boolean, default: false } });
   inset: 0 0 auto;
   height: calc(100% / var(--flap-fraction));
   clip-path: polygon(
-    0 0, 100% 0,
+    0 0,
+    100% 0,
     53.25% calc(92.67% * var(--flap-fraction)),
     51.5% calc(95.4% * var(--flap-fraction)),
     50% calc(96.17% * var(--flap-fraction)),
@@ -223,10 +284,12 @@ defineProps({ open: { type: Boolean, default: false } });
   inset: 0;
   background:
     var(--paper-fibers) 0 0 / 340px,
-    linear-gradient(170deg, #d6c9b2, #f7f1e4 18%, #e8ddc9);
+    linear-gradient(170deg, #e8dfcd, var(--envelope-paper) 18%, #f3ebda);
   clip-path: polygon(0 0, 100% 0, 50% 97%);
 }
-.flap-back .seal { z-index: 0; }
+.flap-back .seal {
+  z-index: 0;
+}
 .slot {
   position: absolute;
   z-index: 1;
@@ -246,66 +309,152 @@ defineProps({ open: { type: Boolean, default: false } });
     var(--paper-fibers) 0 0 / 340px,
     linear-gradient(135deg, #fffefa, #f6efe2);
   color: #913b3e;
-  box-shadow: 0 1px 0 #cdbfa7, 0 3px 0 #e5d9c5, 1px 5px 5px #715c3e33, 3px 18px 24px -8px #715c3e59;
+  box-shadow:
+    0 1px 0 #cdbfa7,
+    0 3px 0 #e5d9c5,
+    1px 5px 5px #715c3e33,
+    3px 18px 24px -8px #715c3e59;
   transform: translateY(110%);
-  transition: transform .42s cubic-bezier(.16, .84, .24, 1) .4s;
+  transition: transform 0.85s cubic-bezier(0.16, 0.84, 0.24, 1) 0.5s;
 }
-.card img { width: 17%; height: auto; }
-.card-title { margin: 0; font: 6cqw/1.3 var(--script-vi); }
-.card-names { margin: 1cqw 0; font: 3.7cqw/1.3 var(--script-vi); }
-.card-names span { display: block; font-size: .65em; }
-.card .when { font-size: 2cqw; }
+.card img {
+  width: 17%;
+  height: auto;
+}
+.card-title {
+  margin: 0;
+  font: 6cqw/1.3 var(--script-vi);
+}
+.card-names {
+  margin: 1cqw 0;
+  font: 3.7cqw/1.3 var(--script-vi);
+}
+.card-names span {
+  display: block;
+  font-size: 0.65em;
+}
+.card .when {
+  font-size: 2cqw;
+}
 .hint {
   margin: 30px 0 0;
   color: #715c3e;
-  font-size: .75rem;
-  letter-spacing: .12em;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  transition: opacity .2s ease;
+  transition: opacity 0.2s ease;
 }
-.hint span { display: inline-block; margin-left: 10px; }
-.is-open .flap { transform: rotateX(-135deg); }
-.is-open .flap-front { visibility: hidden; transition: visibility 0s .44s; }
-.is-open .card { transform: translateY(0); }
+.hint span {
+  display: inline-block;
+  margin-left: 10px;
+}
+.is-open .flap {
+  transform: rotateX(-135deg);
+}
+.is-open .flap-front {
+  visibility: hidden;
+  transition: visibility 0s 0.44s;
+}
+.is-open .card {
+  transform: translateY(0);
+}
 .is-open .front-copy,
-.envelope.is-open + .hint { opacity: 0; }
-.is-open .pocket { z-index: 0; }
-.is-open .slot { z-index: 3; }
+.envelope.is-open + .hint {
+  opacity: 0;
+}
+.is-open .pocket {
+  z-index: 0;
+}
+.is-open .slot {
+  z-index: 3;
+}
 @media (max-width: 600px) {
-  .frame { width: calc(100vw - 40px); }
+  .frame {
+    width: calc(100vw - 40px);
+  }
   .envelope {
     height: calc(100svh - 96px);
     aspect-ratio: auto;
-    --flap-fraction: .47;
+    --flap-fraction: 0.47;
   }
-  .front-copy { inset: 56% 7% 5%; }
-  .happiness { width: 17cqw; height: 20cqw; }
-  .seal { width: 17cqw; height: 17cqw; }
-  .names { font-size: 6.2cqw; }
-  .when { font-size: 3.2cqw; }
-  .addressee { width: 80%; margin: 12cqw auto 0; }
-  .salute { font-size: 3cqw; }
-  .guest { margin-top: 3cqw; font-size: 7cqw; }
-  .slot { inset: 22% 6% 14%; visibility: hidden; }
+  .front-copy {
+    inset: 56% 7% 5%;
+  }
+  .happiness {
+    width: 17cqw;
+    height: 20cqw;
+  }
+  .seal {
+    width: 17cqw;
+    height: 17cqw;
+  }
+  .names {
+    font-size: clamp(23px, 7.4cqw, 40px);
+    line-height: 1.35;
+  }
+  .front-copy .when {
+    margin-top: clamp(10px, 3cqw, 16px);
+    font-size: clamp(12px, 4cqw, 18px);
+    letter-spacing: 0.03em;
+  }
+  .addressee {
+    width: min(100%, 72cqw);
+    margin: clamp(28px, 10cqw, 48px) auto 0;
+    transform: none;
+  }
+  .salute {
+    font-size: clamp(13px, 4.3cqw, 20px);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .guest {
+    margin-top: clamp(12px, 4cqw, 20px);
+    padding-bottom: clamp(8px, 2cqw, 12px);
+    font-size: clamp(30px, 10cqw, 48px);
+  }
+  .hint {
+    font-size: 0.8125rem;
+  }
+  .slot {
+    inset: 22% 6% 14%;
+    visibility: hidden;
+  }
   .card {
     inset: 10px 12px 26px;
     padding: 14px 18px;
     transform: translateY(calc(100% + 32px));
   }
-  .card-title { font-size: min(12cqw, 7svh); }
-  .card-names { margin-block: min(5cqw, 3svh); font-size: min(7cqw, 4svh); text-align: center; }
-  .card img { width: 32%; }
-  .card .when { font-size: min(3.6cqw, 2svh); }
-  .is-open .slot { visibility: visible; transition: visibility 0s .4s; }
-  .is-open .flap { transform: rotateX(-180deg); }
-  .is-open .card { transform: translateY(0); }
+  .card-title {
+    font-size: min(12cqw, 7svh);
+  }
+  .card-names {
+    margin-block: min(5cqw, 3svh);
+    font-size: min(7cqw, 4svh);
+    text-align: center;
+  }
+  .card img {
+    width: 32%;
+  }
+  .card .when {
+    font-size: min(3.6cqw, 2svh);
+  }
+  .is-open .slot {
+    visibility: visible;
+    transition: visibility 0s 0.5s;
+  }
+  .is-open .flap {
+    transform: rotateX(-180deg);
+  }
+  .is-open .card {
+    transform: translateY(0);
+  }
 }
 @media (max-height: 600px) and (min-width: 601px) {
-  .is-open .flap { transform: rotateX(-105deg); }
-  .hint { margin-top: 16px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .flap, .card, .front-copy, .hint { transition-duration: .01s; transition-delay: 0s; }
-  .is-open .flap-front, .is-open .slot { transition-delay: 0s; }
+  .is-open .flap {
+    transform: rotateX(-105deg);
+  }
+  .hint {
+    margin-top: 16px;
+  }
 }
 </style>

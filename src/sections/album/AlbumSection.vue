@@ -64,7 +64,7 @@ async function toggleAlbum() {
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     albumSection.value?.scrollIntoView({
       block: "start",
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      behavior: "smooth",
     });
   } else {
     toggle.value?.focus({ preventScroll: true });

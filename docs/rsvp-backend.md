@@ -51,6 +51,21 @@ deployed code. Do not edit the main invitation's Apps Script project.
 The spreadsheet remains **Restricted**. Only the Apps Script owner's account
 needs permission to edit it. Never enable public spreadsheet editing.
 
+### An HTTP 200 response still shows an update error
+
+An `exec` request returning HTTP 200 only means Google returned a page. Inspect
+the `wedding-rsvp` message: a successful receipt from the current `Code.gs`
+contains `ok: true`, the matching `requestId`, and `version: 3`.
+If `version` is absent or too old for the submitted fields, the frontend reports
+that the receiving system needs an update instead of a connection failure.
+The older script may already have saved a row while ignoring contact or shuttle
+fields, so do not assume that repeating a test will recover those fields.
+
+Replace the entire script with this repository's `apps-script/Code.gs`, then
+edit the **existing deployment** and select **New version** before deploying.
+Saving in the editor does not update `/exec`. If deploying to a new URL, copy
+that exact web-app URL into `scriptUrl` and update the website too.
+
 ## How the browser receives confirmation
 
 A native form POST sends the JSON payload to Google in a hidden iframe. This
@@ -77,6 +92,13 @@ must be `attending` or `absent`, and count an integer from 1 to 10. Payload text
 limited to 16,384 characters. Guest text beginning with formula characters is
 escaped before writing to Sheets.
 
+The form asks for a full name, `phone` and `birthYear`. Phone and birth year are
+optional, including when booking a shuttle; validate them only when provided.
+Phone accepts 9–15 digits with an optional leading `+`; spaces, parentheses,
+dots and hyphens are removed. Raw input is limited to 24 characters. Birth year
+must be an integer from 1900 through the current year. Phone is written as text
+so its leading zero or `+` is preserved. These details are not included in receipts.
+
 The Biên Hòa form (`bh`) also sends shuttle fields. `transport` is `shuttle` or
 `own`. A shuttle guest then sends `outbound` (`trip-1`, `trip-2`, `self`, or
 `none`) and `returnRide` (`self` or `shuttle`). A trip sends the car and pickup as
@@ -86,16 +108,20 @@ used alone. The page offers the choices; this script does not keep those lists,
 so renaming a car or a stop does not require a new Apps Script deployment. Guests who are not attending
 omit these fields. Older BH clients that omit shuttle fields remain
 valid: the script stores the original payload shape and leaves the shuttle
-columns blank. A receipt for every successful save now includes `version: 2`.
-The Biên Hòa page treats a shuttle submission as unconfirmed until it receives
-that version, so deploy this script before sharing the `bh` form.
+columns blank. A receipt for every successful save now includes `version: 3`.
+The page only confirms submissions containing phone or birth year with a
+receipt version of at least 3; an older deployment can silently ignore these
+fields. **Redeploy this script before deploying the updated form.** Saving the
+script alone is not enough. A submission omitting both contact fields still
+accepts the existing version-2 shuttle receipt.
 
 The RSVP tab contains Request ID, Thời gian, Họ tên, Tham dự, Số người, Lời nhắn,
-Payload, and, after this deployment, Xe đưa đón, Chiều đi, Tên xe, Trạm đón, Chiều về,
-Trạm trả. An existing header row with only the first seven titles is extended
-in place. Do not rename the shuttle titles or edit the Request ID/Payload
+Payload, Xe đưa đón, Chiều đi, Tên xe, Trạm đón, Chiều về, Trạm trả, and the new
+Số điện thoại and Năm sinh columns. Existing seven-column or thirteen-column
+headers are extended in place without changing old rows. Do not rename the
+shuttle/contact titles or edit the Request ID/Payload
 columns, and do not sort columns separately.
-Existing rows remain compatible. The script locks lookup plus append, flushes,
+Existing rows remain untouched. The script locks lookup plus append, flushes,
 and verifies the stored payload before acknowledging. Identical retries reuse
 the saved row; a different payload with the same ID is rejected. A guest who
 creates a new ID can still submit another response.

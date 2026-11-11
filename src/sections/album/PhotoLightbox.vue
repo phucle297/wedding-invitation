@@ -18,7 +18,7 @@ let previousOverflow: string | null = null;
 let scrollPosition = { top: 0, left: 0 };
 
 function goTo(index: number) {
-  carousel.value?.scrollTo(index, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  carousel.value?.scrollTo(index);
 }
 
 watch(carousel, (api) => {
@@ -70,11 +70,11 @@ function onBackdrop(event: MouseEvent) {
 }
 
 function previous() {
-  carousel.value?.scrollPrev(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  carousel.value?.scrollPrev();
 }
 
 function next() {
-  carousel.value?.scrollNext(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  carousel.value?.scrollNext();
 }
 
 onBeforeUnmount(restorePage);
@@ -284,12 +284,5 @@ defineExpose({ open });
   .lightbox .light-dot,
   .lightbox .light-dot:hover { min-width: 14px; width: 14px; padding-inline: 3px; }
   .lightbox .light-dot.is-selected { min-width: 30px; width: 30px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .lightbox .light-dot,
-  .lightbox .light-dot:hover,
-  .light-dot::before {
-    transition: none;
-  }
 }
 </style>

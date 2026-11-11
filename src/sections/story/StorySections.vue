@@ -14,7 +14,7 @@ const scenes = [
     title: "Đồng hành",
     image: "10",
     alt: "Linh Đan và Duy Phúc cùng nhau trong khu vườn",
-    text: "Không chỉ là một khoảnh khắc. Là những ngày có nhau.",
+    text: "Hạnh phúc là có nhau, cùng biến những ngày bình thường thành thương nhớ.",
   },
   {
     title: "Về chung một nhà",
