@@ -2,7 +2,7 @@
 // The public form posts directly here; no Cloudflare Function or shared token is needed.
 // Biên Hòa: deploy separately from the main invitation's Apps Script.
 const SPREADSHEET_ID = "1p0KG88IGdCcjXlxcEkaAJliSro5MCtxkKqA78j7M29E";
-const RSVP_TAB = "RSVP";
+const RSVP_SHEET_ID = 736591688;
 const HEADERS = ["Request ID", "Thời gian", "Họ tên", "Tham dự", "Số người", "Lời nhắn", "Payload"];
 const EXTRA = ["Xe đưa đón", "Chiều đi", "Tên xe", "Trạm đón", "Chiều về", "Trạm trả"];
 const TRANSPORT_LABEL = { own: "Tự sắp xếp", shuttle: "Dùng xe" };
@@ -153,8 +153,8 @@ function doPost(e) {
     lock = LockService.getScriptLock();
     if (!lock.tryLock(5000)) return respond({ ok: false, error: "service_unavailable" });
     const book = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = book.getSheetByName(RSVP_TAB) || book.insertSheet(RSVP_TAB);
-    if (!ensureHeaders_(sheet)) return respond({ ok: false, error: "service_unavailable" });
+    const sheet = book.getSheetById(RSVP_SHEET_ID);
+    if (!sheet || !ensureHeaders_(sheet)) return respond({ ok: false, error: "service_unavailable" });
     const payload = storedPayload_(rsvp);
     const lastRow = sheet.getLastRow();
     if (lastRow > 1) {

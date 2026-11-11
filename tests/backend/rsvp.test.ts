@@ -19,7 +19,7 @@ interface Receipt {
 }
 
 // Run the deployable script and its HTML receipt, mocking only Google services.
-function googleHarness() {
+function googleHarness({ missingTarget = false } = {}) {
   const rows: unknown[][] = [];
   let locked = false;
   let busy = false;
@@ -62,15 +62,16 @@ function googleHarness() {
     getRange: range,
     appendRow(values: unknown[]) { expect(locked).toBe(true); rows.push(values); },
   };
-  let exists = false;
   const runtime = runInNewContext(script + "\n({ doPost })", {
     LockService: { getScriptLock: () => lock },
     SpreadsheetApp: {
       openById(id: string) {
         expect(id).toBe("1p0KG88IGdCcjXlxcEkaAJliSro5MCtxkKqA78j7M29E");
         return {
-          getSheetByName: () => exists ? sheet : null,
-          insertSheet(name: string) { expect(name).toBe("RSVP"); exists = true; return sheet; },
+          getSheetById(sheetId: number) {
+            expect(sheetId).toBe(736591688);
+            return missingTarget ? null : sheet;
+          },
         };
       },
       flush() { if (failFlush) throw new Error("private account failure"); },
@@ -120,6 +121,13 @@ describe("Direct RSVP → Google Apps Script", () => {
     expect(google.rows[1]?.slice(2, 6)).toEqual(["Nguyễn An", "attending", 2, "Hẹn gặp hai bạn!"]);
     expect(google.rows[0]?.slice(7, 13)).toEqual(["Xe đưa đón", "Chiều đi", "Tên xe", "Trạm đón", "Chiều về", "Trạm trả"]);
     expect(google.rows[1]?.slice(7, 13)).toEqual(["", "", "", "", "", ""]);
+    expect(google.locked).toBe(false);
+  });
+
+  test("does not write elsewhere when the designated BH tab is missing", () => {
+    google = googleHarness({ missingTarget: true });
+    expect(google.post().error).toBe("service_unavailable");
+    expect(google.rows).toHaveLength(0);
     expect(google.locked).toBe(false);
   });
 

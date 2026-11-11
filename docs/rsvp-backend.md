@@ -4,6 +4,25 @@ The static website submits directly to the Google Apps Script web app. There is
 no `/api/rsvp`, Cloudflare Function, database, or shared API token to configure.
 This works with static hosting, including Cloudflare Pages and S3.
 
+## Separate destinations for main and bh
+
+| Branch | Spreadsheet ID | Tab ID (`gid`) |
+| --- | --- | --- |
+| `main` | `1c7TpzxU7pS5JtdgGbt_1cFwR336KVPWPQqdzLD1ARc0` | `901966793` |
+| `bh` | `1p0KG88IGdCcjXlxcEkaAJliSro5MCtxkKqA78j7M29E` | `736591688` |
+
+This branch's `apps-script/Code.gs` is **BH only**. It selects the spreadsheet
+and tab by their fixed IDs, not the tab name. If that tab is missing, submissions
+fail without creating or writing another tab.
+
+Keep separate Apps Script projects and `/exec` URLs for the two branches.
+Deploying a new version of a shared Apps Script project can affect both sites;
+different deployment URLs alone do not guarantee different spreadsheet targets.
+Do not copy this BH script into main's Apps Script project or replace main's
+destination when merging changes between branches. The frontend `scriptUrl`
+must point to its own branch's deployment. Local source edits do not update
+Google's deployed code, and the current receipt does not identify its destination.
+
 ## Biên Hòa deployment (`bh` branch)
 
 This branch's `apps-script/Code.gs` writes to the dedicated
@@ -21,7 +40,8 @@ writing to its original spreadsheet.
    Changing the spreadsheet ID alone does not connect the website to a new deployment.
 4. Deploy the static website normally. No Cloudflare variables or secrets are
    used. The old `RSVP_API_TOKEN` and `RSVP_SCRIPT_URL` settings can be deleted.
-5. Submit a test RSVP and confirm one row appears in the spreadsheet's RSVP tab.
+5. Submit a test RSVP and confirm one row appears in BH's tab `gid=736591688`
+   and none in main's spreadsheet.
    A retry of identical content with the same request ID must not add a second row.
 
 For later updates to the BH script, choose **Deploy → Manage deployments → Edit
@@ -64,7 +84,7 @@ plain text in `vehicle` and `station`. A return shuttle sends `returnVehicle` an
 `returnStation`, also plain text up to 120 characters. Either direction can be
 used alone. The page offers the choices; this script does not keep those lists,
 so renaming a car or a stop does not require a new Apps Script deployment. Guests who are not attending
-omit these fields. Older clients, including `main`, still omit them and remain
+omit these fields. Older BH clients that omit shuttle fields remain
 valid: the script stores the original payload shape and leaves the shuttle
 columns blank. A receipt for every successful save now includes `version: 2`.
 The Biên Hòa page treats a shuttle submission as unconfirmed until it receives
