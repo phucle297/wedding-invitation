@@ -5,6 +5,7 @@ import InvitationPage from "./InvitationPage.vue";
 
 const envelopeOpen = ref(false);
 const entered = ref(false);
+const invitation = ref<InstanceType<typeof InvitationPage> | null>(null);
 
 function paintTheme(color: string) {
   document
@@ -15,6 +16,7 @@ function paintTheme(color: string) {
 function onOpen() {
   if (envelopeOpen.value) return;
   envelopeOpen.value = true;
+  void invitation.value?.playMusic();
   // Let the inner card finish rising, then leave time to read it before fading.
   const readingDelay = 2500;
   const fadeDuration = 700;
@@ -35,5 +37,5 @@ function onOpen() {
 
 <template>
   <EnvelopeGate :open="envelopeOpen" @open="onOpen" />
-  <InvitationPage :entered="entered" />
+  <InvitationPage ref="invitation" :entered="entered" />
 </template>

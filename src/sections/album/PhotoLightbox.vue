@@ -104,6 +104,7 @@ defineExpose({ open });
             v-for="(photo, index) in photos"
             :key="photo.src"
             class="light-slide"
+            :style="{ '--photo-ratio': photo.width / photo.height }"
             role="group"
             aria-roledescription="ảnh"
             :aria-label="`${index + 1} / ${photos.length}`"
@@ -210,6 +211,7 @@ defineExpose({ open });
 .light-viewport {
   min-width: 0;
   min-height: 0;
+  container-type: size;
   overflow: hidden;
   touch-action: pan-y pinch-zoom;
 }
@@ -227,8 +229,8 @@ defineExpose({ open });
   height: 100%;
 }
 .light-slide .lazy-media {
-  width: 100%;
-  height: 100%;
+  width: min(100cqw, calc(100cqh * var(--photo-ratio)));
+  aspect-ratio: var(--photo-ratio);
   min-height: 0;
   display: grid;
   place-items: center;
