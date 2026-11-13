@@ -38,9 +38,6 @@ onBeforeUnmount(() => document.removeEventListener("pointerdown", closeOnOutside
           </svg>
         </a>
       </li>
-      <li class="menu-rsvp">
-        <a href="#xac-nhan" @click="expanded = false">Xác nhận tham dự <span aria-hidden="true">↗</span></a>
-      </li>
     </ul>
     <div class="nav-actions">
       <a class="nav-rsvp" href="#xac-nhan" @click="expanded = false"
@@ -51,6 +48,7 @@ onBeforeUnmount(() => document.removeEventListener("pointerdown", closeOnOutside
         class="menu-toggle"
         type="button"
         :aria-expanded="expanded"
+        :aria-label="expanded ? 'Đóng mục lục' : 'Mở mục lục'"
         aria-controls="invitation-links"
         @click="expanded = !expanded"
       >
@@ -119,8 +117,7 @@ onBeforeUnmount(() => document.removeEventListener("pointerdown", closeOnOutside
 }
 .menu-heading,
 .menu-number,
-.menu-arrow,
-.menu-rsvp {
+.menu-arrow {
   display: none;
 }
 ul {
@@ -150,23 +147,39 @@ ul a {
 }
 @media (max-width: 600px) {
   .topnav {
-    padding: 10px 20px;
+    padding: 10px 16px;
+    gap: 12px;
   }
   .brand {
-    font-size: 1.5rem;
+    font-size: clamp(1.25rem, 6.4vw, 1.5rem);
+  }
+  .nav-actions {
+    gap: 8px;
   }
   .nav-rsvp {
-    display: none;
+    min-height: 36px;
+    padding-inline: 8px;
+    border-radius: 6px;
+    background: var(--espresso);
+    color: var(--paper);
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .nav-rsvp:hover {
+    background: var(--bronze);
   }
   .menu-toggle {
-    justify-content: space-between;
-    gap: 14px;
-    min-width: 108px;
-    padding-inline: 16px;
+    justify-content: center;
+    width: 36px;
+    min-height: 36px;
+    padding: 0;
     border: 1px solid var(--line);
     border-radius: 24px;
     background: var(--cream);
     color: var(--ink);
+  }
+  .menu-toggle span {
+    display: none;
   }
   .menu-toggle[aria-expanded="true"] {
     background: var(--champagne);
@@ -209,27 +222,8 @@ ul a {
     margin-left: auto;
     color: var(--bronze);
   }
-  .menu-rsvp {
-    display: block;
-    margin-top: 18px;
-  }
-  .menu-rsvp a {
-    justify-content: center;
-    gap: 12px;
-    min-height: 48px;
-    padding: 8px 16px;
-    border: 0;
-    border-radius: 6px;
-    background: var(--espresso);
-    color: var(--paper);
-    font-size: var(--text-body);
-  }
   ul a:hover {
     color: var(--bronze);
-  }
-  .menu-rsvp a:hover {
-    background: var(--bronze);
-    color: var(--paper);
   }
 }
 </style>
