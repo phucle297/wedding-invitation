@@ -378,10 +378,10 @@ function carsFor(tripId: TripId) {
           <input v-model="outbound" type="radio" name="outbound" value="self" :disabled="pending" required />
           <span>{{ shuttle.selfOutbound }}</span>
         </label>
-        <label class="choice">
-          <input v-model="outbound" type="radio" name="outbound" value="none" :disabled="pending" required />
-          <span>{{ shuttle.noneOutbound }}</span>
-        </label>
+        <!-- <label class="choice"> -->
+        <!--   <input v-model="outbound" type="radio" name="outbound" value="none" :disabled="pending" required /> -->
+        <!--   <span>{{ shuttle.noneOutbound }}</span> -->
+        <!-- </label> -->
       </fieldset>
       <div v-if="pickedTrip" class="field">
         <label id="guest-station-label" for="guest-station">{{ shuttle.stationLabel }} <span class="required" aria-hidden="true">*</span></label>
