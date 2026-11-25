@@ -107,6 +107,15 @@ function showFullNotice(event: MouseEvent) {
   fullDialog.value?.showModal();
 }
 
+function closeFullNoticeOnBackdrop(event: MouseEvent) {
+  const dialog = fullDialog.value;
+  if (!dialog) return;
+  const { left, right, top, bottom } = dialog.getBoundingClientRect();
+  if (event.clientX < left || event.clientX > right || event.clientY < top || event.clientY > bottom) {
+    dialog.close();
+  }
+}
+
 function closeRoute() {
   routeOpen.value = false;
 }
@@ -461,6 +470,7 @@ function carsFor(tripId: TripId) {
         class="route-dialog full-dialog"
         aria-labelledby="shuttle-full-title"
         aria-describedby="shuttle-full-message"
+        @click.self="closeFullNoticeOnBackdrop"
       >
         <h3 id="shuttle-full-title">{{ shuttle.fullTitle }}</h3>
         <p id="shuttle-full-message" class="route-lead">{{ shuttle.fullMessage }}</p>
@@ -875,6 +885,43 @@ fieldset {
 
 .full-dialog .btn {
   align-self: flex-start;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .full-dialog {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    transition: opacity 180ms ease-in, transform 180ms ease-in,
+      display 180ms allow-discrete, overlay 180ms allow-discrete;
+  }
+
+  .full-dialog::backdrop {
+    opacity: 0;
+    transition: opacity 180ms ease-in, display 180ms allow-discrete,
+      overlay 180ms allow-discrete;
+  }
+
+  .full-dialog[open],
+  .full-dialog[open]::backdrop {
+    opacity: 1;
+    transition-duration: 240ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .full-dialog[open] {
+    transform: none;
+  }
+
+  @starting-style {
+    .full-dialog[open] {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+
+    .full-dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
 }
 
 @media (min-width: 720px) {
