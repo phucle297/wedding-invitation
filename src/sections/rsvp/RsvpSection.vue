@@ -26,6 +26,7 @@ const sent = ref(false);
 const routeOpen = ref(false);
 const nameInput = ref<HTMLInputElement | null>(null);
 const routeDialog = ref<HTMLElement | null>(null);
+const fullDialog = ref<HTMLDialogElement | null>(null);
 const absent = computed(() => attend.value === rsvp.absentValue);
 const usingShuttle = computed(() => !absent.value && transport.value === "shuttle");
 const pickedTrip = computed(() => shuttleTrips.find((trip) => trip.id === outbound.value) ?? null);
@@ -98,6 +99,12 @@ onUnmounted(() => {
 function openRoute() {
   restoreFocus ??= document.activeElement instanceof HTMLElement ? document.activeElement : null;
   routeOpen.value = true;
+}
+
+function showFullNotice(event: MouseEvent) {
+  // Safari does not focus buttons on click; give the dialog a focus return target.
+  (event.currentTarget as HTMLButtonElement).focus({ preventScroll: true });
+  fullDialog.value?.showModal();
 }
 
 function closeRoute() {
@@ -363,17 +370,23 @@ function carsFor(tripId: TripId) {
       </fieldset>
       <fieldset v-if="usingShuttle">
         <legend>{{ shuttle.outboundLegend }} <span class="required" aria-hidden="true">*</span></legend>
-        <label v-for="trip in shuttleTrips" :key="trip.id" class="choice">
-          <input
-            v-model="outbound"
-            type="radio"
-            name="outbound"
-            :value="trip.id"
-            :disabled="pending"
-            required
-          />
-          <span>{{ carsFor(trip.id) }} · {{ trip.depart }} · {{ trip.seats }} chỗ</span>
-        </label>
+        <template v-for="trip in shuttleTrips" :key="trip.id">
+          <button v-if="trip.id === shuttle.fullTripId" class="choice full-choice" type="button" aria-haspopup="dialog" :disabled="pending" @click="showFullNotice">
+            <span>{{ carsFor(trip.id) }} · {{ trip.depart }} · {{ trip.seats }} chỗ</span>
+            <span class="full-label">{{ shuttle.fullLabel }}</span>
+          </button>
+          <label v-else class="choice">
+            <input
+              v-model="outbound"
+              type="radio"
+              name="outbound"
+              :value="trip.id"
+              :disabled="pending"
+              required
+            />
+            <span>{{ carsFor(trip.id) }} · {{ trip.depart }} · {{ trip.seats }} chỗ</span>
+          </label>
+        </template>
         <label class="choice">
           <input v-model="outbound" type="radio" name="outbound" value="self" :disabled="pending" required />
           <span>{{ shuttle.selfOutbound }}</span>
@@ -397,10 +410,16 @@ function carsFor(tripId: TripId) {
       </div>
       <fieldset v-if="usingShuttle">
         <legend>{{ shuttle.returnLegend }} <span class="required" aria-hidden="true">*</span></legend>
-        <label v-for="car in shuttleVehicles" :key="car.name" class="choice">
-          <input v-model="returnChoice" type="radio" name="return-ride" :value="car.name" :disabled="pending" required />
-          <span>{{ car.name }}</span>
-        </label>
+        <template v-for="car in shuttleVehicles" :key="car.name">
+          <button v-if="car.tripId === shuttle.fullTripId" class="choice full-choice" type="button" aria-haspopup="dialog" :disabled="pending" @click="showFullNotice">
+            <span>{{ car.name }}</span>
+            <span class="full-label">{{ shuttle.fullLabel }}</span>
+          </button>
+          <label v-else class="choice">
+            <input v-model="returnChoice" type="radio" name="return-ride" :value="car.name" :disabled="pending" required />
+            <span>{{ car.name }}</span>
+          </label>
+        </template>
         <label class="choice">
           <input v-model="returnChoice" type="radio" name="return-ride" value="self" :disabled="pending" required />
           <span>{{ shuttle.returnSelf }}</span>
@@ -437,6 +456,16 @@ function carsFor(tripId: TripId) {
       <p class="privacy-note">Thông tin chỉ dùng để sắp xếp tiệc cưới và đối chiếu danh sách xe đưa đón.</p>
     </form>
     <Teleport to="body">
+      <dialog
+        ref="fullDialog"
+        class="route-dialog full-dialog"
+        aria-labelledby="shuttle-full-title"
+        aria-describedby="shuttle-full-message"
+      >
+        <h3 id="shuttle-full-title">{{ shuttle.fullTitle }}</h3>
+        <p id="shuttle-full-message" class="route-lead">{{ shuttle.fullMessage }}</p>
+        <button class="btn btn-ink" type="button" autofocus @click="fullDialog?.close()">{{ shuttle.closeRoute }}</button>
+      </dialog>
       <Transition
         name="route-modal"
         @before-enter="(element) => element.removeAttribute('inert')"
@@ -610,11 +639,16 @@ fieldset {
   cursor: pointer;
 }
 
-.choice input {
+.choice input,
+.full-choice::before {
   width: 1.15rem;
   height: 1.15rem;
-  accent-color: var(--espresso);
+  margin: 0 4px;
   flex: none;
+}
+
+.choice input {
+  accent-color: var(--espresso);
 }
 
 .choice:hover span,
@@ -624,6 +658,25 @@ fieldset {
 
 .choice:has(input:checked) span {
   font-weight: 500;
+}
+
+.full-choice {
+  width: 100%;
+  border-inline: 0;
+  border-bottom: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.full-choice::before {
+  content: "";
+}
+
+.full-choice .full-label {
+  margin-inline-start: auto;
+  color: #913b3e;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .route-link {
@@ -647,6 +700,10 @@ fieldset {
   display: grid;
   place-items: center;
   padding: 16px;
+}
+
+.route-backdrop,
+.full-dialog::backdrop {
   background: rgba(42, 39, 36, 0.46);
 }
 
@@ -798,6 +855,26 @@ fieldset {
 
 .route-dialog .btn {
   width: 100%;
+}
+
+.route-dialog.full-dialog {
+  width: min(420px, calc(100% - 32px));
+  margin: auto;
+  padding: clamp(22px, 5vw, 32px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.full-dialog:not([open]) {
+  display: none;
+}
+
+.full-dialog .route-lead {
+  margin: 10px 0 20px;
+}
+
+.full-dialog .btn {
+  align-self: flex-start;
 }
 
 @media (min-width: 720px) {
